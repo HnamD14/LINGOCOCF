@@ -1,0 +1,60 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: lingococ-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB:       ${DB_NAME:-lingococ}
+      POSTGRES_USER:     ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lingococ-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-lingococ}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lingococ-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-lingococ}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASS: ${DB_PASS}
+      JWT_SECRET:           ${JWT_SECRET}
+      JWT_EXPIRATION:       ${JWT_EXPIRATION:-86400000}
+      MAIL_USERNAME:        ${MAIL_USERNAME}
+      MAIL_PASSWORD:        ${MAIL_PASSWORD}
+      SEPAY_WEBHOOK_SECRET: ${SEPAY_WEBHOOK_SECRET}
+      ANTHROPIC_API_KEY:    ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL:      ${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
+      CORS_ORIGINS:         ${CORS_ORIGINS:-http://localhost:8080}
+      APP_FRONTEND_URL:     ${APP_FRONTEND_URL:-http://localhost:8080}
+    networks:
+      - lingococ-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  lingococ-net:
+    driver: bridge

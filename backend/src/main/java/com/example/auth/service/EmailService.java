@@ -1,0 +1,178 @@
+package com.example.auth.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class EmailService {
+
+    private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
+    // ══════════════════════════════════════════════════════════════
+    //  Reset password
+    // ══════════════════════════════════════════════════════════════
+
+    @Async
+    public void sendResetPasswordEmail(String toEmail, String username, String resetToken) {
+        String resetLink = frontendUrl + "/index.html?token=" + resetToken;
+        String html = """
+            <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
+            <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
+              <div style="max-width:520px;margin:auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
+                <div style="background:linear-gradient(135deg,#6C63FF,#48BB78);padding:30px;text-align:center">
+                  <h1 style="color:#fff;margin:0;font-size:26px">🦜 LingoCoc</h1>
+                  <p style="color:rgba(255,255,255,.85);margin:6px 0 0">Nền tảng cày từ vựng tiếng Trung</p>
+                </div>
+                <div style="padding:32px 28px">
+                  <h2 style="color:#333;margin-top:0">Xin chào, %s! 👋</h2>
+                  <p style="color:#555;line-height:1.6">
+                    Chúng tôi nhận được yêu cầu đặt lại mật khẩu.<br>
+                    Nhấp vào nút bên dưới để đặt lại mật khẩu mới.
+                  </p>
+                  <div style="text-align:center;margin:30px 0">
+                    <a href="%s" style="background:linear-gradient(135deg,#6C63FF,#48BB78);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;display:inline-block">
+                      🔑 Đặt lại mật khẩu
+                    </a>
+                  </div>
+                  <p style="color:#888;font-size:13px">
+                    Hoặc copy link này vào trình duyệt:<br>
+                    <span style="color:#6C63FF;word-break:break-all">%s</span>
+                  </p>
+                  <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+                  <p style="color:#aaa;font-size:12px;margin:0">
+                    ⚠️ Link này hết hạn sau <strong>30 phút</strong>.<br>
+                    Nếu bạn không yêu cầu, hãy bỏ qua email này.
+                  </p>
+                </div>
+                <div style="background:#f9f9f9;padding:16px 28px;text-align:center">
+                  <p style="color:#bbb;font-size:12px;margin:0">© 2026 LingoCoc. All rights reserved.</p>
+                </div>
+              </div>
+            </body></html>
+            """.formatted(username, resetLink, resetLink);
+
+        sendHtml(toEmail, "🔐 Đặt lại mật khẩu LingoCoc của bạn", html);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  Streak reminder — gọi từ StreakReminderScheduler lúc 20:00
+    // ══════════════════════════════════════════════════════════════
+
+    @Async
+    public void sendStreakReminderEmail(String toEmail, String username, int currentStreak) {
+        String studyLink = frontendUrl + "/index.html";
+
+        // Tuỳ streak mà chọn message khác nhau
+        String urgencyMsg;
+        String urgencyColor;
+        if (currentStreak == 0) {
+            urgencyMsg   = "Bắt đầu chuỗi ngày học hôm nay để xây nền móng!";
+            urgencyColor = "#6C63FF";
+        } else if (currentStreak < 7) {
+            urgencyMsg   = "Cóc đang canh — " + currentStreak + " ngày streak sắp bay màu rồi!";
+            urgencyColor = "#F59E0B";
+        } else {
+            urgencyMsg   = "🔥 " + currentStreak + " ngày streak — đừng để công sức đổ sông!";
+            urgencyColor = "#EF4444";
+        }
+
+        String html = """
+            <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
+            <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
+              <div style="max-width:520px;margin:auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
+
+                <!-- Header -->
+                <div style="background:linear-gradient(135deg,#FF6B35,#F59E0B);padding:30px;text-align:center">
+                  <div style="font-size:56px;margin-bottom:8px">🔥</div>
+                  <h1 style="color:#fff;margin:0;font-size:22px">Streak của bạn đang chờ!</h1>
+                  <p style="color:rgba(255,255,255,.9);margin:6px 0 0;font-size:14px">LingoCoc nhắc bạn học tiếng Trung hôm nay</p>
+                </div>
+
+                <!-- Body -->
+                <div style="padding:28px">
+                  <h2 style="color:#333;margin-top:0;font-size:18px">Ôi ôi, %s ơi! 👀</h2>
+
+                  <!-- Streak box -->
+                  <div style="background:#FFF7ED;border:2px solid #FDE68A;border-radius:12px;padding:16px;text-align:center;margin:16px 0">
+                    <div style="font-size:40px;font-weight:900;color:%s">%d</div>
+                    <div style="font-size:13px;color:#92400E;font-weight:700;margin-top:4px">NGÀY STREAK HIỆN TẠI</div>
+                    <div style="font-size:13px;color:#B45309;margin-top:6px">%s</div>
+                  </div>
+
+                  <p style="color:#555;line-height:1.6;font-size:14px">
+                    Hôm nay bạn chưa học bài nào. Chỉ cần <strong>5 phút</strong> flashcard
+                    là đủ để giữ streak — đừng để ngọn lửa tắt nhé!
+                  </p>
+
+                  <!-- CTA -->
+                  <div style="text-align:center;margin:24px 0">
+                    <a href="%s" style="background:linear-gradient(135deg,#FF6B35,#F59E0B);color:#fff;padding:14px 36px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:16px;display:inline-block;box-shadow:0 4px 12px rgba(255,107,53,.35)">
+                      🐸 Học ngay — 5 phút thôi!
+                    </a>
+                  </div>
+
+                  <!-- Quick tip -->
+                  <div style="background:#F0FDF4;border-left:4px solid #22C55E;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0">
+                    <p style="margin:0;font-size:13px;color:#166534">
+                      <strong>💡 Tip hôm nay:</strong> Học lúc 20h là thời điểm não ghi nhớ tốt nhất.
+                      Chỉ cần vuốt 10 flashcard, SM-2 sẽ tự động lên lịch ôn tập cho bạn!
+                    </p>
+                  </div>
+
+                  <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
+                  <p style="color:#bbb;font-size:11px;text-align:center;margin:0">
+                    Bạn nhận được email này vì đã bật nhắc nhở streak trong LingoCoc.<br>
+                    <a href="%s#profile" style="color:#6C63FF;text-decoration:none">Tắt nhắc nhở</a> trong phần Cài đặt.
+                  </p>
+                </div>
+
+                <div style="background:#f9f9f9;padding:14px 28px;text-align:center">
+                  <p style="color:#bbb;font-size:12px;margin:0">© 2026 LingoCoc · Cày từ vựng tiếng Trung mỗi ngày</p>
+                </div>
+              </div>
+            </body></html>
+            """.formatted(username, urgencyColor, currentStreak, urgencyMsg, studyLink, frontendUrl);
+
+        sendHtml(toEmail, "🔥 " + (currentStreak > 0 ? currentStreak + " ngày streak" : "Bắt đầu streak") + " — học 5 phút thôi!", html);
+        log.info("📧 Streak reminder sent to {} (streak={})", toEmail, currentStreak);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  Internal helper
+    // ══════════════════════════════════════════════════════════════
+
+    @Async
+    public void sendHtml(String toEmail, String subject, String htmlBody) {
+        try {
+            MimeMessage msg = mailSender.createMimeMessage();
+            MimeMessageHelper h = new MimeMessageHelper(msg, true, "UTF-8");
+            h.setFrom(fromEmail, "LingoCoc");
+            h.setTo(toEmail);
+            h.setSubject(subject);
+            h.setText(htmlBody, true);
+            mailSender.send(msg);
+        } catch (MessagingException e) {
+            log.error("❌ Failed to send email to {}: {}", toEmail, e.getMessage());
+            throw new RuntimeException("Không thể gửi email.", e);
+        } catch (Exception e) {
+            log.error("❌ Unexpected error sending email to {}: {}", toEmail, e.getMessage());
+            throw new RuntimeException("Lỗi hệ thống khi gửi email.", e);
+        }
+    }
+}

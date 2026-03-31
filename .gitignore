@@ -1,0 +1,33 @@
+# ── Secrets — KHÔNG bao giờ commit ───────────────────────────────
+.env
+*.env.local
+*.pem
+*.key
+*.p12
+docker/nginx/certs/
+
+# ── Java / Maven ──────────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.log
+.mvn/wrapper/maven-wrapper.jar
+
+# ── H2 DB file (chỉ dùng local, không commit) ────────────────────
+data/
+*.mv.db
+*.trace.db
+
+# ── IDE ───────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# ── Docker volumes / logs ─────────────────────────────────────────
+logs/
+
+# H2 file-based database
+/backend/data/
+*.db

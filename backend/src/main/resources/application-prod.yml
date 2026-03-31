@@ -1,0 +1,44 @@
+# ══════════════════════════════════════════════════════════════════
+# 🐸 LingoCóc — Production Profile (PostgreSQL)
+# Dùng khi chạy Docker: SPRING_PROFILES_ACTIVE=prod
+# Mọi giá trị đọc từ biến môi trường trong docker-compose.yml / .env
+# ══════════════════════════════════════════════════════════════════
+
+spring:
+  datasource:
+    url:               jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:lingococ}
+    driver-class-name: org.postgresql.Driver
+    username:          ${DB_USER:postgres}
+    password:          ${DB_PASS}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  mail:
+    host:     ${MAIL_HOST:smtp.gmail.com}
+    port:     ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth:             true
+      mail.smtp.starttls.enable:  true
+      mail.smtp.starttls.required: true
+
+jwt:
+  secret:     ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+app:
+  frontend-url: ${APP_FRONTEND_URL:http://localhost}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost}
+
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY}
+  model:   ${ANTHROPIC_MODEL:claude-haiku-4-5-20251001}

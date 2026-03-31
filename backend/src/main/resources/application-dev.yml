@@ -1,0 +1,28 @@
+# ══════════════════════════════════════════════════════════════════
+# 🐸 LingoCóc — Dev Profile (PostgreSQL local, không gửi email thật)
+# Chạy: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# Yêu cầu: PostgreSQL đang chạy local, đã tạo DB "lingococ"
+# ══════════════════════════════════════════════════════════════════
+
+spring:
+  datasource:
+    url:               jdbc:postgresql://localhost:5432/lingococ
+    driver-class-name: org.postgresql.Driver
+    username:          postgres
+    password:          postgres   # ← đổi nếu khác
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true   # bật SQL log khi dev
+
+  # Mail — dùng MailHog hoặc tắt khi dev cục bộ
+  mail:
+    host:     localhost
+    port:     1025
+    username: dev
+    password: dev
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
