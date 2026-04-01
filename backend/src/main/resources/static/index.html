@@ -5192,6 +5192,7 @@ function onAuthSuccess(user, token, isNew = false){
   updateHintBtn();
   applyNameGoldBadge();
   setTimeout(grantDailyCoins, 1800);
+  setTimeout(updateDailyBanner, 300); // cập nhật banner daily đúng theo userId sau login
 
   // ── Role unlock ──
   if(user.role === 'PRO' || user.role === 'ADMIN') unlockPro(user);
