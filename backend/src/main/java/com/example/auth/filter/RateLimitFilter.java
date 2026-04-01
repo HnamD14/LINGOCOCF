@@ -47,6 +47,9 @@ public class RateLimitFilter implements Filter {
         "/api/auth/register",
         "/api/auth/forgot-password"
     };
+    // forgot-password được phép nhiều hơn vì user hay nhập sai email
+    private static final int FORGOT_MAX_ATTEMPTS = 10;
+    private static final long FORGOT_WINDOW_MS   = 300_000; // 5 phút
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -57,7 +60,11 @@ public class RateLimitFilter implements Filter {
 
         if (isRateLimited(request.getRequestURI()) && "POST".equalsIgnoreCase(request.getMethod())) {
             String ip = extractIp(request);
-            if (isBlocked(ip)) {
+            String uri = request.getRequestURI();
+            boolean blocked = uri.contains("forgot-password")
+                ? isBlockedWithLimits(ip + ":forgot", FORGOT_MAX_ATTEMPTS, FORGOT_WINDOW_MS)
+                : isBlocked(ip);
+            if (blocked) {
                 log.warn("⛔ Rate limit exceeded — IP: {}, path: {}", ip, request.getRequestURI());
                 response.setStatus(429);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -79,26 +86,20 @@ public class RateLimitFilter implements Filter {
     // ── Logic kiểm tra & đếm ─────────────────────────────────────────────────
 
     private boolean isBlocked(String ip) {
+        return isBlockedWithLimits(ip, maxAttempts, windowMs);
+    }
+
+    private boolean isBlockedWithLimits(String ip, int max, long window) {
         long now = System.currentTimeMillis();
-
-        // Dọn dẹp các entry cũ để tránh memory leak (chạy ~1% requests)
         if (Math.random() < 0.01) {
-            loginAttempts.entrySet().removeIf(e -> now - e.getValue()[1] > windowMs * 2);
+            loginAttempts.entrySet().removeIf(e -> now - e.getValue()[1] > window * 2);
         }
-
         long[] slot = loginAttempts.computeIfAbsent(ip, k -> new long[]{0, now});
-
-        // Window hết hạn → reset
-        if (now - slot[1] > windowMs) {
-            slot[0] = 1;
-            slot[1] = now;
-            return false;
+        if (now - slot[1] > window) {
+            slot[0] = 1; slot[1] = now; return false;
         }
-
-        // Tăng đếm
         slot[0]++;
-
-        return slot[0] > maxAttempts;
+        return slot[0] > max;
     }
 
     private boolean isRateLimited(String uri) {

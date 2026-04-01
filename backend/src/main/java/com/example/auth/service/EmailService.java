@@ -8,7 +8,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 @Slf4j
@@ -24,13 +23,9 @@ public class EmailService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
-    // ══════════════════════════════════════════════════════════════
-    //  Reset password
-    // ══════════════════════════════════════════════════════════════
-
     @Async
     public void sendResetPasswordEmail(String toEmail, String username, String resetToken) {
-        log.info("📧 Preparing reset password email to: {}", toEmail);
+        log.info("📧 Sending reset password email to: {}", toEmail);
         String resetLink = frontendUrl + "/index.html?token=" + resetToken;
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
@@ -67,18 +62,12 @@ public class EmailService {
               </div>
             </body></html>
             """.formatted(username, resetLink, resetLink);
-
         sendHtml(toEmail, "🔐 Đặt lại mật khẩu LingoCoc của bạn", html);
     }
-
-    // ══════════════════════════════════════════════════════════════
-    //  Streak reminder
-    // ══════════════════════════════════════════════════════════════
 
     @Async
     public void sendStreakReminderEmail(String toEmail, String username, int currentStreak) {
         String studyLink = frontendUrl + "/index.html";
-
         String urgencyMsg;
         String urgencyColor;
         if (currentStreak == 0) {
@@ -91,21 +80,19 @@ public class EmailService {
             urgencyMsg   = "🔥 " + currentStreak + " ngày streak — đừng để công sức đổ sông!";
             urgencyColor = "#EF4444";
         }
-
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
             <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
-              <div style="max-width:520px;margin:auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
+              <div style="max-width:520px;margin:auto;background:#fff;border-radius:12px;overflow:hidden">
                 <div style="background:linear-gradient(135deg,#FF6B35,#F59E0B);padding:30px;text-align:center">
-                  <div style="font-size:56px;margin-bottom:8px">🔥</div>
+                  <div style="font-size:56px">🔥</div>
                   <h1 style="color:#fff;margin:0;font-size:22px">Streak của bạn đang chờ!</h1>
-                  <p style="color:rgba(255,255,255,.9);margin:6px 0 0;font-size:14px">LingoCoc nhắc bạn học tiếng Trung hôm nay</p>
                 </div>
                 <div style="padding:28px">
-                  <h2 style="color:#333;margin-top:0;font-size:18px">Ôi ôi, %s ơi! 👀</h2>
+                  <h2 style="color:#333;margin-top:0">Ôi ôi, %s ơi! 👀</h2>
                   <div style="background:#FFF7ED;border:2px solid #FDE68A;border-radius:12px;padding:16px;text-align:center;margin:16px 0">
                     <div style="font-size:40px;font-weight:900;color:%s">%d</div>
-                    <div style="font-size:13px;color:#92400E;font-weight:700;margin-top:4px">NGÀY STREAK HIỆN TẠI</div>
+                    <div style="font-size:13px;color:#92400E;font-weight:700">NGÀY STREAK HIỆN TẠI</div>
                     <div style="font-size:13px;color:#B45309;margin-top:6px">%s</div>
                   </div>
                   <div style="text-align:center;margin:24px 0">
@@ -113,26 +100,21 @@ public class EmailService {
                       🐸 Học ngay — 5 phút thôi!
                     </a>
                   </div>
-                  <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
-                  <p style="color:#bbb;font-size:11px;text-align:center;margin:0">
-                    <a href="%s#profile" style="color:#6C63FF;text-decoration:none">Tắt nhắc nhở</a> trong phần Cài đặt.
+                  <p style="color:#bbb;font-size:11px;text-align:center">
+                    <a href="%s#profile" style="color:#6C63FF">Tắt nhắc nhở</a> trong Cài đặt.
                   </p>
                 </div>
               </div>
             </body></html>
             """.formatted(username, urgencyColor, currentStreak, urgencyMsg, studyLink, frontendUrl);
-
         sendHtml(toEmail, "🔥 " + (currentStreak > 0 ? currentStreak + " ngày streak" : "Bắt đầu streak") + " — học 5 phút thôi!", html);
         log.info("📧 Streak reminder sent to {} (streak={})", toEmail, currentStreak);
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  Internal helper — KHÔNG @Async để exception không bị nuốt
-    // ══════════════════════════════════════════════════════════════
-
+    // KHÔNG @Async — để exception không bị nuốt
     public void sendHtml(String toEmail, String subject, String htmlBody) {
         try {
-            log.info("📤 Sending email to: {} | subject: {}", toEmail, subject);
+            log.info("📤 Sending email to={} subject={}", toEmail, subject);
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper h = new MimeMessageHelper(msg, true, "UTF-8");
             h.setFrom(fromEmail, "LingoCoc");
@@ -140,11 +122,9 @@ public class EmailService {
             h.setSubject(subject);
             h.setText(htmlBody, true);
             mailSender.send(msg);
-            log.info("✅ Email sent successfully to: {}", toEmail);
-        } catch (MessagingException e) {
-            log.error("❌ MessagingException sending email to {}: {}", toEmail, e.getMessage(), e);
+            log.info("✅ Email sent to {}", toEmail);
         } catch (Exception e) {
-            log.error("❌ Unexpected error sending email to {}: {}", toEmail, e.getMessage(), e);
+            log.error("❌ Email failed to={} error={}", toEmail, e.getMessage(), e);
         }
     }
 }
