@@ -2532,7 +2532,7 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap"></div>
+      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:16px;overflow:hidden;background:#F5F3FF"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
@@ -8826,8 +8826,8 @@ function startStrokeGame(){
   setTimeout(loadStrokeChar, 150);
 }
 
-let _hwWriters = []; // mảng writer cho từng ký tự
-let _skDoneCount = 0; // đếm số ký tự đã hoàn thành
+let _hwWriters = [];
+let _skDoneCount = 0;
 
 function loadStrokeChar(){
   if(skIdx>=skWords.length){ endStrokeGame(); return; }
@@ -8846,91 +8846,74 @@ function loadStrokeChar(){
   _hwWriters=[]; _skDoneCount=0;
 
   const target = document.getElementById('skHanziTarget');
-  target.innerHTML = '';
+  target.innerHTML='';
 
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
 
   const chars = [...w.h].filter(c=>c.trim());
-  // Kích thước mỗi canvas tùy số ký tự
-  const canvasSize = chars.length === 1 ? 272 : chars.length === 2 ? 200 : 160;
+  // Kích thước mỗi ô: tổng luôn ~280px để trông như 1 canvas
+  const size = chars.length === 1 ? 280 : Math.floor(280 / chars.length);
 
   chars.forEach((char, i) => {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px`;
-
-    // Label ký tự (chỉ hiện khi >1 ký tự)
-    if(chars.length > 1){
-      const lbl = document.createElement('div');
-      lbl.id = `skCharLabel_${i}`;
-      lbl.textContent = char;
-      lbl.style.cssText = `font-size:.7rem;font-weight:800;color:#7C3AED;letter-spacing:.05em`;
-      wrap.appendChild(lbl);
-    }
-
-    const canvasEl = document.createElement('div');
-    canvasEl.id = `skCanvas_${i}`;
-    canvasEl.style.cssText = `border-radius:14px;overflow:hidden;background:#F5F3FF;position:relative`;
-    wrap.appendChild(canvasEl);
-
-    // Vòng trạng thái
-    const statusEl = document.createElement('div');
-    statusEl.id = `skStatus_${i}`;
-    statusEl.textContent = '✏️';
-    statusEl.style.cssText = `font-size:.8rem;height:18px`;
-    wrap.appendChild(statusEl);
-
-    target.appendChild(wrap);
+    const cell = document.createElement('div');
+    cell.id = `skCanvas_${i}`;
+    // Không có gap, không border giữa — liền mạch
+    // Chỉ có đường kẻ mờ phân cách nếu >1 ký tự
+    cell.style.cssText = [
+      `width:${size}px`,
+      `height:${size}px`,
+      `position:relative`,
+      `flex-shrink:0`,
+      i > 0 && chars.length > 1 ? `border-left:1.5px solid #DDD6FE` : ''
+    ].filter(Boolean).join(';');
+    target.appendChild(cell);
 
     try{
       const writer = HanziWriter.create(`skCanvas_${i}`, char, {
-        width: canvasSize, height: canvasSize, padding: 14,
+        width:size, height:size, padding: size > 200 ? 18 : 12,
         showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
-        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth: chars.length===1?8:6,
+        highlightColor:'#A78BFA', drawingColor:'#4C1D95',
+        drawingWidth: chars.length===1 ? 8 : 6,
         strokeAnimationSpeed:1, delayBetweenStrokes:200,
-        charDataLoader: (ch, onLoad, onError) => {
+        charDataLoader:(ch, onLoad, onError)=>{
           fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
-            .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
+            .then(r=>{ if(!r.ok) throw 0; return r.json(); })
             .then(onLoad).catch(onError);
         },
-        onLoadCharDataSuccess: () => {
+        onLoadCharDataSuccess:()=>{
           writer.quiz({
-            onMistake: () => {
-              _hwMistakes++;
-              _skUpdateMistakeRow();
-              try{haptic('error');}catch(e){}
-            },
-            onCorrectStroke: (d) => {
-              const el = document.getElementById('skGuide');
-              if(el) el.textContent = d.strokesRemaining > 0
-                ? `✅ Còn ${d.strokesRemaining} nét...`
-                : chars.length > 1 ? `✅ Xong ký tự ${char}!` : '🎉 Hoàn thành!';
+            onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
+            onCorrectStroke:(d)=>{
+              const el=document.getElementById('skGuide');
+              if(el) el.textContent = d.strokesRemaining>0 ? `✅ Còn ${d.strokesRemaining} nét...` : '🎉 Ký tự xong!';
               try{haptic('medium');}catch(e){}
             },
-            onComplete: () => {
-              const st = document.getElementById(`skStatus_${i}`);
-              if(st) st.textContent = '✅';
+            onComplete:()=>{
+              // Đánh dấu ô hoàn thành bằng overlay nhẹ
+              const done = document.createElement('div');
+              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;pointer-events:none`;
+              done.textContent='✅';
+              cell.appendChild(done);
               _skDoneCount++;
               if(_skDoneCount >= chars.length){
-                _hwDone = true;
-                _skShowResult(_hwMistakes);
+                _hwDone=true;
+                setTimeout(()=>_skShowResult(_hwMistakes), 400);
               } else {
-                const el = document.getElementById('skGuide');
-                if(el) el.textContent = `✅ Ký tự ${_skDoneCount}/${chars.length} xong! Tiếp tục các ký tự còn lại!`;
+                const el=document.getElementById('skGuide');
+                if(el) el.textContent=`✅ ${_skDoneCount}/${chars.length} ký tự xong — tiếp tục nhé!`;
               }
             }
           });
         },
-        onLoadCharDataError: () => {
-          const st = document.getElementById(`skStatus_${i}`);
-          if(st) st.textContent = '❌';
+        onLoadCharDataError:()=>{
           _skDoneCount++;
-          if(_skDoneCount >= chars.length) _skFallback(w);
+          if(_skDoneCount>=chars.length) _skFallback(w);
         }
       });
       _hwWriters.push(writer);
     }catch(e){
       _skDoneCount++;
-      if(_skDoneCount >= chars.length) _skFallback(w);
+      if(_skDoneCount>=chars.length) _skFallback(w);
     }
   });
 
