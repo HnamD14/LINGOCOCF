@@ -1303,6 +1303,7 @@
   <div class="shop-tabs">
     <button class="shop-tab active" id="shopTabBoost"   onclick="switchShopTab('boost',this)">⚡ Vật phẩm</button>
     <button class="shop-tab"        id="shopTabAvatar"  onclick="switchShopTab('avatar',this)">🐸 Linh vật</button>
+    <button class="shop-tab"        id="shopTabSpin"    onclick="switchShopTab('spin',this)">🎰 Vòng quay</button>
     <button class="shop-tab"        id="shopTabOwned"   onclick="switchShopTab('owned',this)">📦 Đã mua</button>
   </div>
 
@@ -1326,6 +1327,29 @@
       <div class="shop-grid" id="shopGridAvatar"></div>
     </div>
 
+    <!-- Panel: Vòng quay -->
+    <div id="shopPanelSpin" class="shop-panel">
+      <div class="shop-section-label">Chọn loại vòng quay</div>
+      <div style="display:flex;gap:10px;margin-bottom:18px">
+        <button id="spinBtnNormal" onclick="openSpinWheel(false)"
+          style="flex:1;padding:14px 8px;border-radius:14px;border:2px solid #F59E0B;background:linear-gradient(135deg,#FEF3C7,#FDE68A);font-family:'Baloo 2',cursive;font-size:.9rem;font-weight:800;color:#92400E;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:1.8rem">🎰</span>
+          <span>Vòng quay thường</span>
+          <span style="font-size:.75rem;font-weight:700;background:#F59E0B;color:#fff;border-radius:99px;padding:2px 8px">50 xu / lượt</span>
+        </button>
+        <button id="spinBtnVip" onclick="openSpinWheel(true)"
+          style="flex:1;padding:14px 8px;border-radius:14px;border:2px solid #7C3AED;background:linear-gradient(135deg,#EDE9FE,#DDD6FE);font-family:'Baloo 2',cursive;font-size:.9rem;font-weight:800;color:#4C1D95;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:1.8rem">🌟</span>
+          <span>Vòng quay VIP</span>
+          <span style="font-size:.75rem;font-weight:700;background:#7C3AED;color:#fff;border-radius:99px;padding:2px 8px">120 xu / lượt</span>
+        </button>
+      </div>
+      <div style="background:var(--gray-50,#F9FAFB);border-radius:14px;padding:14px;border:1px solid var(--gray-200,#E5E7EB)">
+        <div style="font-size:.78rem;font-weight:800;color:var(--gray-500,#6B7280);margin-bottom:10px">🎁 Phần thưởng có thể nhận</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="spinPrizePreview"></div>
+      </div>
+    </div>
+
     <!-- Panel: Đã mua -->
     <div id="shopPanelOwned" class="shop-panel">
       <div id="shopOwnedEmpty" style="display:none;text-align:center;padding:40px 20px;color:var(--gray-400)">
@@ -1336,6 +1360,32 @@
       <div class="shop-grid" id="shopGridOwned"></div>
     </div>
 
+  </div>
+
+  <!-- Spin Wheel Modal -->
+  <div id="spinWheelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9500;align-items:center;justify-content:center;flex-direction:column">
+    <div style="background:#fff;border-radius:24px;padding:24px 20px 28px;width:92%;max-width:360px;text-align:center;position:relative">
+      <button onclick="closeSpinWheel()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9CA3AF">✕</button>
+      <div id="spinWheelTitle" style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;margin-bottom:4px">🎰 Vòng quay may mắn</div>
+      <div id="spinWheelSubtitle" style="font-size:.78rem;color:#6B7280;margin-bottom:16px">50 xu / lượt</div>
+
+      <!-- Wheel canvas area -->
+      <div style="position:relative;width:280px;height:280px;margin:0 auto 16px">
+        <canvas id="spinCanvas" width="280" height="280" style="border-radius:50%;display:block"></canvas>
+        <!-- Pointer -->
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:2rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">▼</div>
+      </div>
+
+      <div id="spinResultBox" style="display:none;background:#F0FDF4;border:2px solid #6EE7B7;border-radius:14px;padding:12px;margin-bottom:14px">
+        <div id="spinResultText" style="font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:#065F46"></div>
+      </div>
+
+      <button id="spinStartBtn" onclick="doSpin()"
+        style="width:100%;padding:14px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,.4)">
+        🎰 Quay ngay!
+      </button>
+      <div id="spinCoinInfo" style="font-size:.75rem;color:#9CA3AF;margin-top:8px"></div>
+    </div>
   </div>
 
   <!-- Buy confirm modal -->
@@ -6317,8 +6367,6 @@ const SHOP_ITEMS = {
     { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
   ],
   special: [
-    { id:'lucky_draw',    ico:'🎰', name:'Vòng quay may mắn',    desc:'Ngẫu nhiên: xu, XP, tim hoặc jackpot 500xu',  price:50,  type:'consumable', effect:'lucky',    weekly:false },
-    { id:'lucky_draw_ex', ico:'🌟', name:'Vòng quay VIP',        desc:'Phần thưởng gấp đôi, tỉ lệ jackpot cao hơn', price:120, type:'consumable', effect:'lucky_ex', weekly:true },
     { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
     { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:280, type:'permanent',  effect:'name_purple' },
     { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:280, type:'permanent',  effect:'name_red' },
@@ -6503,23 +6551,204 @@ function applyItemEffect(item){
   }
 }
 
-function _runLuckyDraw(vip){
-  const prizes = vip ? [
-    {msg:'🪙 +400 xu!', coins:400},{msg:'🪙 +200 xu!', coins:200},
-    {msg:'⭐ +150 XP!', xp:150},{msg:'💎 Tim đầy!', hearts:true},
-    {msg:'🌟 JACKPOT +1000 xu!', coins:1000},{msg:'🪙 +80 xu', coins:80},
-  ] : [
-    {msg:'🪙 +200 xu!', coins:200},{msg:'🪙 +100 xu!', coins:100},
-    {msg:'⭐ +50 XP!', xp:50},{msg:'💎 Tim đầy!', hearts:true},
-    {msg:'🪙 +500 xu! May mắn!', coins:500},{msg:'🪙 +30 xu', coins:30},
-  ];
-  const prize = prizes[Math.floor(Math.random()*prizes.length)];
-  if(prize.coins) addCoins(prize.coins);
-  if(prize.xp) addXP(prize.xp);
-  if(prize.hearts){ state.hearts=MAX_HEARTS; _saveHearts(null); loadHearts(); }
-  showToast((vip?'🌟 VIP: ':'🎰 ') + prize.msg);
-  fireConfetti();
+/* ════════════════════════════════════════════════
+   🎰 SPIN WHEEL — Vòng quay may mắn
+════════════════════════════════════════════════ */
+const SPIN_PRIZES_NORMAL = [
+  { label:'30 xu',       ico:'🪙', color:'#FDE68A', textColor:'#92400E', coins:30,  weight:30 },
+  { label:'100 xu',      ico:'🪙', color:'#F59E0B', textColor:'#fff',    coins:100, weight:20 },
+  { label:'200 xu',      ico:'💰', color:'#D97706', textColor:'#fff',    coins:200, weight:10 },
+  { label:'+50 XP',      ico:'⭐', color:'#A78BFA', textColor:'#fff',    xp:50,     weight:20 },
+  { label:'Tim đầy',     ico:'💎', color:'#60A5FA', textColor:'#fff',    hearts:true,weight:10 },
+  { label:'+5 Gợi ý',   ico:'💡', color:'#34D399', textColor:'#fff',    hints:5,   weight:20 },
+  { label:'+1 Freeze',   ico:'🧊', color:'#93C5FD', textColor:'#1E3A5F', freeze:1,  weight:10 },
+  { label:'JACKPOT!',    ico:'🎉', color:'#EF4444', textColor:'#fff',    coins:500, weight:5  },
+  { label:'+80 XP',      ico:'⭐', color:'#8B5CF6', textColor:'#fff',    xp:80,     weight:10 },
+  { label:'50 xu',       ico:'🪙', color:'#FCD34D', textColor:'#92400E', coins:50,  weight:25 },
+];
+const SPIN_PRIZES_VIP = [
+  { label:'80 xu',       ico:'🪙', color:'#FDE68A', textColor:'#92400E', coins:80,  weight:20 },
+  { label:'200 xu',      ico:'🪙', color:'#F59E0B', textColor:'#fff',    coins:200, weight:18 },
+  { label:'400 xu',      ico:'💰', color:'#D97706', textColor:'#fff',    coins:400, weight:10 },
+  { label:'+150 XP',     ico:'⭐', color:'#A78BFA', textColor:'#fff',    xp:150,    weight:15 },
+  { label:'Tim đầy',     ico:'💎', color:'#60A5FA', textColor:'#fff',    hearts:true,weight:12 },
+  { label:'XP x2/30p',  ico:'⚡', color:'#34D399', textColor:'#fff',    xp2x:true, weight:10 },
+  { label:'+2 Freeze',   ico:'🧊', color:'#93C5FD', textColor:'#1E3A5F', freeze:2,  weight:8  },
+  { label:'JACKPOT!',    ico:'🌟', color:'#EF4444', textColor:'#fff',    coins:1000,weight:3  },
+  { label:'+300 XP',     ico:'⭐', color:'#8B5CF6', textColor:'#fff',    xp:300,    weight:8  },
+  { label:'500 xu',      ico:'💰', color:'#B45309', textColor:'#fff',    coins:500, weight:6  },
+];
+
+let _spinIsVip = false;
+let _spinIsRunning = false;
+let _spinCurrentAngle = 0;
+let _spinSelectedIdx = 0;
+
+function _weightedRandom(prizes){
+  const total = prizes.reduce((s,p)=>s+p.weight,0);
+  let r = Math.random()*total;
+  for(let i=0;i<prizes.length;i++){ r-=prizes[i].weight; if(r<=0) return i; }
+  return prizes.length-1;
 }
+
+function drawWheel(prizes, rotationRad){
+  const canvas = document.getElementById('spinCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 140, cy = 140, R = 132, n = prizes.length;
+  const sliceAngle = (2*Math.PI)/n;
+  ctx.clearRect(0,0,280,280);
+
+  // Outer ring shadow
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.25)';
+  ctx.shadowBlur=16;
+  ctx.beginPath(); ctx.arc(cx,cy,R+4,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.restore();
+
+  prizes.forEach((p,i)=>{
+    const startAngle = rotationRad + i*sliceAngle - Math.PI/2;
+    const endAngle   = startAngle + sliceAngle;
+    const mid        = startAngle + sliceAngle/2;
+
+    // Slice
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,startAngle,endAngle);
+    ctx.closePath();
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.7)';
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    // Icon + label
+    ctx.save();
+    ctx.translate(cx+Math.cos(mid)*(R*.62), cy+Math.sin(mid)*(R*.62));
+    ctx.rotate(mid+Math.PI/2);
+    ctx.font='bold 11px Baloo\\ 2,sans-serif';
+    ctx.fillStyle = p.textColor || '#fff';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(p.ico+' '+p.label, 0, 0);
+    ctx.restore();
+  });
+
+  // Center circle
+  ctx.beginPath(); ctx.arc(cx,cy,20,0,2*Math.PI);
+  const grad = ctx.createRadialGradient(cx-5,cy-5,2,cx,cy,20);
+  grad.addColorStop(0,'#FEF9C3'); grad.addColorStop(1,'#F59E0B');
+  ctx.fillStyle=grad; ctx.fill();
+  ctx.strokeStyle='#D97706'; ctx.lineWidth=2; ctx.stroke();
+  ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#7C2D12';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('元',cx,cy);
+}
+
+function openSpinWheel(vip){
+  _spinIsVip = vip;
+  _spinIsRunning = false;
+  _spinCurrentAngle = 0;
+  const prizes = vip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
+  const cost   = vip ? 120 : 50;
+
+  document.getElementById('spinWheelTitle').textContent = vip ? '🌟 Vòng quay VIP' : '🎰 Vòng quay may mắn';
+  document.getElementById('spinWheelSubtitle').textContent = cost+' xu / lượt';
+  document.getElementById('spinResultBox').style.display='none';
+  document.getElementById('spinStartBtn').textContent='🎰 Quay ngay!';
+  document.getElementById('spinStartBtn').disabled=false;
+  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+
+  // Prize preview
+  const preview = document.getElementById('spinPrizePreview');
+  if(preview) preview.innerHTML = prizes.map(p=>
+    `<div style="background:${p.color}22;border:1px solid ${p.color}66;border-radius:8px;padding:6px 8px;font-size:.72rem;font-weight:700;color:${p.textColor==='#fff'?'#374151':p.textColor}">
+      ${p.ico} ${p.label} <span style="float:right;opacity:.6">${p.weight}%</span>
+    </div>`
+  ).join('');
+
+  drawWheel(prizes, 0);
+
+  const modal = document.getElementById('spinWheelModal');
+  modal.style.display='flex';
+}
+
+function closeSpinWheel(){
+  if(_spinIsRunning) return;
+  document.getElementById('spinWheelModal').style.display='none';
+}
+
+function doSpin(){
+  if(_spinIsRunning) return;
+  const prizes = _spinIsVip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
+  const cost   = _spinIsVip ? 120 : 50;
+
+  if(getCoins()<cost){ showToast('❌ Không đủ xu!'); return; }
+  if(!spendCoins(cost)){ showToast('❌ Không đủ xu!'); return; }
+  updateCoinUI();
+  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+
+  _spinIsRunning = true;
+  document.getElementById('spinStartBtn').disabled=true;
+  document.getElementById('spinResultBox').style.display='none';
+
+  // Chọn ô thắng theo xác suất
+  _spinSelectedIdx = _weightedRandom(prizes);
+  const n = prizes.length;
+  const sliceAngle = (2*Math.PI)/n;
+
+  // Tính góc cần quay để ô thắng dừng ở trên cùng (pointer ở top)
+  // Pointer ở -PI/2 (top). Trung tâm ô i ở: angle_i = i*sliceAngle - PI/2 + sliceAngle/2
+  // Ta cần trung tâm ô thắng = -PI/2 (top) sau khi quay
+  // targetAngle = -(selectedIdx*sliceAngle + sliceAngle/2) làm cho mid của ô = 0 rad
+  const targetOffset = -((_spinSelectedIdx * sliceAngle) + sliceAngle/2);
+  const fullSpins = (5 + Math.floor(Math.random()*3)) * 2 * Math.PI; // 5–7 vòng
+  const finalAngle = _spinCurrentAngle + fullSpins + targetOffset - (_spinCurrentAngle % (2*Math.PI));
+
+  const duration = 4000 + Math.random()*1000;
+  const startAngle = _spinCurrentAngle;
+  const startTime = performance.now();
+
+  function easeOut(t){ return 1 - Math.pow(1-t, 4); }
+
+  function animate(now){
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed/duration, 1);
+    _spinCurrentAngle = startAngle + (finalAngle - startAngle) * easeOut(t);
+    drawWheel(prizes, _spinCurrentAngle);
+    if(t < 1){ requestAnimationFrame(animate); }
+    else {
+      _spinCurrentAngle = finalAngle;
+      _spinIsRunning = false;
+      _applySpinPrize(prizes[_spinSelectedIdx]);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function _applySpinPrize(prize){
+  if(prize.coins)  { addCoins(prize.coins); }
+  if(prize.xp)     { addXP(prize.xp); }
+  if(prize.hearts) { state.hearts=MAX_HEARTS; _saveHearts(null); syncHeartUI(); }
+  if(prize.hints)  { const h=parseInt(localStorage.getItem(uk('lingococ_hints'))||'0'); localStorage.setItem(uk('lingococ_hints'),h+prize.hints); if(typeof updateHintBtn==='function') updateHintBtn(); }
+  if(prize.freeze) { const f=parseInt(localStorage.getItem(uk('lingococ_freezes'))||'2'); localStorage.setItem(uk('lingococ_freezes'),f+prize.freeze); }
+  if(prize.xp2x)   { localStorage.setItem(uk('lingococ_xp2x_until'),Date.now()+30*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
+
+  const box = document.getElementById('spinResultBox');
+  const txt = document.getElementById('spinResultText');
+  if(box && txt){
+    txt.textContent = prize.ico+' '+prize.label+' — Chúc mừng!';
+    box.style.display='block';
+  }
+  const btn = document.getElementById('spinStartBtn');
+  btn.textContent = '🎰 Quay lần nữa';
+  btn.disabled = false;
+  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  fireConfetti();
+  updateCoinUI();
+}
+
+function _runLuckyDraw(vip){ openSpinWheel(vip); }
 
 function equipAvatar(id){
   const item = SHOP_ITEMS.avatar.find(i => i.id === id);
@@ -6662,6 +6891,15 @@ function switchShopTab(tab, btn){
   const panel = document.getElementById('shopPanel' + tab.charAt(0).toUpperCase() + tab.slice(1));
   if(panel) panel.classList.add('active');
   if(tab === 'avatar') applyEquippedAvatar();
+  if(tab === 'spin'){
+    const prizes = SPIN_PRIZES_NORMAL;
+    const preview = document.getElementById('spinPrizePreview');
+    if(preview) preview.innerHTML = prizes.map(p=>
+      `<div style="background:${p.color}22;border:1px solid ${p.color}66;border-radius:8px;padding:6px 8px;font-size:.72rem;font-weight:700;color:#374151">
+        ${p.ico} ${p.label}
+      </div>`
+    ).join('');
+  }
 }
 
 function goShop(){
