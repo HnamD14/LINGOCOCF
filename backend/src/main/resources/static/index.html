@@ -4420,13 +4420,6 @@ function goScreen(id){
   document.getElementById(id).classList.add('active');
   // Dừng đọc khi chuyển màn hình
   window.speechSynthesis && window.speechSynthesis.cancel();
-  // Load settings khi vào màn cài đặt
-  if(id === 'settingsScreen') cfgLoad();
-  // Sync avatar & màu tên khi vào profile
-  if(id === 'profileScreen'){
-    if(typeof applyEquippedAvatar === 'function') applyEquippedAvatar();
-    if(typeof applyNameColorBadge === 'function') applyNameColorBadge();
-  }
 }
 function goHome(){ goScreen('homeScreen'); syncHomeStats(); loadAllDeckBars(); }
 
@@ -5304,12 +5297,12 @@ function onAuthSuccess(user, token, isNew = false){
   }, 200);
 
   // ── Font size & coin/shop/avatar init ──
-  cfgLoad();
+  try { const fs = cfgGet().fontSize; if(fs) cfgApplyFontSize(fs); } catch(e) {}
   updateCoinUI();
   applyEquippedAvatar();
   showXP2xIndicator();
   updateHintBtn();
-  applyNameColorBadge();
+  applyNameGoldBadge();
   setTimeout(grantDailyCoins, 1800);
   setTimeout(updateDailyBanner, 300); // cập nhật banner daily đúng theo userId sau login
 
@@ -5534,13 +5527,10 @@ function cfgLoad(){
   // Sound fx
   const sf = document.getElementById('cfgSoundFx');
   if(sf) sf.checked = cfg.soundFx !== false;
-  // Font size — normalize old keys to new
-  const fontRemap = { sm:'small', md:'normal', lg:'large', xl:'xlarge' };
-  const savedFont = cfg.fontSize || 'normal';
-  const fontVal = fontRemap[savedFont] || savedFont;
+  // Font size
   const fs = document.getElementById('cfgFontSize');
-  if(fs) fs.value = fontVal;
-  cfgApplyFontSize(fontVal);
+  if(fs) fs.value = cfg.fontSize || 'md';
+  if(cfg.fontSize) cfgApplyFontSize(cfg.fontSize);
   // Haptic
   const hp = document.getElementById('cfgHaptic');
   if(hp) hp.checked = cfg.haptic !== false;
@@ -5579,13 +5569,8 @@ function cfgSetFontSize(val){
 
 function cfgApplyFontSize(val){
   const root = document.documentElement;
-  const sizes = { small:'13px', normal:'15px', large:'17px', xlarge:'19px',
-                  sm:'13px', md:'15px', lg:'17px', xl:'19px' }; // backward compat
+  const sizes = { sm:'13px', md:'15px', lg:'17px', xl:'19px' };
   if(sizes[val]) root.style.setProperty('--base-font', sizes[val]);
-  const sub = document.getElementById('cfgFontSub');
-  const labels = { small:'Nhỏ', normal:'Cỡ thường', large:'Lớn', xlarge:'Rất lớn',
-                   sm:'Nhỏ', md:'Cỡ thường', lg:'Lớn', xl:'Rất lớn' };
-  if(sub) sub.textContent = labels[val] || 'Cỡ thường';
 }
 
 function cfgSetHaptic(val){
@@ -8855,28 +8840,91 @@ function loadStrokeChar(){
   document.getElementById('skMistakeRow').innerHTML='';
   document.getElementById('skGuide').textContent='✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!';
   _hwMistakes=0; _hwTotalStrokes=0; _hwDone=false;
-  const target=document.getElementById('skHanziTarget'); target.innerHTML='';
+
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
+
+  // Tách từng ký tự — HanziWriter chỉ nhận 1 ký tự/lần
+  const chars = [...w.h].filter(c => c.trim()); // loại khoảng trắng
+  _skLoadChars(w, chars, 0);
+  speakText(w.h);
+}
+
+// Biến theo dõi ký tự hiện tại trong từ
+let _skCharIdx = 0;
+let _skChars = [];
+let _skCurrentWord = null;
+
+function _skLoadChars(w, chars, charIdx){
+  _skCurrentWord = w;
+  _skChars = chars;
+  _skCharIdx = charIdx;
+
+  const target = document.getElementById('skHanziTarget');
+  target.innerHTML = '';
+
+  if(charIdx >= chars.length){ _skShowResult(_hwMistakes); return; }
+
+  // Nếu từ nhiều ký tự, hiển thị tiến trình ký tự
+  const charProgress = chars.length > 1
+    ? `<div style="text-align:center;font-size:.75rem;color:#7C3AED;font-weight:700;margin-bottom:6px">Ký tự ${charIdx+1}/${chars.length}: ${chars[charIdx]}</div>`
+    : '';
+  target.innerHTML = charProgress + '<div id="skHanziCanvas"></div>';
+
+  const char = chars[charIdx];
   try{
-    _hwWriter = HanziWriter.create('skHanziTarget',w.h,{
-      width:280,height:280,padding:18,
-      showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
-      highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
-      strokeAnimationSpeed:1,delayBetweenStrokes:200,
-      onLoadCharDataSuccess:()=>{
+    _hwWriter = HanziWriter.create('skHanziCanvas', char, {
+      width:260, height:260, padding:16,
+      showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
+      highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:8,
+      strokeAnimationSpeed:1, delayBetweenStrokes:200,
+      charDataLoader: (char, onLoad, onError) => {
+        const url = `https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/${encodeURIComponent(char)}.json`;
+        fetch(url)
+          .then(r => { if(!r.ok) throw new Error('404'); return r.json(); })
+          .then(onLoad)
+          .catch(() => {
+            // Fallback URL thứ 2
+            fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`)
+              .then(r => { if(!r.ok) throw new Error('404'); return r.json(); })
+              .then(onLoad)
+              .catch(onError);
+          });
+      },
+      onLoadCharDataSuccess: () => {
+        const guideEl = document.getElementById('skGuide');
+        if(guideEl && chars.length > 1)
+          guideEl.textContent = `✏️ Ký tự ${charIdx+1}/${chars.length} — Vẽ từng nét theo thứ tự!`;
         _hwWriter.quiz({
-          onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
-          onCorrectStroke:(d)=>{
-            document.getElementById('skGuide').textContent=d.strokesRemaining>0?`✅ Đúng! Còn ${d.strokesRemaining} nét...`:'🎉 Xong rồi!';
+          onMistake: () => { _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
+          onCorrectStroke: (d) => {
+            const el = document.getElementById('skGuide');
+            if(el) el.textContent = d.strokesRemaining > 0
+              ? `✅ Đúng! Còn ${d.strokesRemaining} nét...`
+              : (chars.length > 1 && charIdx < chars.length-1 ? '🎉 Ký tự xong! Tiếp theo...' : '🎉 Xong rồi!');
             try{haptic('medium');}catch(e){}
           },
-          onComplete:(d)=>{ _hwDone=true; _skShowResult(d.totalMistakes); }
+          onComplete: (d) => {
+            _hwTotalStrokes += d.totalMistakes;
+            if(charIdx + 1 < chars.length){
+              // Còn ký tự tiếp theo — chờ chút rồi load
+              setTimeout(() => _skLoadChars(w, chars, charIdx + 1), 800);
+            } else {
+              _hwDone = true;
+              _skShowResult(_hwMistakes);
+            }
+          }
         });
       },
-      onLoadCharDataError:()=>_skFallback(w)
+      onLoadCharDataError: () => {
+        if(charIdx + 1 < chars.length){
+          // Ký tự lỗi → bỏ qua, load ký tự tiếp
+          setTimeout(() => _skLoadChars(w, chars, charIdx + 1), 400);
+        } else {
+          _skFallback(w);
+        }
+      }
     });
-  }catch(e){ _skFallback(w); }
-  speakText(w.h);
+  } catch(e){ _skFallback(w); }
 }
 
 function _skUpdateMistakeRow(){
