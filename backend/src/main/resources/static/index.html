@@ -1329,24 +1329,39 @@
 
     <!-- Panel: Vòng quay -->
     <div id="shopPanelSpin" class="shop-panel">
-      <div class="shop-section-label">Chọn loại vòng quay</div>
-      <div style="display:flex;gap:10px;margin-bottom:18px">
-        <button id="spinBtnNormal" onclick="openSpinWheel(false)"
-          style="flex:1;padding:14px 8px;border-radius:14px;border:2px solid #F59E0B;background:linear-gradient(135deg,#FEF3C7,#FDE68A);font-family:'Baloo 2',cursive;font-size:.9rem;font-weight:800;color:#92400E;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
-          <span style="font-size:1.8rem">🎰</span>
-          <span>Vòng quay thường</span>
-          <span style="font-size:.75rem;font-weight:700;background:#F59E0B;color:#fff;border-radius:99px;padding:2px 8px">50 xu / lượt</span>
+      <div style="text-align:center;padding:8px 0 20px">
+        <div style="font-size:2.8rem;margin-bottom:6px">🎰</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:900;color:#1F2937">Vòng Quay May Mắn</div>
+        <div style="font-size:.8rem;color:#6B7280;margin-top:4px">Quay để nhận xu, XP và nhiều phần thưởng hấp dẫn!</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+        <button onclick="openSpinWheel(false)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left">
+          <div style="border-radius:18px;background:linear-gradient(135deg,#FF6B00,#FF4500);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(255,107,0,.35);position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0">🎰</div>
+            <div style="flex:1">
+              <div style="font-family:'Baloo 2',cursive;font-size:1rem;font-weight:900;color:#fff">Vòng Quay Thường</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,.8);margin-top:2px">Xu · XP · Tim · Jackpot 500xu</div>
+            </div>
+            <div style="background:rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font-family:'Baloo 2',cursive;font-size:.85rem;font-weight:900;color:#fff;white-space:nowrap">50 xu</div>
+          </div>
         </button>
-        <button id="spinBtnVip" onclick="openSpinWheel(true)"
-          style="flex:1;padding:14px 8px;border-radius:14px;border:2px solid #7C3AED;background:linear-gradient(135deg,#EDE9FE,#DDD6FE);font-family:'Baloo 2',cursive;font-size:.9rem;font-weight:800;color:#4C1D95;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px">
-          <span style="font-size:1.8rem">🌟</span>
-          <span>Vòng quay VIP</span>
-          <span style="font-size:.75rem;font-weight:700;background:#7C3AED;color:#fff;border-radius:99px;padding:2px 8px">120 xu / lượt</span>
+        <button onclick="openSpinWheel(true)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left">
+          <div style="border-radius:18px;background:linear-gradient(135deg,#7C3AED,#5B21B6);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(124,58,237,.35);position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none"></div>
+            <div style="position:absolute;top:8px;right:12px;background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:99px;padding:2px 8px;font-size:.65rem;font-weight:900;color:#7C2D12">VIP</div>
+            <div style="width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0">🌟</div>
+            <div style="flex:1">
+              <div style="font-family:'Baloo 2',cursive;font-size:1rem;font-weight:900;color:#fff">Vòng Quay VIP</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,.8);margin-top:2px">Phần thưởng x2 · Jackpot 1000xu</div>
+            </div>
+            <div style="background:rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font-family:'Baloo 2',cursive;font-size:.85rem;font-weight:900;color:#fff;white-space:nowrap">120 xu</div>
+          </div>
         </button>
       </div>
-      <div style="background:var(--gray-50,#F9FAFB);border-radius:14px;padding:14px;border:1px solid var(--gray-200,#E5E7EB)">
-        <div style="font-size:.78rem;font-weight:800;color:var(--gray-500,#6B7280);margin-bottom:10px">🎁 Phần thưởng có thể nhận</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="spinPrizePreview"></div>
+      <div style="background:#FAFAFA;border-radius:14px;padding:14px 16px;border:1px solid #E5E7EB">
+        <div style="font-size:.75rem;font-weight:900;color:#9CA3AF;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎁 Phần thưởng</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px" id="spinPrizePreview"></div>
       </div>
     </div>
 
@@ -1363,28 +1378,75 @@
   </div>
 
   <!-- Spin Wheel Modal -->
-  <div id="spinWheelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9500;align-items:center;justify-content:center;flex-direction:column">
-    <div style="background:#fff;border-radius:24px;padding:24px 20px 28px;width:92%;max-width:360px;text-align:center;position:relative">
-      <button onclick="closeSpinWheel()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9CA3AF">✕</button>
-      <div id="spinWheelTitle" style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;margin-bottom:4px">🎰 Vòng quay may mắn</div>
-      <div id="spinWheelSubtitle" style="font-size:.78rem;color:#6B7280;margin-bottom:16px">50 xu / lượt</div>
+  <style>
+    @keyframes spinStarFloat{0%,100%{transform:translateY(0) rotate(0deg);opacity:.7}50%{transform:translateY(-8px) rotate(180deg);opacity:1}}
+    @keyframes spinPulseRing{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.18);opacity:0}}
+    @keyframes spinResultPop{0%{transform:scale(.5) translateY(20px);opacity:0}70%{transform:scale(1.08) translateY(-4px)}100%{transform:scale(1) translateY(0);opacity:1}}
+    @keyframes spinBtnPulse{0%,100%{box-shadow:0 4px 20px rgba(255,107,0,.5)}50%{box-shadow:0 4px 32px rgba(255,107,0,.9),0 0 0 8px rgba(255,107,0,.15)}}
+    @keyframes spinBtnPulseVip{0%,100%{box-shadow:0 4px 20px rgba(124,58,237,.5)}50%{box-shadow:0 4px 32px rgba(124,58,237,.9),0 0 0 8px rgba(124,58,237,.15)}}
+    @keyframes spinGlow{0%,100%{opacity:.4}50%{opacity:.9}}
+    #spinWheelModal.active { animation: none; }
+    .spin-star { position:absolute; font-size:1.2rem; animation: spinStarFloat 2.5s ease-in-out infinite; pointer-events:none; }
+    .spin-pulse-ring { position:absolute;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:spinPulseRing 1.6s ease-out infinite; pointer-events:none; }
+  </style>
+  <div id="spinWheelModal" style="display:none;position:fixed;inset:0;z-index:9500;align-items:center;justify-content:center;flex-direction:column;overflow:hidden">
+    <!-- Dark gradient BG -->
+    <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0F0A1E 0%,#1A0A3E 40%,#0A1628 100%)"></div>
+    <!-- Decorative stars -->
+    <div class="spin-star" style="top:6%;left:8%;animation-delay:.3s">✨</div>
+    <div class="spin-star" style="top:12%;right:10%;animation-delay:.8s">⭐</div>
+    <div class="spin-star" style="top:75%;left:6%;animation-delay:1.2s">💫</div>
+    <div class="spin-star" style="top:80%;right:8%;animation-delay:.5s">✨</div>
+    <div class="spin-star" style="top:45%;left:3%;animation-delay:1.8s;font-size:.9rem">⭐</div>
+    <div class="spin-star" style="top:30%;right:4%;animation-delay:1s;font-size:.9rem">💫</div>
 
-      <!-- Wheel canvas area -->
-      <div style="position:relative;width:280px;height:280px;margin:0 auto 16px">
-        <canvas id="spinCanvas" width="280" height="280" style="border-radius:50%;display:block"></canvas>
-        <!-- Pointer -->
-        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:2rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">▼</div>
+    <!-- Card -->
+    <div style="position:relative;width:94%;max-width:380px;z-index:1">
+      <!-- Close -->
+      <button onclick="closeSpinWheel()" style="position:absolute;top:-44px;right:0;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)">✕</button>
+
+      <!-- Title bar -->
+      <div id="spinWheelTitle" style="text-align:center;margin-bottom:10px">
+        <div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>
+        <div id="spinWheelSubtitle" style="font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px">50 xu / lượt</div>
       </div>
 
-      <div id="spinResultBox" style="display:none;background:#F0FDF4;border:2px solid #6EE7B7;border-radius:14px;padding:12px;margin-bottom:14px">
-        <div id="spinResultText" style="font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:#065F46"></div>
+      <!-- Wheel area -->
+      <div style="position:relative;width:300px;height:300px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center">
+        <!-- Glow behind wheel -->
+        <div id="spinGlowBg" style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%);animation:spinGlow 2s ease-in-out infinite;pointer-events:none"></div>
+        <!-- Pulse rings -->
+        <div class="spin-pulse-ring" style="width:296px;height:296px;animation-delay:0s"></div>
+        <div class="spin-pulse-ring" style="width:296px;height:296px;animation-delay:.8s"></div>
+        <!-- Outer decorative ring -->
+        <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:conic-gradient(#F59E0B,#EF4444,#8B5CF6,#3B82F6,#10B981,#F59E0B);padding:5px;box-sizing:border-box">
+          <div style="width:100%;height:100%;border-radius:50%;background:#1A0A3E"></div>
+        </div>
+        <!-- Canvas -->
+        <canvas id="spinCanvas" width="272" height="272" style="position:absolute;border-radius:50%;display:block"></canvas>
+        <!-- Center hub -->
+        <div style="position:absolute;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FEF9C3,#F59E0B);border:3px solid #fff;box-shadow:0 0 16px rgba(245,158,11,.8);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:13px;font-weight:900;color:#7C2D12;z-index:2">元</div>
+        <!-- Pointer (top) -->
+        <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))">
+          <svg width="28" height="36" viewBox="0 0 28 36"><defs><linearGradient id="ptr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient></defs><polygon points="14,34 0,4 28,4" fill="url(#ptr)" stroke="#D97706" stroke-width="1.5"/><polygon points="14,28 5,8 23,8" fill="rgba(255,255,255,.3)"/></svg>
+        </div>
       </div>
 
+      <!-- Result box (hidden initially) -->
+      <div id="spinResultBox" style="display:none;margin-bottom:14px;animation:spinResultPop .5s cubic-bezier(.34,1.56,.64,1) both">
+        <div style="background:linear-gradient(135deg,#065F46,#047857);border-radius:16px;padding:16px;text-align:center;box-shadow:0 8px 24px rgba(6,95,70,.4)">
+          <div id="spinResultIco" style="font-size:2.4rem;margin-bottom:4px">🎉</div>
+          <div id="spinResultText" style="font-family:'Baloo 2',cursive;font-size:1.15rem;font-weight:900;color:#fff"></div>
+          <div id="spinResultSub" style="font-size:.75rem;color:rgba(255,255,255,.7);margin-top:2px">Đã thêm vào tài khoản!</div>
+        </div>
+      </div>
+
+      <!-- Spin button -->
       <button id="spinStartBtn" onclick="doSpin()"
-        style="width:100%;padding:14px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,.4)">
-        🎰 Quay ngay!
+        style="width:100%;padding:16px;background:linear-gradient(135deg,#FF6B00,#FF4500);border:none;border-radius:14px;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:900;color:#fff;cursor:pointer;animation:spinBtnPulse 2s ease-in-out infinite;letter-spacing:.02em">
+        🎰 &nbsp;QUAY NGAY!
       </button>
-      <div id="spinCoinInfo" style="font-size:.75rem;color:#9CA3AF;margin-top:8px"></div>
+      <div id="spinCoinInfo" style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:10px;text-align:center"></div>
     </div>
   </div>
 
@@ -6595,54 +6657,88 @@ function drawWheel(prizes, rotationRad){
   const canvas = document.getElementById('spinCanvas');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-  const cx = 140, cy = 140, R = 132, n = prizes.length;
+  const W = 272, cx = 136, cy = 136, R = 128;
+  const n = prizes.length;
   const sliceAngle = (2*Math.PI)/n;
-  ctx.clearRect(0,0,280,280);
-
-  // Outer ring shadow
-  ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.25)';
-  ctx.shadowBlur=16;
-  ctx.beginPath(); ctx.arc(cx,cy,R+4,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill();
-  ctx.restore();
+  ctx.clearRect(0,0,W,W);
 
   prizes.forEach((p,i)=>{
-    const startAngle = rotationRad + i*sliceAngle - Math.PI/2;
-    const endAngle   = startAngle + sliceAngle;
-    const mid        = startAngle + sliceAngle/2;
+    const startA = rotationRad + i*sliceAngle - Math.PI/2;
+    const endA   = startA + sliceAngle;
+    const midA   = startA + sliceAngle/2;
 
-    // Slice
+    // Slice gradient
+    const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    grd.addColorStop(0, lightenHex(p.color, 40));
+    grd.addColorStop(1, p.color);
+
     ctx.beginPath();
     ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,R,startAngle,endAngle);
+    ctx.arc(cx,cy,R,startA,endA);
     ctx.closePath();
-    ctx.fillStyle = p.color;
+    ctx.fillStyle = grd;
     ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.7)';
-    ctx.lineWidth=2;
+
+    // Separator lines
+    ctx.strokeStyle = 'rgba(255,255,255,.5)';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Icon + label
+    // Sheen highlight on top half of each slice
     ctx.save();
-    ctx.translate(cx+Math.cos(mid)*(R*.62), cy+Math.sin(mid)*(R*.62));
-    ctx.rotate(mid+Math.PI/2);
-    ctx.font='bold 11px Baloo\\ 2,sans-serif';
-    ctx.fillStyle = p.textColor || '#fff';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(p.ico+' '+p.label, 0, 0);
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,startA,endA);
+    ctx.closePath();
+    ctx.clip();
+    const sheen = ctx.createLinearGradient(
+      cx+Math.cos(midA)*R*.3, cy+Math.sin(midA)*R*.3,
+      cx+Math.cos(midA)*R, cy+Math.sin(midA)*R
+    );
+    sheen.addColorStop(0,'rgba(255,255,255,.28)');
+    sheen.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = sheen;
+    ctx.fill();
+    ctx.restore();
+
+    // Icon
+    ctx.save();
+    ctx.translate(cx + Math.cos(midA)*(R*.58), cy + Math.sin(midA)*(R*.58));
+    ctx.rotate(midA + Math.PI/2);
+    ctx.font = '15px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(p.ico, 0, 0);
+
+    // Label with shadow for readability
+    ctx.font = 'bold 10px "Baloo 2",sans-serif';
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.fillText(p.label, 1, 13);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(p.label, 0, 12);
     ctx.restore();
   });
 
-  // Center circle
-  ctx.beginPath(); ctx.arc(cx,cy,20,0,2*Math.PI);
-  const grad = ctx.createRadialGradient(cx-5,cy-5,2,cx,cy,20);
-  grad.addColorStop(0,'#FEF9C3'); grad.addColorStop(1,'#F59E0B');
-  ctx.fillStyle=grad; ctx.fill();
-  ctx.strokeStyle='#D97706'; ctx.lineWidth=2; ctx.stroke();
-  ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#7C2D12';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText('元',cx,cy);
+  // Outer decorative dots ring
+  ctx.save();
+  for(let i=0;i<n*2;i++){
+    const a = (i/(n*2))*2*Math.PI + rotationRad;
+    const dx = cx + Math.cos(a)*(R+10);
+    const dy = cy + Math.sin(a)*(R+10);
+    ctx.beginPath(); ctx.arc(dx,dy,2,0,2*Math.PI);
+    ctx.fillStyle = i%2===0 ? '#FCD34D' : 'rgba(255,255,255,.4)';
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function lightenHex(hex, amt){
+  // Simple lighten by increasing RGB values
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (num>>16)+amt);
+  const g = Math.min(255, ((num>>8)&0xFF)+amt);
+  const b = Math.min(255, (num&0xFF)+amt);
+  return `rgb(${r},${g},${b})`;
 }
 
 function openSpinWheel(vip){
@@ -6652,30 +6748,48 @@ function openSpinWheel(vip){
   const prizes = vip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
   const cost   = vip ? 120 : 50;
 
-  document.getElementById('spinWheelTitle').textContent = vip ? '🌟 Vòng quay VIP' : '🎰 Vòng quay may mắn';
+  // Title
+  const titleEl = document.getElementById('spinWheelTitle');
+  if(titleEl) titleEl.innerHTML = vip
+    ? `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(167,139,250,.8)">🌟 Vòng Quay VIP</div>`
+    : `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>`;
   document.getElementById('spinWheelSubtitle').textContent = cost+' xu / lượt';
   document.getElementById('spinResultBox').style.display='none';
-  document.getElementById('spinStartBtn').textContent='🎰 Quay ngay!';
-  document.getElementById('spinStartBtn').disabled=false;
-  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
 
-  // Prize preview
+  const btn = document.getElementById('spinStartBtn');
+  btn.textContent = '🎰  QUAY NGAY!';
+  btn.disabled = false;
+  btn.style.background = vip
+    ? 'linear-gradient(135deg,#7C3AED,#5B21B6)'
+    : 'linear-gradient(135deg,#FF6B00,#FF4500)';
+  btn.style.animation = vip ? 'spinBtnPulseVip 2s ease-in-out infinite' : 'spinBtnPulse 2s ease-in-out infinite';
+
+  // Glow color
+  const glow = document.getElementById('spinGlowBg');
+  if(glow) glow.style.background = vip
+    ? 'radial-gradient(circle,rgba(124,58,237,.3) 0%,transparent 70%)'
+    : 'radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%)';
+
+  document.getElementById('spinCoinInfo').textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+
+  // Prize preview grid
   const preview = document.getElementById('spinPrizePreview');
   if(preview) preview.innerHTML = prizes.map(p=>
-    `<div style="background:${p.color}22;border:1px solid ${p.color}66;border-radius:8px;padding:6px 8px;font-size:.72rem;font-weight:700;color:${p.textColor==='#fff'?'#374151':p.textColor}">
-      ${p.ico} ${p.label} <span style="float:right;opacity:.6">${p.weight}%</span>
+    `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
+      <div style="font-size:1.1rem">${p.ico}</div>
+      <div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div>
     </div>`
   ).join('');
 
   drawWheel(prizes, 0);
 
   const modal = document.getElementById('spinWheelModal');
-  modal.style.display='flex';
+  modal.style.display = 'flex';
 }
 
 function closeSpinWheel(){
   if(_spinIsRunning) return;
-  document.getElementById('spinWheelModal').style.display='none';
+  document.getElementById('spinWheelModal').style.display = 'none';
 }
 
 function doSpin(){
@@ -6734,16 +6848,29 @@ function _applySpinPrize(prize){
   if(prize.freeze) { const f=parseInt(localStorage.getItem(uk('lingococ_freezes'))||'2'); localStorage.setItem(uk('lingococ_freezes'),f+prize.freeze); }
   if(prize.xp2x)   { localStorage.setItem(uk('lingococ_xp2x_until'),Date.now()+30*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
 
+  const isJackpot = prize.label && prize.label.includes('JACKPOT');
   const box = document.getElementById('spinResultBox');
+  const icoEl = document.getElementById('spinResultIco');
   const txt = document.getElementById('spinResultText');
+  const sub = document.getElementById('spinResultSub');
   if(box && txt){
-    txt.textContent = prize.ico+' '+prize.label+' — Chúc mừng!';
-    box.style.display='block';
+    if(isJackpot){
+      box.querySelector('div').style.background = 'linear-gradient(135deg,#7C2D12,#B45309)';
+      box.querySelector('div').style.boxShadow = '0 8px 32px rgba(245,158,11,.6)';
+    } else {
+      box.querySelector('div').style.background = 'linear-gradient(135deg,#065F46,#047857)';
+      box.querySelector('div').style.boxShadow = '0 8px 24px rgba(6,95,70,.4)';
+    }
+    if(icoEl) icoEl.textContent = isJackpot ? '🏆' : prize.ico;
+    txt.textContent = prize.label + (isJackpot ? ' 🎉' : '');
+    if(sub) sub.textContent = isJackpot ? '🎊 JACKPOT! Siêu may mắn!' : 'Đã thêm vào tài khoản!';
+    box.style.display = 'block';
   }
+
   const btn = document.getElementById('spinStartBtn');
-  btn.textContent = '🎰 Quay lần nữa';
+  btn.textContent = '🎰  QUAY LẦN NỮA';
   btn.disabled = false;
-  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  document.getElementById('spinCoinInfo').textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
   fireConfetti();
   updateCoinUI();
 }
@@ -6895,8 +7022,9 @@ function switchShopTab(tab, btn){
     const prizes = SPIN_PRIZES_NORMAL;
     const preview = document.getElementById('spinPrizePreview');
     if(preview) preview.innerHTML = prizes.map(p=>
-      `<div style="background:${p.color}22;border:1px solid ${p.color}66;border-radius:8px;padding:6px 8px;font-size:.72rem;font-weight:700;color:#374151">
-        ${p.ico} ${p.label}
+      `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
+        <div style="font-size:1.1rem">${p.ico}</div>
+        <div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div>
       </div>`
     ).join('');
   }
