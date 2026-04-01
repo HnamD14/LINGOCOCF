@@ -6497,6 +6497,17 @@ function saveInventory(inv){ localStorage.setItem(uk(INVENTORY_KEY), JSON.string
 function addToInventory(id){ const inv=getInventory(); inv.push(id); saveInventory(inv); }
 function removeFromInventory(id){ const inv=getInventory(); const idx=inv.indexOf(id); if(idx>-1){inv.splice(idx,1);saveInventory(inv);} }
 
+function useItem(id){
+  const inv = getInventory();
+  if(!inv.includes(id)){ showToast('❌ Không tìm thấy vật phẩm trong kho!'); return; }
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const item = allItems.find(i => i.id === id);
+  if(!item){ showToast('❌ Vật phẩm không hợp lệ!'); return; }
+  removeFromInventory(id);
+  applyItemEffect(item);
+  renderShop();
+}
+
 function buyItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
@@ -6535,25 +6546,20 @@ function confirmBuy(){
   if(!spendCoins(item.price)){ showToast('❌ Không đủ xu!'); closeShopModal(); return; }
 
   if(item.type === 'permanent' || item.type === 'avatar'){
-    // Permanent/avatar: lưu owned như cũ
+    // Permanent/avatar: lưu owned + áp dụng ngay
     const owned = getOwned();
     if(!owned.includes(id)){ owned.push(id); localStorage.setItem(uk(COIN_OWNED_KEY), JSON.stringify(owned)); }
     if(item.weekly) markWeeklyBought(id);
-    applyItemEffect(item); // avatar/permanent áp dụng ngay
-    closeShopModal();
-    renderShop();
-    fireConfetti();
+    applyItemEffect(item);
+    closeShopModal(); renderShop(); fireConfetti();
     showToast(`✅ Mua thành công: ${item.name}!`);
   } else {
     // Consumable: lưu vào kho, KHÔNG dùng ngay
     if(item.weekly) markWeeklyBought(id);
     addToInventory(id);
-    closeShopModal();
-    renderShop();
-    fireConfetti();
-    showToast(`🎒 Đã thêm vào kho: ${item.name}! Vào "Đã mua" để sử dụng.`);
-    // Tự động chuyển sang tab Đã mua
-    setTimeout(()=> switchShopTab('owned', document.getElementById('shopTabOwned')), 600);
+    closeShopModal(); renderShop(); fireConfetti();
+    showToast(`🎒 Đã thêm vào kho: ${item.name}!`);
+    setTimeout(()=> switchShopTab('owned', document.getElementById('shopTabOwned')), 700);
   }
 }
 
@@ -6630,17 +6636,6 @@ function applyItemEffect(item){
       applyEquippedAvatar();
     }
   }
-}
-
-function useItem(id){
-  const inv = getInventory();
-  if(!inv.includes(id)){ showToast('❌ Không tìm thấy vật phẩm trong kho!'); return; }
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
-  const item = allItems.find(i => i.id === id);
-  if(!item){ showToast('❌ Vật phẩm không hợp lệ!'); return; }
-  removeFromInventory(id);
-  applyItemEffect(item);
-  renderShop();
 }
 
 /* ════════════════════════════════════════════════
@@ -6958,6 +6953,13 @@ function applyNameColorBadge(){
 /* backward compat */
 function applyNameGoldBadge(){ applyNameColorBadge(); }
 
+function applyNameColor(color){
+  localStorage.setItem(uk('lingococ_name_color'), color);
+  applyNameColorBadge();
+  showToast(color==='gold'?'✨ Tên màu vàng đang dùng!':color==='purple'?'💜 Tên màu tím đang dùng!':'❤️ Tên màu đỏ đang dùng!');
+  renderShop();
+}
+
 
 /* ── Render shop ── */
 function renderShop(){
@@ -6968,23 +6970,36 @@ function renderShop(){
   const wp       = getWeeklyPurchases();
   const resetIn  = daysUntilMonday();
 
-  function makeCard(item){
+  function makeCard(item, inOwnedPanel=false){
     const ownedFlag    = owned.includes(item.id);
     const weeklyBought = item.weekly && wp[item.id];
     const canAfford    = coins >= item.price;
     const isPerm       = item.type === 'permanent';
+    const isAvatar     = item.type === 'avatar';
     const isEquippedNow= equipped === item.id;
 
+    // Detect "đang dùng" cho màu tên
+    const activeNameColor = localStorage.getItem(uk('lingococ_name_color'));
+    const nameColorMap = { name_color:'gold', name_purple:'purple', name_red:'red' };
+    const isNameActive = nameColorMap[item.id] && activeNameColor === nameColorMap[item.id];
+
+    const isActive = isEquippedNow || isNameActive;
+
     let badge = '';
-    if(isEquippedNow)   badge = '<div class="shop-item-owned-badge" style="background:#0FD688">Đang dùng</div>';
-    else if(ownedFlag && isPerm) badge = '<div class="shop-item-owned-badge">Sở hữu</div>';
+    if(isActive)          badge = '<div class="shop-item-owned-badge" style="background:#0FD688">✓ Đang dùng</div>';
+    else if(ownedFlag && isPerm) badge = '<div class="shop-item-owned-badge" style="background:#6366F1">Đã sở hữu</div>';
     else if(weeklyBought) badge = `<div class="shop-item-owned-badge" style="background:#6B7280">Đã mua tuần này</div>`;
-    else if(item.isNew) badge = '<div class="shop-item-new">MỚI</div>';
+    else if(item.isNew)   badge = '<div class="shop-item-new">MỚI</div>';
     if(item.weekly && !weeklyBought) badge += `<div class="shop-weekly-tag">🔄 Tuần</div>`;
 
     let priceHtml;
     if(ownedFlag && isPerm){
-      priceHtml = `<div class="shop-item-price" style="background:#D1FAF0;border-color:#6EE7B7;color:#065F46">${isEquippedNow?'✓ Đang mặc':'✓ Mặc vào'}</div>`;
+      if(isActive){
+        priceHtml = `<div class="shop-item-price" style="background:#D1FAF0;border-color:#0FD688;color:#065F46;font-weight:900">✓ Đang dùng</div>`;
+      } else {
+        const actionLabel = isAvatar ? '👕 Mặc vào' : '⚡ Dùng ngay';
+        priceHtml = `<div class="shop-item-price" style="background:#EDE9FE;border-color:#7C3AED;color:#5B21B6;font-weight:800">${actionLabel}</div>`;
+      }
     } else if(weeklyBought){
       priceHtml = `<div class="shop-item-price" style="background:#F3F4F6;border-color:#D1D5DB;color:#6B7280">🔄 ${resetIn} ngày</div>`;
     } else {
@@ -6996,12 +7011,14 @@ function renderShop(){
       ? `<div class="shop-item-ico" style="font-size:1rem;line-height:1">${item.svg}</div>`
       : `<div class="shop-item-ico">${item.ico}</div>`;
 
-    const clickFn = (ownedFlag && item.type==='avatar')
-      ? `equipAvatar('${item.id}')`
-      : `buyItem('${item.id}')`;
+    let clickFn;
+    if(ownedFlag && isAvatar)       clickFn = `equipAvatar('${item.id}')`;
+    else if(ownedFlag && isPerm && nameColorMap[item.id]) clickFn = `applyNameColor('${nameColorMap[item.id]}')`;
+    else                             clickFn = `buyItem('${item.id}')`;
 
     const dimmed = weeklyBought ? 'opacity:.65;' : '';
-    return `<div class="shop-item ${isEquippedNow?'equipped':ownedFlag&&isPerm?'owned':''}" style="${dimmed}" onclick="${clickFn}">
+    const highlight = inOwnedPanel && isActive ? 'box-shadow:0 0 0 2px #0FD688;' : '';
+    return `<div class="shop-item ${isActive?'equipped':ownedFlag&&isPerm?'owned':''}" style="${dimmed}${highlight}" onclick="${clickFn}">
       ${badge}${icoHtml}
       <div class="shop-item-name">${item.name}</div>
       <div class="shop-item-desc">${item.desc}</div>
@@ -7033,9 +7050,9 @@ function renderShop(){
     boostPanel.prepend(banner);
   }
 
-  // Owned panel — gồm 2 phần: kho đồ chưa dùng + vật phẩm permanent
+  // Owned panel — kho đồ chưa dùng + vật phẩm permanent
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
-  const inventory = getInventory();
+  const inventory = getInventory ? getInventory() : [];
   const ownedItems = allItems.filter(i => owned.includes(i.id));
   const go = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
@@ -7049,7 +7066,6 @@ function renderShop(){
       // Kho đồ chưa dùng (consumable)
       if(inventory.length > 0){
         html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;grid-column:1/-1">🎒 Kho đồ — chưa sử dụng</div>`;
-        // Nhóm các item cùng loại lại
         const invCounts = {};
         inventory.forEach(id => invCounts[id] = (invCounts[id]||0)+1);
         Object.entries(invCounts).forEach(([id, count])=>{
@@ -7067,10 +7083,10 @@ function renderShop(){
         });
       }
 
-      // Vật phẩm permanent đã sở hữu
+      // Vật phẩm permanent đã sở hữu — truyền inOwnedPanel=true
       if(ownedItems.length > 0){
         html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin:${inventory.length>0?'16px':0} 0 8px;grid-column:1/-1">🏆 Vật phẩm vĩnh viễn</div>`;
-        html += ownedItems.map(makeCard).join('');
+        html += ownedItems.map(i => makeCard(i, true)).join('');
       }
 
       go.innerHTML = html;
