@@ -4420,6 +4420,13 @@ function goScreen(id){
   document.getElementById(id).classList.add('active');
   // Dừng đọc khi chuyển màn hình
   window.speechSynthesis && window.speechSynthesis.cancel();
+  // Load settings khi vào màn cài đặt
+  if(id === 'settingsScreen') cfgLoad();
+  // Sync avatar & màu tên khi vào profile
+  if(id === 'profileScreen'){
+    if(typeof applyEquippedAvatar === 'function') applyEquippedAvatar();
+    if(typeof applyNameColorBadge === 'function') applyNameColorBadge();
+  }
 }
 function goHome(){ goScreen('homeScreen'); syncHomeStats(); loadAllDeckBars(); }
 
@@ -5297,12 +5304,12 @@ function onAuthSuccess(user, token, isNew = false){
   }, 200);
 
   // ── Font size & coin/shop/avatar init ──
-  try { const fs = cfgGet().fontSize; if(fs) cfgApplyFontSize(fs); } catch(e) {}
+  cfgLoad();
   updateCoinUI();
   applyEquippedAvatar();
   showXP2xIndicator();
   updateHintBtn();
-  applyNameGoldBadge();
+  applyNameColorBadge();
   setTimeout(grantDailyCoins, 1800);
   setTimeout(updateDailyBanner, 300); // cập nhật banner daily đúng theo userId sau login
 
@@ -5527,10 +5534,13 @@ function cfgLoad(){
   // Sound fx
   const sf = document.getElementById('cfgSoundFx');
   if(sf) sf.checked = cfg.soundFx !== false;
-  // Font size
+  // Font size — normalize old keys to new
+  const fontRemap = { sm:'small', md:'normal', lg:'large', xl:'xlarge' };
+  const savedFont = cfg.fontSize || 'normal';
+  const fontVal = fontRemap[savedFont] || savedFont;
   const fs = document.getElementById('cfgFontSize');
-  if(fs) fs.value = cfg.fontSize || 'md';
-  if(cfg.fontSize) cfgApplyFontSize(cfg.fontSize);
+  if(fs) fs.value = fontVal;
+  cfgApplyFontSize(fontVal);
   // Haptic
   const hp = document.getElementById('cfgHaptic');
   if(hp) hp.checked = cfg.haptic !== false;
@@ -5569,8 +5579,13 @@ function cfgSetFontSize(val){
 
 function cfgApplyFontSize(val){
   const root = document.documentElement;
-  const sizes = { sm:'13px', md:'15px', lg:'17px', xl:'19px' };
+  const sizes = { small:'13px', normal:'15px', large:'17px', xlarge:'19px',
+                  sm:'13px', md:'15px', lg:'17px', xl:'19px' }; // backward compat
   if(sizes[val]) root.style.setProperty('--base-font', sizes[val]);
+  const sub = document.getElementById('cfgFontSub');
+  const labels = { small:'Nhỏ', normal:'Cỡ thường', large:'Lớn', xlarge:'Rất lớn',
+                   sm:'Nhỏ', md:'Cỡ thường', lg:'Lớn', xl:'Rất lớn' };
+  if(sub) sub.textContent = labels[val] || 'Cỡ thường';
 }
 
 function cfgSetHaptic(val){
@@ -7812,10 +7827,9 @@ async function _loadRealPlayers(page=0){
     // API cũ trả array trực tiếp — handle cả hai
     const list = Array.isArray(data.data) ? data.data : (data.data.items || []);
     const myUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
-    const myEmo = _getMyAvatarEmo();
     _realLbPlayers = list.map(p => ({
       name: p.fullName || p.username,
-      emo: p.username === myUser?.username ? myEmo : _emoForName(p.username),
+      emo: p.username === myUser?.username ? '🐸' : _emoForName(p.username),
       xp: p.xp || 0,
       streak: p.streak || 0,
       isMe: p.username === myUser?.username,
@@ -7827,7 +7841,7 @@ async function _loadRealPlayers(page=0){
         const list2 = r2.data.data.items || [];
         _realLbPlayers = _realLbPlayers.concat(list2.map(p => ({
           name: p.fullName || p.username,
-          emo: p.username === myUser?.username ? myEmo : _emoForName(p.username),
+          emo: p.username === myUser?.username ? '🐸' : _emoForName(p.username),
           xp: p.xp || 0,
           streak: p.streak || 0,
           isMe: p.username === myUser?.username,
@@ -7843,36 +7857,27 @@ function _emoForName(name){
   for(let i=0; i<(name||'').length; i++) h = (h*31 + name.charCodeAt(i)) & 0xfffff;
   return _EMO_POOL[Math.abs(h) % _EMO_POOL.length];
 }
-function _getMyAvatarEmo(){
-  try{
-    const eq = localStorage.getItem(uk('lingococ_shop_equipped'));
-    if(!eq || eq==='default') return '🐸';
-    const item = SHOP_ITEMS.avatar.find(i=>i.id===eq);
-    return item ? (item.ico||'🐸') : '🐸';
-  }catch{ return '🐸'; }
-}
 
 function _genPlayers(type){
   const myUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
   const myName = myUser ? (myUser.fullName || myUser.username) : (state.myUsername || 'Bạn');
-  const myEmo  = _getMyAvatarEmo();
 
   if(_realLbPlayers && _realLbPlayers.length > 0){
     // Dùng data thật từ API
     let players = _realLbPlayers.map(p => ({...p, val: type==='xp' ? p.xp : p.streak}));
     // Đảm bảo user hiện tại luôn có trong danh sách
     if(!players.find(p=>p.isMe)){
-      players.push({ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
+      players.push({ name:myName, emo:'🐸', val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
     } else {
       const me = players.find(p=>p.isMe);
-      if(me){ me.val = Math.max(me.val, type==='xp'?state.xp:state.streak); me.emo = myEmo; }
+      if(me) me.val = Math.max(me.val, type==='xp'?state.xp:state.streak);
     }
     players.sort((a,b)=>b.val-a.val);
     return players;
   }
 
   // Fallback: chỉ hiện mình user khi chưa có data
-  return [{ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, isMe:true }];
+  return [{ name:myName, emo:'🐸', val: type==='xp'?state.xp:state.streak, isMe:true }];
 }
 
 // Tính thời gian còn lại đến cuối tuần (Chủ nhật 23:59)
