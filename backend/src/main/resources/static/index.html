@@ -2532,7 +2532,7 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:20px;overflow:hidden;background:#F5F3FF"></div>
+      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:16px;overflow:hidden;background:#F5F3FF"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
@@ -8849,7 +8849,8 @@ function loadStrokeChar(){
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
 
   const chars = [...w.h].filter(c=>c.trim());
-  const CELL = 220; // mỗi ký tự 220px — 2 ký tự = 440px tổng
+  // 1 ký tự = 280px, 2 ký tự = 210px mỗi cái, 3+ = 170px
+  const CELL = chars.length === 1 ? 280 : chars.length === 2 ? 210 : 170;
 
   chars.forEach((char, i) => {
     const cell = document.createElement('div');
@@ -8865,9 +8866,10 @@ function loadStrokeChar(){
 
     try{
       const writer = HanziWriter.create(`skCanvas_${i}`, char, {
-        width:CELL, height:CELL, padding:16,
+        width:CELL, height:CELL, padding:14,
         showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
-        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:7,
+        highlightColor:'#A78BFA', drawingColor:'#4C1D95',
+        drawingWidth: chars.length===1 ? 8 : 6,
         strokeAnimationSpeed:1, delayBetweenStrokes:200,
         charDataLoader:(ch, onLoad, onError)=>{
           fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
