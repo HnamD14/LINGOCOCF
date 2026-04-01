@@ -1327,6 +1327,16 @@
       <div class="shop-grid" id="shopGridAvatar"></div>
     </div>
 
+    <!-- Panel: Đã mua -->
+    <div id="shopPanelOwned" class="shop-panel">
+      <div id="shopOwnedEmpty" style="display:none;text-align:center;padding:40px 20px;color:var(--gray-400)">
+        <div style="font-size:3rem;margin-bottom:12px">📦</div>
+        <div style="font-weight:700;font-size:.9rem">Chưa mua gì cả</div>
+        <div style="font-size:.8rem;margin-top:4px">Hãy học để kiếm xu và mua vật phẩm!</div>
+      </div>
+      <div class="shop-grid" id="shopGridOwned"></div>
+    </div>
+
     <!-- Panel: Vòng quay -->
     <div id="shopPanelSpin" class="shop-panel">
       <div style="text-align:center;padding:8px 0 20px">
@@ -1335,7 +1345,7 @@
         <div style="font-size:.8rem;color:#6B7280;margin-top:4px">Quay để nhận xu, XP và nhiều phần thưởng hấp dẫn!</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
-        <button onclick="openSpinWheel(false)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left">
+        <button onclick="openSpinWheel(false)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left;position:relative;z-index:2">
           <div style="border-radius:18px;background:linear-gradient(135deg,#FF6B00,#FF4500);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(255,107,0,.35);position:relative;overflow:hidden">
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none"></div>
             <div style="width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0">🎰</div>
@@ -1346,7 +1356,7 @@
             <div style="background:rgba(255,255,255,.25);border-radius:99px;padding:5px 12px;font-family:'Baloo 2',cursive;font-size:.85rem;font-weight:900;color:#fff;white-space:nowrap">50 xu</div>
           </div>
         </button>
-        <button onclick="openSpinWheel(true)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left">
+        <button onclick="openSpinWheel(true)" style="width:100%;padding:0;border:none;background:none;cursor:pointer;text-align:left;position:relative;z-index:2">
           <div style="border-radius:18px;background:linear-gradient(135deg,#7C3AED,#5B21B6);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(124,58,237,.35);position:relative;overflow:hidden">
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none"></div>
             <div style="position:absolute;top:8px;right:12px;background:linear-gradient(135deg,#FCD34D,#F59E0B);border-radius:99px;padding:2px 8px;font-size:.65rem;font-weight:900;color:#7C2D12">VIP</div>
@@ -1365,16 +1375,6 @@
       </div>
     </div>
 
-    <!-- Panel: Đã mua -->
-    <div id="shopPanelOwned" class="shop-panel">
-      <div id="shopOwnedEmpty" style="display:none;text-align:center;padding:40px 20px;color:var(--gray-400)">
-        <div style="font-size:3rem;margin-bottom:12px">📦</div>
-        <div style="font-weight:700;font-size:.9rem">Chưa mua gì cả</div>
-        <div style="font-size:.8rem;margin-top:4px">Hãy học để kiếm xu và mua vật phẩm!</div>
-      </div>
-      <div class="shop-grid" id="shopGridOwned"></div>
-    </div>
-
   </div>
 
   <!-- Spin Wheel Modal -->
@@ -1385,54 +1385,41 @@
     @keyframes spinBtnPulse{0%,100%{box-shadow:0 4px 20px rgba(255,107,0,.5)}50%{box-shadow:0 4px 32px rgba(255,107,0,.9),0 0 0 8px rgba(255,107,0,.15)}}
     @keyframes spinBtnPulseVip{0%,100%{box-shadow:0 4px 20px rgba(124,58,237,.5)}50%{box-shadow:0 4px 32px rgba(124,58,237,.9),0 0 0 8px rgba(124,58,237,.15)}}
     @keyframes spinGlow{0%,100%{opacity:.4}50%{opacity:.9}}
-    #spinWheelModal.active { animation: none; }
-    .spin-star { position:absolute; font-size:1.2rem; animation: spinStarFloat 2.5s ease-in-out infinite; pointer-events:none; }
-    .spin-pulse-ring { position:absolute;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:spinPulseRing 1.6s ease-out infinite; pointer-events:none; }
+    .spin-star{position:absolute;font-size:1.2rem;animation:spinStarFloat 2.5s ease-in-out infinite;pointer-events:none}
+    .spin-pulse-ring{position:absolute;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:spinPulseRing 1.6s ease-out infinite;pointer-events:none}
   </style>
   <div id="spinWheelModal" style="display:none;position:fixed;inset:0;z-index:9500;align-items:center;justify-content:center;flex-direction:column;overflow:hidden">
-    <!-- Dark gradient BG -->
+    <!-- Dark BG -->
     <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0F0A1E 0%,#1A0A3E 40%,#0A1628 100%);pointer-events:none"></div>
-    <!-- Decorative stars -->
+    <!-- Stars -->
     <div class="spin-star" style="top:6%;left:8%;animation-delay:.3s">✨</div>
     <div class="spin-star" style="top:12%;right:10%;animation-delay:.8s">⭐</div>
     <div class="spin-star" style="top:75%;left:6%;animation-delay:1.2s">💫</div>
     <div class="spin-star" style="top:80%;right:8%;animation-delay:.5s">✨</div>
     <div class="spin-star" style="top:45%;left:3%;animation-delay:1.8s;font-size:.9rem">⭐</div>
     <div class="spin-star" style="top:30%;right:4%;animation-delay:1s;font-size:.9rem">💫</div>
-
     <!-- Card -->
     <div style="position:relative;width:94%;max-width:380px;z-index:1">
-      <!-- Close -->
-      <button onclick="closeSpinWheel()" style="position:absolute;top:-44px;right:0;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)">✕</button>
-
-      <!-- Title bar -->
+      <button onclick="closeSpinWheel()" style="position:absolute;top:-44px;right:0;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center">✕</button>
       <div id="spinWheelTitle" style="text-align:center;margin-bottom:10px">
         <div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>
         <div id="spinWheelSubtitle" style="font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px">50 xu / lượt</div>
       </div>
-
       <!-- Wheel area -->
       <div style="position:relative;width:300px;height:300px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center">
-        <!-- Glow behind wheel -->
         <div id="spinGlowBg" style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%);animation:spinGlow 2s ease-in-out infinite;pointer-events:none"></div>
-        <!-- Pulse rings -->
         <div class="spin-pulse-ring" style="width:296px;height:296px;animation-delay:0s"></div>
         <div class="spin-pulse-ring" style="width:296px;height:296px;animation-delay:.8s"></div>
-        <!-- Outer decorative ring -->
         <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:conic-gradient(#F59E0B,#EF4444,#8B5CF6,#3B82F6,#10B981,#F59E0B);padding:5px;box-sizing:border-box;pointer-events:none">
           <div style="width:100%;height:100%;border-radius:50%;background:#1A0A3E"></div>
         </div>
-        <!-- Canvas -->
         <canvas id="spinCanvas" width="272" height="272" style="position:absolute;border-radius:50%;display:block"></canvas>
-        <!-- Center hub -->
         <div style="position:absolute;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FEF9C3,#F59E0B);border:3px solid #fff;box-shadow:0 0 16px rgba(245,158,11,.8);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:13px;font-weight:900;color:#7C2D12;z-index:2">元</div>
-        <!-- Pointer (top) -->
         <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))">
           <svg width="28" height="36" viewBox="0 0 28 36"><defs><linearGradient id="ptr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient></defs><polygon points="14,34 0,4 28,4" fill="url(#ptr)" stroke="#D97706" stroke-width="1.5"/><polygon points="14,28 5,8 23,8" fill="rgba(255,255,255,.3)"/></svg>
         </div>
       </div>
-
-      <!-- Result box (hidden initially) -->
+      <!-- Result -->
       <div id="spinResultBox" style="display:none;margin-bottom:14px;animation:spinResultPop .5s cubic-bezier(.34,1.56,.64,1) both">
         <div style="background:linear-gradient(135deg,#065F46,#047857);border-radius:16px;padding:16px;text-align:center;box-shadow:0 8px 24px rgba(6,95,70,.4)">
           <div id="spinResultIco" style="font-size:2.4rem;margin-bottom:4px">🎉</div>
@@ -1440,17 +1427,13 @@
           <div id="spinResultSub" style="font-size:.75rem;color:rgba(255,255,255,.7);margin-top:2px">Đã thêm vào tài khoản!</div>
         </div>
       </div>
-
       <!-- Spin button -->
-      <button id="spinStartBtn" onclick="doSpin()"
-        style="width:100%;padding:16px;background:linear-gradient(135deg,#FF6B00,#FF4500);border:none;border-radius:14px;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:900;color:#fff;cursor:pointer;animation:spinBtnPulse 2s ease-in-out infinite;letter-spacing:.02em">
+      <button id="spinStartBtn" onclick="doSpin()" style="width:100%;padding:16px;background:linear-gradient(135deg,#FF6B00,#FF4500);border:none;border-radius:14px;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:900;color:#fff;cursor:pointer;animation:spinBtnPulse 2s ease-in-out infinite;letter-spacing:.02em">
         🎰 &nbsp;QUAY NGAY!
       </button>
       <div id="spinCoinInfo" style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:10px;text-align:center"></div>
     </div>
   </div>
-
-  <!-- Buy confirm modal -->
   <div id="shopBuyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeShopModal()">
     <div class="shop-modal-sheet">
       <div class="shop-modal-ico" id="shopModalIco"><svg width="52" height="52" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="coinModal" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="35%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="22" r="18" fill="#B45309" opacity=".3"/><circle cx="20" cy="20" r="18" fill="url(#coinModal)" stroke="#D97706" stroke-width="2"/><circle cx="20" cy="20" r="13" fill="none" stroke="#FCD34D" stroke-width="1.5" opacity=".55"/><text x="20" y="26" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#7C2D12">元</text><ellipse cx="13" cy="11" rx="7" ry="4" fill="#fff" opacity=".38" transform="rotate(-25,13,11)"/></svg></div>
@@ -5304,7 +5287,6 @@ function onAuthSuccess(user, token, isNew = false){
   updateHintBtn();
   applyNameGoldBadge();
   setTimeout(grantDailyCoins, 1800);
-  setTimeout(updateDailyBanner, 300); // cập nhật banner daily đúng theo userId sau login
 
   // ── Role unlock ──
   if(user.role === 'PRO' || user.role === 'ADMIN') unlockPro(user);
@@ -6429,6 +6411,8 @@ const SHOP_ITEMS = {
     { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
   ],
   special: [
+    { id:'lucky_draw',    ico:'🎰', name:'Vòng quay may mắn',    desc:'Ngẫu nhiên: xu, XP, tim hoặc jackpot 500xu',  price:50,  type:'consumable', effect:'lucky',    weekly:false },
+    { id:'lucky_draw_ex', ico:'🌟', name:'Vòng quay VIP',        desc:'Phần thưởng gấp đôi, tỉ lệ jackpot cao hơn', price:120, type:'consumable', effect:'lucky_ex', weekly:true },
     { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
     { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:280, type:'permanent',  effect:'name_purple' },
     { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:280, type:'permanent',  effect:'name_red' },
@@ -6613,269 +6597,165 @@ function applyItemEffect(item){
   }
 }
 
-/* ════════════════════════════════════════════════
-   🎰 SPIN WHEEL — Vòng quay may mắn
-════════════════════════════════════════════════ */
+/* ── SPIN WHEEL ── */
 const SPIN_PRIZES_NORMAL = [
-  { label:'30 xu',       ico:'🪙', color:'#FDE68A', textColor:'#92400E', coins:30,  weight:30 },
-  { label:'100 xu',      ico:'🪙', color:'#F59E0B', textColor:'#fff',    coins:100, weight:20 },
-  { label:'200 xu',      ico:'💰', color:'#D97706', textColor:'#fff',    coins:200, weight:10 },
-  { label:'+50 XP',      ico:'⭐', color:'#A78BFA', textColor:'#fff',    xp:50,     weight:20 },
-  { label:'Tim đầy',     ico:'💎', color:'#60A5FA', textColor:'#fff',    hearts:true,weight:10 },
-  { label:'+5 Gợi ý',   ico:'💡', color:'#34D399', textColor:'#fff',    hints:5,   weight:20 },
-  { label:'+1 Freeze',   ico:'🧊', color:'#93C5FD', textColor:'#1E3A5F', freeze:1,  weight:10 },
-  { label:'JACKPOT!',    ico:'🎉', color:'#EF4444', textColor:'#fff',    coins:500, weight:5  },
-  { label:'+80 XP',      ico:'⭐', color:'#8B5CF6', textColor:'#fff',    xp:80,     weight:10 },
-  { label:'50 xu',       ico:'🪙', color:'#FCD34D', textColor:'#92400E', coins:50,  weight:25 },
+  { label:'30 xu',      ico:'🪙', color:'#F59E0B', coins:30,   weight:25 },
+  { label:'100 xu',     ico:'🪙', color:'#D97706', coins:100,  weight:18 },
+  { label:'200 xu',     ico:'💰', color:'#B45309', coins:200,  weight:10 },
+  { label:'+50 XP',     ico:'⭐', color:'#7C3AED', xp:50,      weight:20 },
+  { label:'Tim đầy',    ico:'💎', color:'#3B82F6', hearts:true,weight:12 },
+  { label:'+5 Gợi ý',   ico:'💡', color:'#10B981', hints:5,    weight:10 },
+  { label:'+1 Freeze',  ico:'🧊', color:'#06B6D4', freeze:1,   weight:8  },
+  { label:'JACKPOT!',   ico:'🎉', color:'#EF4444', coins:500,  weight:3  },
+  { label:'+80 XP',     ico:'🌟', color:'#8B5CF6', xp:80,      weight:10 },
+  { label:'50 xu',      ico:'🪙', color:'#F59E0B', coins:50,   weight:20 },
 ];
 const SPIN_PRIZES_VIP = [
-  { label:'80 xu',       ico:'🪙', color:'#FDE68A', textColor:'#92400E', coins:80,  weight:20 },
-  { label:'200 xu',      ico:'🪙', color:'#F59E0B', textColor:'#fff',    coins:200, weight:18 },
-  { label:'400 xu',      ico:'💰', color:'#D97706', textColor:'#fff',    coins:400, weight:10 },
-  { label:'+150 XP',     ico:'⭐', color:'#A78BFA', textColor:'#fff',    xp:150,    weight:15 },
-  { label:'Tim đầy',     ico:'💎', color:'#60A5FA', textColor:'#fff',    hearts:true,weight:12 },
-  { label:'XP x2/30p',  ico:'⚡', color:'#34D399', textColor:'#fff',    xp2x:true, weight:10 },
-  { label:'+2 Freeze',   ico:'🧊', color:'#93C5FD', textColor:'#1E3A5F', freeze:2,  weight:8  },
-  { label:'JACKPOT!',    ico:'🌟', color:'#EF4444', textColor:'#fff',    coins:1000,weight:3  },
-  { label:'+300 XP',     ico:'⭐', color:'#8B5CF6', textColor:'#fff',    xp:300,    weight:8  },
-  { label:'500 xu',      ico:'💰', color:'#B45309', textColor:'#fff',    coins:500, weight:6  },
+  { label:'100 xu',     ico:'🪙', color:'#F59E0B', coins:100,  weight:22 },
+  { label:'300 xu',     ico:'💰', color:'#D97706', coins:300,  weight:15 },
+  { label:'400 xu',     ico:'💰', color:'#B45309', coins:400,  weight:10 },
+  { label:'+100 XP',    ico:'⭐', color:'#7C3AED', xp:100,     weight:18 },
+  { label:'Tim đầy',    ico:'💎', color:'#3B82F6', hearts:true,weight:12 },
+  { label:'+10 Gợi ý',  ico:'💡', color:'#10B981', hints:10,   weight:8  },
+  { label:'+2 Freeze',  ico:'🧊', color:'#06B6D4', freeze:2,   weight:7  },
+  { label:'JACKPOT!',   ico:'🏆', color:'#EF4444', coins:1000, weight:3  },
+  { label:'+200 XP',    ico:'🌟', color:'#8B5CF6', xp:200,     weight:8  },
+  { label:'80 xu',      ico:'🪙', color:'#F59E0B', coins:80,   weight:17 },
 ];
-
-let _spinIsVip = false;
-let _spinIsRunning = false;
-let _spinCurrentAngle = 0;
-let _spinSelectedIdx = 0;
+let _spinIsVip=false, _spinIsRunning=false, _spinCurrentAngle=0, _spinSelectedIdx=0;
 
 function _weightedRandom(prizes){
-  const total = prizes.reduce((s,p)=>s+p.weight,0);
-  let r = Math.random()*total;
-  for(let i=0;i<prizes.length;i++){ r-=prizes[i].weight; if(r<=0) return i; }
+  const total=prizes.reduce((s,p)=>s+p.weight,0);
+  let r=Math.random()*total;
+  for(let i=0;i<prizes.length;i++){r-=prizes[i].weight;if(r<=0)return i;}
   return prizes.length-1;
 }
-
-function drawWheel(prizes, rotationRad){
-  const canvas = document.getElementById('spinCanvas');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = 272, cx = 136, cy = 136, R = 128;
-  const n = prizes.length;
-  const sliceAngle = (2*Math.PI)/n;
+function lightenHex(hex,amt){
+  const num=parseInt(hex.replace('#',''),16);
+  const r=Math.min(255,(num>>16)+amt);
+  const g=Math.min(255,((num>>8)&0xFF)+amt);
+  const b=Math.min(255,(num&0xFF)+amt);
+  return `rgb(${r},${g},${b})`;
+}
+function drawWheel(prizes,rotationRad){
+  const canvas=document.getElementById('spinCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=272,cx=136,cy=136,R=128,n=prizes.length;
+  const sliceAngle=(2*Math.PI)/n;
   ctx.clearRect(0,0,W,W);
-
   prizes.forEach((p,i)=>{
-    const startA = rotationRad + i*sliceAngle - Math.PI/2;
-    const endA   = startA + sliceAngle;
-    const midA   = startA + sliceAngle/2;
-
-    // Slice gradient
-    const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,R);
-    grd.addColorStop(0, lightenHex(p.color, 40));
-    grd.addColorStop(1, p.color);
-
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,R,startA,endA);
-    ctx.closePath();
-    ctx.fillStyle = grd;
-    ctx.fill();
-
-    // Separator lines
-    ctx.strokeStyle = 'rgba(255,255,255,.5)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Sheen highlight on top half of each slice
+    const startA=rotationRad+i*sliceAngle-Math.PI/2;
+    const endA=startA+sliceAngle;
+    const midA=startA+sliceAngle/2;
+    const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    grd.addColorStop(0,lightenHex(p.color,40));
+    grd.addColorStop(1,p.color);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,startA,endA);ctx.closePath();
+    ctx.fillStyle=grd;ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;ctx.stroke();
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,R,startA,endA);
-    ctx.closePath();
-    ctx.clip();
-    const sheen = ctx.createLinearGradient(
-      cx+Math.cos(midA)*R*.3, cy+Math.sin(midA)*R*.3,
-      cx+Math.cos(midA)*R, cy+Math.sin(midA)*R
-    );
-    sheen.addColorStop(0,'rgba(255,255,255,.28)');
-    sheen.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle = sheen;
-    ctx.fill();
-    ctx.restore();
-
-    // Icon
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,startA,endA);ctx.closePath();ctx.clip();
+    const sheen=ctx.createLinearGradient(cx+Math.cos(midA)*R*.3,cy+Math.sin(midA)*R*.3,cx+Math.cos(midA)*R,cy+Math.sin(midA)*R);
+    sheen.addColorStop(0,'rgba(255,255,255,.28)');sheen.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=sheen;ctx.fill();ctx.restore();
     ctx.save();
-    ctx.translate(cx + Math.cos(midA)*(R*.58), cy + Math.sin(midA)*(R*.58));
-    ctx.rotate(midA + Math.PI/2);
-    ctx.font = '15px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText(p.ico, 0, 0);
-
-    // Label with shadow for readability
-    ctx.font = 'bold 10px "Baloo 2",sans-serif';
-    ctx.fillStyle = 'rgba(0,0,0,.35)';
-    ctx.fillText(p.label, 1, 13);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(p.label, 0, 12);
+    ctx.translate(cx+Math.cos(midA)*(R*.58),cy+Math.sin(midA)*(R*.58));
+    ctx.rotate(midA+Math.PI/2);
+    ctx.font='15px serif';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(p.ico,0,0);
+    ctx.font='bold 10px "Baloo 2",sans-serif';
+    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillText(p.label,1,13);
+    ctx.fillStyle='#fff';ctx.fillText(p.label,0,12);
     ctx.restore();
   });
-
-  // Outer decorative dots ring
   ctx.save();
   for(let i=0;i<n*2;i++){
-    const a = (i/(n*2))*2*Math.PI + rotationRad;
-    const dx = cx + Math.cos(a)*(R+10);
-    const dy = cy + Math.sin(a)*(R+10);
-    ctx.beginPath(); ctx.arc(dx,dy,2,0,2*Math.PI);
-    ctx.fillStyle = i%2===0 ? '#FCD34D' : 'rgba(255,255,255,.4)';
-    ctx.fill();
+    const a=(i/(n*2))*2*Math.PI+rotationRad;
+    ctx.beginPath();ctx.arc(cx+Math.cos(a)*(R+10),cy+Math.sin(a)*(R+10),2,0,2*Math.PI);
+    ctx.fillStyle=i%2===0?'#FCD34D':'rgba(255,255,255,.4)';ctx.fill();
   }
   ctx.restore();
 }
-
-function lightenHex(hex, amt){
-  // Simple lighten by increasing RGB values
-  const num = parseInt(hex.replace('#',''), 16);
-  const r = Math.min(255, (num>>16)+amt);
-  const g = Math.min(255, ((num>>8)&0xFF)+amt);
-  const b = Math.min(255, (num&0xFF)+amt);
-  return `rgb(${r},${g},${b})`;
-}
-
 function openSpinWheel(vip){
-  _spinIsVip = vip;
-  _spinIsRunning = false;
-  _spinCurrentAngle = 0;
-  const prizes = vip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
-  const cost   = vip ? 120 : 50;
-
-  // Title
-  const titleEl = document.getElementById('spinWheelTitle');
-  if(titleEl) titleEl.innerHTML = vip
-    ? `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(167,139,250,.8)">🌟 Vòng Quay VIP</div>`
-    : `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>`;
-  document.getElementById('spinWheelSubtitle').textContent = cost+' xu / lượt';
+  _spinIsVip=vip;_spinIsRunning=false;_spinCurrentAngle=0;
+  const prizes=vip?SPIN_PRIZES_VIP:SPIN_PRIZES_NORMAL;
+  const cost=vip?120:50;
+  const titleEl=document.getElementById('spinWheelTitle');
+  if(titleEl) titleEl.innerHTML=vip
+    ?`<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(167,139,250,.8)">🌟 Vòng Quay VIP</div>`
+    :`<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>`;
+  document.getElementById('spinWheelSubtitle').textContent=cost+' xu / lượt';
   document.getElementById('spinResultBox').style.display='none';
-
-  const btn = document.getElementById('spinStartBtn');
-  btn.textContent = '🎰  QUAY NGAY!';
-  btn.disabled = false;
-  btn.style.background = vip
-    ? 'linear-gradient(135deg,#7C3AED,#5B21B6)'
-    : 'linear-gradient(135deg,#FF6B00,#FF4500)';
-  btn.style.animation = vip ? 'spinBtnPulseVip 2s ease-in-out infinite' : 'spinBtnPulse 2s ease-in-out infinite';
-
-  // Glow color
-  const glow = document.getElementById('spinGlowBg');
-  if(glow) glow.style.background = vip
-    ? 'radial-gradient(circle,rgba(124,58,237,.3) 0%,transparent 70%)'
-    : 'radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%)';
-
-  document.getElementById('spinCoinInfo').textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
-
-  // Prize preview grid
-  const preview = document.getElementById('spinPrizePreview');
-  if(preview) preview.innerHTML = prizes.map(p=>
-    `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
-      <div style="font-size:1.1rem">${p.ico}</div>
-      <div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div>
-    </div>`
-  ).join('');
-
-  drawWheel(prizes, 0);
-
-  const modal = document.getElementById('spinWheelModal');
-  modal.style.display = 'flex';
-}
-
-function closeSpinWheel(){
-  if(_spinIsRunning) return;
-  document.getElementById('spinWheelModal').style.display = 'none';
-}
-
-function doSpin(){
-  if(_spinIsRunning) return;
-  const prizes = _spinIsVip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
-  const cost   = _spinIsVip ? 120 : 50;
-
-  if(getCoins()<cost){ showToast('❌ Không đủ xu!'); return; }
-  if(!spendCoins(cost)){ showToast('❌ Không đủ xu!'); return; }
-  updateCoinUI();
+  const btn=document.getElementById('spinStartBtn');
+  btn.textContent='🎰  QUAY NGAY!';btn.disabled=false;
+  btn.style.background=vip?'linear-gradient(135deg,#7C3AED,#5B21B6)':'linear-gradient(135deg,#FF6B00,#FF4500)';
+  btn.style.animation=vip?'spinBtnPulseVip 2s ease-in-out infinite':'spinBtnPulse 2s ease-in-out infinite';
+  const glow=document.getElementById('spinGlowBg');
+  if(glow) glow.style.background=vip?'radial-gradient(circle,rgba(124,58,237,.3) 0%,transparent 70%)':'radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%)';
   document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
-
-  _spinIsRunning = true;
+  const preview=document.getElementById('spinPrizePreview');
+  if(preview) preview.innerHTML=prizes.map(p=>`<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center"><div style="font-size:1.1rem">${p.ico}</div><div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div></div>`).join('');
+  drawWheel(prizes,0);
+  document.getElementById('spinWheelModal').style.display='flex';
+}
+function closeSpinWheel(){
+  if(_spinIsRunning)return;
+  document.getElementById('spinWheelModal').style.display='none';
+}
+function doSpin(){
+  if(_spinIsRunning)return;
+  const prizes=_spinIsVip?SPIN_PRIZES_VIP:SPIN_PRIZES_NORMAL;
+  const cost=_spinIsVip?120:50;
+  if(getCoins()<cost){showToast('❌ Không đủ xu!');return;}
+  addCoins(-cost);
+  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  _spinIsRunning=true;
   document.getElementById('spinStartBtn').disabled=true;
   document.getElementById('spinResultBox').style.display='none';
-
-  // Chọn ô thắng theo xác suất
-  _spinSelectedIdx = _weightedRandom(prizes);
-  const n = prizes.length;
-  const sliceAngle = (2*Math.PI)/n;
-
-  // Tính góc cần quay để ô thắng dừng ở trên cùng (pointer ở top)
-  // Pointer ở -PI/2 (top). Trung tâm ô i ở: angle_i = i*sliceAngle - PI/2 + sliceAngle/2
-  // Ta cần trung tâm ô thắng = -PI/2 (top) sau khi quay
-  // targetAngle = -(selectedIdx*sliceAngle + sliceAngle/2) làm cho mid của ô = 0 rad
-  const targetOffset = -((_spinSelectedIdx * sliceAngle) + sliceAngle/2);
-  const fullSpins = (5 + Math.floor(Math.random()*3)) * 2 * Math.PI; // 5–7 vòng
-  const finalAngle = _spinCurrentAngle + fullSpins + targetOffset - (_spinCurrentAngle % (2*Math.PI));
-
-  const duration = 4000 + Math.random()*1000;
-  const startAngle = _spinCurrentAngle;
-  const startTime = performance.now();
-
-  function easeOut(t){ return 1 - Math.pow(1-t, 4); }
-
-  function animate(now){
-    const elapsed = now - startTime;
-    const t = Math.min(elapsed/duration, 1);
-    _spinCurrentAngle = startAngle + (finalAngle - startAngle) * easeOut(t);
-    drawWheel(prizes, _spinCurrentAngle);
-    if(t < 1){ requestAnimationFrame(animate); }
-    else {
-      _spinCurrentAngle = finalAngle;
-      _spinIsRunning = false;
-      _applySpinPrize(prizes[_spinSelectedIdx]);
-    }
+  _spinSelectedIdx=_weightedRandom(prizes);
+  const n=prizes.length;
+  const sliceAngle=(2*Math.PI)/n;
+  const targetOffset=-((_spinSelectedIdx*sliceAngle)+sliceAngle/2);
+  const fullSpins=(5+Math.floor(Math.random()*3))*2*Math.PI;
+  const finalAngle=_spinCurrentAngle+fullSpins+targetOffset-(_spinCurrentAngle%(2*Math.PI));
+  const startAngle=_spinCurrentAngle;
+  const dur=4000+Math.random()*1000;
+  const startTime=performance.now();
+  const easeOut=t=>1-Math.pow(1-t,4);
+  function frame(now){
+    const t=Math.min((now-startTime)/dur,1);
+    _spinCurrentAngle=startAngle+(finalAngle-startAngle)*easeOut(t);
+    drawWheel(prizes,_spinCurrentAngle);
+    if(t<1){requestAnimationFrame(frame);}
+    else{_spinCurrentAngle=finalAngle;_spinIsRunning=false;_applySpinPrize(prizes[_spinSelectedIdx]);}
   }
-  requestAnimationFrame(animate);
+  requestAnimationFrame(frame);
 }
-
 function _applySpinPrize(prize){
-  if(prize.coins)  { addCoins(prize.coins); }
-  if(prize.xp)     { addXP(prize.xp); }
-  if(prize.hearts) { state.hearts=MAX_HEARTS; _saveHearts(null); syncHeartUI(); }
-  if(prize.hints)  { const h=parseInt(localStorage.getItem(uk('lingococ_hints'))||'0'); localStorage.setItem(uk('lingococ_hints'),h+prize.hints); if(typeof updateHintBtn==='function') updateHintBtn(); }
-  if(prize.freeze) { const f=parseInt(localStorage.getItem(uk('lingococ_freezes'))||'2'); localStorage.setItem(uk('lingococ_freezes'),f+prize.freeze); }
-  if(prize.xp2x)   { localStorage.setItem(uk('lingococ_xp2x_until'),Date.now()+30*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
-
-  const isJackpot = prize.label && prize.label.includes('JACKPOT');
-  const box = document.getElementById('spinResultBox');
-  const icoEl = document.getElementById('spinResultIco');
-  const txt = document.getElementById('spinResultText');
-  const sub = document.getElementById('spinResultSub');
-  if(box && txt){
-    if(isJackpot){
-      box.querySelector('div').style.background = 'linear-gradient(135deg,#7C2D12,#B45309)';
-      box.querySelector('div').style.boxShadow = '0 8px 32px rgba(245,158,11,.6)';
-    } else {
-      box.querySelector('div').style.background = 'linear-gradient(135deg,#065F46,#047857)';
-      box.querySelector('div').style.boxShadow = '0 8px 24px rgba(6,95,70,.4)';
-    }
-    if(icoEl) icoEl.textContent = isJackpot ? '🏆' : prize.ico;
-    txt.textContent = prize.label + (isJackpot ? ' 🎉' : '');
-    if(sub) sub.textContent = isJackpot ? '🎊 JACKPOT! Siêu may mắn!' : 'Đã thêm vào tài khoản!';
-    box.style.display = 'block';
+  if(prize.coins)addCoins(prize.coins);
+  if(prize.xp)addXP(prize.xp);
+  if(prize.hearts){state.hearts=MAX_HEARTS;_saveHearts(null);syncHeartUI();}
+  if(prize.hints){const h=parseInt(localStorage.getItem(uk('lingococ_hints'))||'0');localStorage.setItem(uk('lingococ_hints'),h+prize.hints);if(typeof updateHintBtn==='function')updateHintBtn();}
+  if(prize.freeze){const f=parseInt(localStorage.getItem(uk('lingococ_freezes'))||'2');localStorage.setItem(uk('lingococ_freezes'),f+prize.freeze);}
+  const isJackpot=prize.label&&prize.label.includes('JACKPOT');
+  const box=document.getElementById('spinResultBox');
+  const icoEl=document.getElementById('spinResultIco');
+  const txt=document.getElementById('spinResultText');
+  const sub=document.getElementById('spinResultSub');
+  if(box&&txt){
+    box.querySelector('div').style.background=isJackpot?'linear-gradient(135deg,#7C2D12,#B45309)':'linear-gradient(135deg,#065F46,#047857)';
+    box.querySelector('div').style.boxShadow=isJackpot?'0 8px 32px rgba(245,158,11,.6)':'0 8px 24px rgba(6,95,70,.4)';
+    if(icoEl)icoEl.textContent=isJackpot?'🏆':prize.ico;
+    txt.textContent=prize.label+(isJackpot?' 🎉':'');
+    if(sub)sub.textContent=isJackpot?'🎊 JACKPOT! Siêu may mắn!':'Đã thêm vào tài khoản!';
+    box.style.display='block';
   }
-
-  const btn = document.getElementById('spinStartBtn');
-  btn.textContent = '🎰  QUAY LẦN NỮA';
-  btn.disabled = false;
-  document.getElementById('spinCoinInfo').textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
-  fireConfetti();
-  updateCoinUI();
+  const btn=document.getElementById('spinStartBtn');
+  btn.textContent='🎰  QUAY LẦN NỮA';btn.disabled=false;
+  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  fireConfetti();updateCoinUI();
 }
-
-function _runLuckyDraw(vip){ openSpinWheel(vip); }
+function _runLuckyDraw(vip){openSpinWheel(vip);}
 
 function equipAvatar(id){
   const item = SHOP_ITEMS.avatar.find(i => i.id === id);
@@ -7016,35 +6896,30 @@ function switchShopTab(tab, btn){
   if(btn) btn.classList.add('active');
   document.querySelectorAll('.shop-panel').forEach(p=>{
     p.classList.remove('active');
-    p.style.pointerEvents = 'none';
-    p.style.zIndex = '0';
+    p.style.pointerEvents='none';
+    p.style.zIndex='0';
   });
-  const panel = document.getElementById('shopPanel' + tab.charAt(0).toUpperCase() + tab.slice(1));
-  if(panel){ panel.classList.add('active'); panel.style.pointerEvents = 'auto'; panel.style.zIndex = '1'; }
-  if(tab === 'avatar') applyEquippedAvatar();
-  if(tab === 'spin'){
-    const prizes = SPIN_PRIZES_NORMAL;
-    const preview = document.getElementById('spinPrizePreview');
-    if(preview) preview.innerHTML = prizes.map(p=>
-      `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
-        <div style="font-size:1.1rem">${p.ico}</div>
-        <div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div>
-      </div>`
-    ).join('');
+  const panel=document.getElementById('shopPanel'+tab.charAt(0).toUpperCase()+tab.slice(1));
+  if(panel){panel.classList.add('active');panel.style.pointerEvents='auto';panel.style.zIndex='1';}
+  if(tab==='avatar') applyEquippedAvatar();
+  if(tab==='spin'){
+    const prizes=SPIN_PRIZES_NORMAL;
+    const preview=document.getElementById('spinPrizePreview');
+    if(preview) preview.innerHTML=prizes.map(p=>`<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center"><div style="font-size:1.1rem">${p.ico}</div><div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div></div>`).join('');
   }
 }
 
 function goShop(){
-  const cur = document.querySelector('.screen.active');
-  if(cur) state._navOrigin = cur.id;
+  const cur=document.querySelector('.screen.active');
+  if(cur) state._navOrigin=cur.id;
   goScreen('shopScreen');
-  document.querySelectorAll('.bottom-nav .nav-item').forEach(b => {
-    b.classList.toggle('active', b.textContent.includes('Cửa hàng'));
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(b=>{
+    b.classList.toggle('active',b.textContent.includes('Cửa hàng'));
   });
-  // Đảm bảo pointer-events đúng cho từng panel khi mở shop
   document.querySelectorAll('.shop-panel').forEach(p=>{
-    p.style.pointerEvents = p.classList.contains('active') ? 'auto' : 'none';
-    p.style.zIndex = p.classList.contains('active') ? '1' : '0';
+    const isActive=p.classList.contains('active');
+    p.style.pointerEvents=isActive?'auto':'none';
+    p.style.zIndex=isActive?'1':'0';
   });
   renderShop();
   updateCoinUI();
@@ -8757,7 +8632,6 @@ function showFillResult(){
   const grade=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'😎':pct>=30?'🐸':'💪';
 
   const overlay=document.createElement('div');
-  overlay.id='fillResultOverlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:9998;background:#00000070;display:flex;align-items:flex-end;justify-content:center';
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:28px 22px 40px;width:100%;max-width:480px">
@@ -8781,11 +8655,11 @@ function showFillResult(){
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <button onclick="document.getElementById('fillResultOverlay').remove();startFillGame()"
+        <button onclick="this.closest('div[style]').remove();startFillGame()"
           style="width:100%;padding:14px;background:linear-gradient(135deg,#10B981,#059669);border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;color:#fff;cursor:pointer">
           🔄 Chơi lại
         </button>
-        <button onclick="document.getElementById('fillResultOverlay').remove();goHome()"
+        <button onclick="this.closest('div[style]').remove();goHome()"
           style="width:100%;padding:13px;background:none;border:2px solid #e4e4e7;border-radius:12px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;color:#9ca3af;cursor:pointer">
           🏠 Trang chủ
         </button>
@@ -8812,9 +8686,17 @@ function startStrokeGame(){
   const _cur = document.querySelector('.screen.active');
   if(_cur) state._navOrigin = _cur.id;
   const pool = (typeof activeVocab!=='undefined'&&activeVocab.length>=SK_TOTAL)?activeVocab:HSK1;
-  const singles = pool.filter(w=>w.h.length<=2);
-  const src = singles.length>=SK_TOTAL?singles:pool;
-  skWords = [...src].sort(()=>Math.random()-.5).slice(0,SK_TOTAL);
+
+  // Tách từng chữ đơn từ tất cả từ vựng (HanziWriter chỉ nhận 1 chữ)
+  const charMap = {};
+  pool.forEach(w => {
+    [...w.h].forEach(ch => {
+      if (!charMap[ch]) charMap[ch] = { h: ch, p: w.p, m: w.m, ex: w.ex };
+    });
+  });
+  const allChars = Object.values(charMap);
+  const src = allChars.length >= SK_TOTAL ? allChars : allChars;
+  skWords = [...src].sort(()=>Math.random()-.5).slice(0, SK_TOTAL);
   skIdx = 0;
   goScreen('strokeScreen');
   setTimeout(loadStrokeChar, 150);
@@ -8836,9 +8718,25 @@ function loadStrokeChar(){
   _hwMistakes=0; _hwTotalStrokes=0; _hwDone=false;
   const target=document.getElementById('skHanziTarget'); target.innerHTML='';
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
+  // HanziWriter chỉ nhận đúng 1 chữ — lấy chữ đầu tiên nếu có nhiều
+  const singleChar = [...w.h][0];
   try{
-    _hwWriter = HanziWriter.create('skHanziTarget',w.h,{
+    // Xay dung loader thu nhieu CDN
+    var _cdnList = [
+      'https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/' + singleChar + '.json',
+      'https://unpkg.com/hanzi-writer-data@2.0/' + singleChar + '.json',
+      'https://cdn.jsdelivr.net/gh/chanind/hanzi-writer-data@master/data/' + singleChar + '.json'
+    ];
+    function _tryLoadChar(urls, onOK, onFail) {
+      if(!urls.length){ onFail(); return; }
+      fetch(urls[0], {cache:'force-cache'})
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(onOK)
+        .catch(function(){ _tryLoadChar(urls.slice(1), onOK, onFail); });
+    }
+    _hwWriter = HanziWriter.create('skHanziTarget', singleChar,{
       width:280,height:280,padding:18,
+      charDataLoader: function(ch, onDone, onErr){ _tryLoadChar(_cdnList, onDone, onErr); },
       showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
       highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
       strokeAnimationSpeed:1,delayBetweenStrokes:200,
@@ -8852,7 +8750,20 @@ function loadStrokeChar(){
           onComplete:(d)=>{ _hwDone=true; _skShowResult(d.totalMistakes); }
         });
       },
-      onLoadCharDataError:()=>_skFallback(w)
+      onLoadCharDataError: function() {
+        // Thu CDN du phong truoc khi hien loi
+        var altUrl = 'https://unpkg.com/hanzi-writer-data@2.0/' + singleChar + '.json';
+        fetch(altUrl)
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            _hwWriter.setCharacter(singleChar);
+          })
+          .catch(function(){
+            // Ca 2 CDN deu loi -> tu dong skip sang chu tiep
+            skIdx++;
+            setTimeout(loadStrokeChar, 200);
+          });
+      }
     });
   }catch(e){ _skFallback(w); }
   speakText(w.h);
@@ -9133,7 +9044,6 @@ function finishDaily(){
   syncHomeStats();
 
   const overlay=document.createElement('div');
-  overlay.id='dailyResultOverlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:#00000075;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:24px;padding:32px 24px;max-width:300px;width:90%;text-align:center;box-shadow:0 20px 60px #00000040">
@@ -9141,7 +9051,7 @@ function finishDaily(){
       <div style="font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;margin-bottom:6px">Daily hoàn thành!</div>
       <div style="font-size:.84rem;color:#6b7280;font-weight:600;margin-bottom:16px">+${bonusXP} XP bonus · Quay lại ngày mai!</div>
       <div style="font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;color:#FF6B00;margin-bottom:20px">+${dcXP} XP tổng</div>
-      <button onclick="document.getElementById('dailyResultOverlay').remove();goHome()"
+      <button onclick="this.closest('div[style]').remove();goHome()"
         style="width:100%;padding:14px;background:linear-gradient(135deg,#FF6B00,#FF4500);border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;color:#fff;cursor:pointer">
         🐸 Về trang chủ!
       </button>
