@@ -7847,10 +7847,7 @@ function _getMyAvatarEmo(){
     if(!equipped || equipped === 'default') return '🐸';
     const item = SHOP_ITEMS.avatar.find(i => i.id === equipped);
     if(!item) return '🐸';
-    // Trả về SVG nếu có, emoji nếu không
-    return item.svg
-      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px">${item.svg.replace(/width="\d+" height="\d+"/, 'width="36" height="36"')}</span>`
-      : (item.emoji || item.ico || '🐸');
+    return item.ico || '🐸';  // chỉ dùng emoji ico cho gọn
   } catch { return '🐸'; }
 }
 
@@ -7871,6 +7868,12 @@ function _genPlayers(type){
     return players;
   }
 
+  return [{ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, isMe:true }];
+}
+    return players;
+  }
+
+  // Fallback: chỉ hiện mình user khi chưa có data
   return [{ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, isMe:true }];
 }
 
