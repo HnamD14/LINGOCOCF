@@ -2388,7 +2388,7 @@
   </div>
 
   <!-- Two-column layout -->
-  <div class="mg-arena">
+  <div class="mg-arena" id="mgArena">
     <!-- SVG overlay for match lines -->
     <svg id="mgLineSVG" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2"></svg>
     <!-- Left: Hanzi -->
@@ -2514,40 +2514,26 @@
      ⑭ STROKE PRACTICE SCREEN
 ═══════════════════════════════════════════════ -->
 <div class="screen" id="strokeScreen">
-  <!-- Header -->
   <div class="sk-header">
     <button class="back-btn" style="background:rgba(255,255,255,.15);color:#fff" onclick="goBackToOrigin()">←</button>
     <div class="sk-title">🖊️ Tập viết</div>
-    <div class="sk-progress-badge" id="skProgress">1/10</div>
+    <div style="font-size:.78rem;font-weight:800;color:rgba(255,255,255,.7)" id="skProgress">1/10</div>
   </div>
-
-  <!-- Progress bar -->
-  <div style="height:3px;background:rgba(255,255,255,.15);flex-shrink:0">
-    <div style="height:100%;background:linear-gradient(90deg,#A78BFA,#7C3AED);transition:width .4s;border-radius:0 2px 2px 0" id="skProgressBar"></div>
+  <div style="height:4px;background:rgba(255,255,255,.2)">
+    <div style="height:100%;background:#A78BFA;transition:width .4s" id="skProgressBar"></div>
   </div>
-
   <div class="sk-body">
-
-    <!-- Guide pill -->
-    <div class="sk-guide" id="skGuide">✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!</div>
-
-    <!-- Word info card -->
+    <div class="sk-guide" id="skGuide">✏️ Vẽ từng nét theo đúng thứ tự — hanzi-writer sẽ hướng dẫn từng bước!</div>
     <div class="sk-info">
-      <div class="sk-info-label">Từ cần viết</div>
+      <div style="font-size:.7rem;font-weight:900;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Từ cần viết</div>
       <div class="sk-char" id="skChar">你</div>
-      <div class="sk-pinyin" id="skPinyin">Nǐ</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--orange);margin-top:2px" id="skPinyin">Nǐ</div>
       <div class="sk-meaning" id="skMeaning">Bạn</div>
     </div>
-
-    <!-- Mistake row -->
-    <div id="skMistakeRow" style="display:flex;gap:5px;align-items:center;min-height:22px"></div>
-
-    <!-- Canvas area -->
-    <div class="sk-canvas-wrap">
-      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:20px;overflow:hidden;background:#F5F3FF"></div>
+    <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
+    <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
+      <div id="skHanziTarget" style="width:280px;height:280px"></div>
     </div>
-
-    <!-- Score ring -->
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
         <circle cx="45" cy="45" r="38" fill="none" stroke="#EDE9FE" stroke-width="7"/>
@@ -2557,20 +2543,15 @@
       </svg>
       <div class="sk-score-val" id="skScoreVal">0%</div>
     </div>
-    <div class="sk-feedback" id="skFeedback" style="display:none"></div>
-
-    <!-- Controls -->
+    <div class="sk-feedback" id="skFeedback" style="display:none">Hãy vẽ để xem điểm!</div>
     <div class="sk-controls">
-      <button class="sk-btn sk-btn-hint" onclick="skShowHint()">💡 Gợi ý</button>
-      <button class="sk-btn sk-btn-anim" onclick="skAnimateChar()">▶ Xem mẫu</button>
+      <button class="sk-btn clear" onclick="skShowHint()">💡 Gợi ý</button>
+      <button class="sk-btn" style="background:var(--gray-100);color:var(--gray-600);flex:1;padding:12px;border:none;border-radius:var(--r-sm);font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;cursor:pointer" onclick="skAnimateChar()">▶ Xem mẫu</button>
     </div>
-
-    <!-- Nav -->
     <div class="sk-nav" id="skNav" style="display:none">
       <button class="sk-nav-btn" onclick="prevStrokeChar()">← Trước</button>
       <button class="sk-nav-btn next" onclick="nextStrokeChar()">Tiếp theo →</button>
     </div>
-
   </div>
 </div>
 
@@ -8394,7 +8375,7 @@ function mgTap(side, slotIdx){
 
 function mgDrawLine(leftEl, rightEl){
   const svg = document.getElementById('mgLineSVG');
-  const arena = document.getElementById('matchingScreen');
+  const arena = document.getElementById('mgArena'); // relative to arena, not full screen
   const arenaRect = arena.getBoundingClientRect();
   const lRect = leftEl.getBoundingClientRect();
   const rRect = rightEl.getBoundingClientRect();
@@ -8404,7 +8385,6 @@ function mgDrawLine(leftEl, rightEl){
   const x2 = rRect.left   - arenaRect.left;
   const y2 = rRect.top    - arenaRect.top  + rRect.height / 2;
 
-  // Bezier curve through midpoint
   const mx = (x1 + x2) / 2;
   const line = document.createElementNS('http://www.w3.org/2000/svg','path');
   line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
@@ -8413,7 +8393,6 @@ function mgDrawLine(leftEl, rightEl){
   line.setAttribute('stroke-dashoffset','200');
   svg.appendChild(line);
 
-  // Animate dashoffset
   requestAnimationFrame(() => {
     line.style.transition = 'stroke-dashoffset .35s ease';
     line.setAttribute('stroke-dashoffset','0');
@@ -8845,9 +8824,6 @@ function startStrokeGame(){
   setTimeout(loadStrokeChar, 150);
 }
 
-let _hwWriters = [];
-let _skDoneCount = 0;
-
 function loadStrokeChar(){
   if(skIdx>=skWords.length){ endStrokeGame(); return; }
   const w = skWords[skIdx];
@@ -8862,75 +8838,27 @@ function loadStrokeChar(){
   document.getElementById('skMistakeRow').innerHTML='';
   document.getElementById('skGuide').textContent='✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!';
   _hwMistakes=0; _hwTotalStrokes=0; _hwDone=false;
-  _hwWriters=[]; _skDoneCount=0;
-
-  const target = document.getElementById('skHanziTarget');
-  target.innerHTML = '';
-
+  const target=document.getElementById('skHanziTarget'); target.innerHTML='';
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
-
-  const chars = [...w.h].filter(c=>c.trim());
-  const CELL = 220; // mỗi ký tự 220px — tổng 2 ký tự = 440px
-
-  chars.forEach((char, i) => {
-    const cell = document.createElement('div');
-    cell.id = `skCanvas_${i}`;
-    cell.style.cssText = [
-      `width:${CELL}px`,
-      `height:${CELL}px`,
-      `position:relative`,
-      `flex-shrink:0`,
-      i > 0 ? `border-left:1.5px solid #DDD6FE` : ''
-    ].filter(Boolean).join(';');
-    target.appendChild(cell);
-
-    try{
-      const writer = HanziWriter.create(`skCanvas_${i}`, char, {
-        width:CELL, height:CELL, padding:16,
-        showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
-        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:7,
-        strokeAnimationSpeed:1, delayBetweenStrokes:200,
-        charDataLoader:(ch, onLoad, onError)=>{
-          fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
-            .then(r=>{ if(!r.ok) throw 0; return r.json(); })
-            .then(onLoad).catch(onError);
-        },
-        onLoadCharDataSuccess:()=>{
-          writer.quiz({
-            onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
-            onCorrectStroke:(d)=>{
-              const el=document.getElementById('skGuide');
-              if(el) el.textContent=d.strokesRemaining>0?`✅ Còn ${d.strokesRemaining} nét...`:'🎉 Ký tự xong!';
-              try{haptic('medium');}catch(e){}
-            },
-            onComplete:()=>{
-              const done=document.createElement('div');
-              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;pointer-events:none;background:rgba(245,243,255,.6)`;
-              done.textContent='✅';
-              cell.appendChild(done);
-              _skDoneCount++;
-              if(_skDoneCount>=chars.length){
-                _hwDone=true;
-                setTimeout(()=>_skShowResult(_hwMistakes), 400);
-              } else {
-                const el=document.getElementById('skGuide');
-                if(el) el.textContent=`✅ ${_skDoneCount}/${chars.length} ký tự xong — tiếp tục nhé!`;
-              }
-            }
-          });
-        },
-        onLoadCharDataError:()=>{
-          _skDoneCount++;
-          if(_skDoneCount>=chars.length) _skFallback(w);
-        }
-      });
-      _hwWriters.push(writer);
-    }catch(e){
-      _skDoneCount++;
-      if(_skDoneCount>=chars.length) _skFallback(w);
-    }
-  });
-
+  try{
+    _hwWriter = HanziWriter.create('skHanziTarget',w.h,{
+      width:280,height:280,padding:18,
+      showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
+      highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
+      strokeAnimationSpeed:1,delayBetweenStrokes:200,
+      onLoadCharDataSuccess:()=>{
+        _hwWriter.quiz({
+          onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
+          onCorrectStroke:(d)=>{
+            document.getElementById('skGuide').textContent=d.strokesRemaining>0?`✅ Đúng! Còn ${d.strokesRemaining} nét...`:'🎉 Xong rồi!';
+            try{haptic('medium');}catch(e){}
+          },
+          onComplete:(d)=>{ _hwDone=true; _skShowResult(d.totalMistakes); }
+        });
+      },
+      onLoadCharDataError:()=>_skFallback(w)
+    });
+  }catch(e){ _skFallback(w); }
   speakText(w.h);
 }
 
@@ -8971,8 +8899,8 @@ function _skFallback(w){
     </div>`;
   document.getElementById('skNav').style.display='flex';
 }
-function skShowHint(){ _hwWriters.forEach(w=>{ try{ if(!_hwDone) w.showHint(); }catch(e){} }); }
-function skAnimateChar(){ _hwWriters.forEach(w=>{ try{ w.animateCharacter(); }catch(e){} }); }
+function skShowHint(){ if(_hwWriter&&!_hwDone) _hwWriter.showHint(); }
+function skAnimateChar(){ if(_hwWriter) _hwWriter.animateCharacter(); }
 function prevStrokeChar(){ if(skIdx>0){skIdx--;loadStrokeChar();} }
 function nextStrokeChar(){ skIdx++; loadStrokeChar(); }
 function endStrokeGame(){
