@@ -6490,6 +6490,13 @@ function getOwned(){ try{ return JSON.parse(localStorage.getItem(uk(COIN_OWNED_K
 function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; }
 function isOwned(id){ return getOwned().includes(id); }
 
+/* ── Kho đồ: consumable đã mua, chưa dùng ── */
+const INVENTORY_KEY = 'lingococ_inventory';
+function getInventory(){ try{ return JSON.parse(localStorage.getItem(uk(INVENTORY_KEY))||'[]'); }catch{ return []; } }
+function saveInventory(inv){ localStorage.setItem(uk(INVENTORY_KEY), JSON.stringify(inv)); }
+function addToInventory(id){ const inv=getInventory(); inv.push(id); saveInventory(inv); }
+function removeFromInventory(id){ const inv=getInventory(); const idx=inv.indexOf(id); if(idx>-1){inv.splice(idx,1);saveInventory(inv);} }
+
 function buyItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
@@ -6526,16 +6533,28 @@ function confirmBuy(){
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   if(!spendCoins(item.price)){ showToast('❌ Không đủ xu!'); closeShopModal(); return; }
-  if(item.type === 'permanent'){
+
+  if(item.type === 'permanent' || item.type === 'avatar'){
+    // Permanent/avatar: lưu owned như cũ
     const owned = getOwned();
     if(!owned.includes(id)){ owned.push(id); localStorage.setItem(uk(COIN_OWNED_KEY), JSON.stringify(owned)); }
+    if(item.weekly) markWeeklyBought(id);
+    applyItemEffect(item); // avatar/permanent áp dụng ngay
+    closeShopModal();
+    renderShop();
+    fireConfetti();
+    showToast(`✅ Mua thành công: ${item.name}!`);
+  } else {
+    // Consumable: lưu vào kho, KHÔNG dùng ngay
+    if(item.weekly) markWeeklyBought(id);
+    addToInventory(id);
+    closeShopModal();
+    renderShop();
+    fireConfetti();
+    showToast(`🎒 Đã thêm vào kho: ${item.name}! Vào "Đã mua" để sử dụng.`);
+    // Tự động chuyển sang tab Đã mua
+    setTimeout(()=> switchShopTab('owned', document.getElementById('shopTabOwned')), 600);
   }
-  if(item.weekly) markWeeklyBought(id);
-  applyItemEffect(item);
-  closeShopModal();
-  renderShop();
-  fireConfetti();
-  showToast(`🪙 Mua thành công: ${item.name}!`);
 }
 
 function applyItemEffect(item){
@@ -6611,6 +6630,17 @@ function applyItemEffect(item){
       applyEquippedAvatar();
     }
   }
+}
+
+function useItem(id){
+  const inv = getInventory();
+  if(!inv.includes(id)){ showToast('❌ Không tìm thấy vật phẩm trong kho!'); return; }
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const item = allItems.find(i => i.id === id);
+  if(!item){ showToast('❌ Vật phẩm không hợp lệ!'); return; }
+  removeFromInventory(id);
+  applyItemEffect(item);
+  renderShop();
 }
 
 /* ════════════════════════════════════════════════
@@ -6895,26 +6925,10 @@ function equipAvatar(id){
 function applyEquippedAvatar(){
   const equipped = getEquipped();
   const item = SHOP_ITEMS.avatar.find(i => i.id === equipped);
-  const avatarHTML = item && item.svg ? item.svg : '🐸';
-
-  // Cập nhật tất cả .pf2-avatar (profile page)
-  document.querySelectorAll('.pf2-avatar').forEach(el => el.innerHTML = avatarHTML);
-
-  // Cập nhật con ếch ở home screen
-  const heroFrog = document.getElementById('roadmapBtn');
-  if(heroFrog){
-    // Giữ onclick và title, chỉ thay nội dung ếch
-    if(item && item.svg){
-      // Wrap svg nhỏ lại cho vừa khung
-      heroFrog.innerHTML = `<div style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:2rem">${item.svg.replace(/width="72" height="72"/, 'width="42" height="42"')}</div>`;
-    } else {
-      heroFrog.innerHTML = `<svg width="42" height="42" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="fbghero" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#6EE7B7"/><stop offset="100%" stop-color="#059669"/></radialGradient><radialGradient id="fbellyhero" cx="50%" cy="60%" r="45%"><stop offset="0%" stop-color="#D1FAE5"/><stop offset="100%" stop-color="#6EE7B7"/></radialGradient></defs><ellipse cx="40" cy="48" rx="28" ry="22" fill="url(#fbghero)"/><ellipse cx="40" cy="52" rx="18" ry="14" fill="url(#fbellyhero)" opacity=".85"/><circle cx="27" cy="28" r="11" fill="url(#fbghero)"/><circle cx="53" cy="28" r="11" fill="url(#fbghero)"/><circle cx="27" cy="27" r="8" fill="#fff"/><circle cx="53" cy="27" r="8" fill="#fff"/><circle cx="29" cy="27" r="4.5" fill="#1F2937"/><circle cx="55" cy="27" r="4.5" fill="#1F2937"/><path d="M32 58 Q40 65 48 58" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/></svg>`;
-    }
-  }
-
-  // Cập nhật shop preview
+  const pf = document.querySelector('.pf2-avatar');
+  if(pf) pf.innerHTML = item && item.svg ? item.svg : '🐸';
   const preview = document.getElementById('shopAvatarPreview');
-  if(preview){ preview.innerHTML = avatarHTML; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
+  if(preview){ preview.innerHTML = item && item.svg ? item.svg : '🐸'; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
   const lbl = document.getElementById('shopAvatarLabel');
   if(lbl) lbl.textContent = item ? item.name : 'Mặc định';
 }
@@ -7019,14 +7033,48 @@ function renderShop(){
     boostPanel.prepend(banner);
   }
 
-  // Owned panel
+  // Owned panel — gồm 2 phần: kho đồ chưa dùng + vật phẩm permanent
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const inventory = getInventory();
   const ownedItems = allItems.filter(i => owned.includes(i.id));
   const go = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
   if(go && empty){
-    if(ownedItems.length === 0){ empty.style.display='block'; go.innerHTML=''; }
-    else{ empty.style.display='none'; go.innerHTML = ownedItems.map(makeCard).join(''); }
+    const hasAnything = inventory.length > 0 || ownedItems.length > 0;
+    if(!hasAnything){ empty.style.display='block'; go.innerHTML=''; }
+    else{
+      empty.style.display='none';
+      let html = '';
+
+      // Kho đồ chưa dùng (consumable)
+      if(inventory.length > 0){
+        html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;grid-column:1/-1">🎒 Kho đồ — chưa sử dụng</div>`;
+        // Nhóm các item cùng loại lại
+        const invCounts = {};
+        inventory.forEach(id => invCounts[id] = (invCounts[id]||0)+1);
+        Object.entries(invCounts).forEach(([id, count])=>{
+          const it = allItems.find(i=>i.id===id);
+          if(!it) return;
+          html += `<div class="shop-item" style="position:relative">
+            ${count>1?`<div class="shop-item-owned-badge" style="background:#6366F1">x${count}</div>`:''}
+            <div class="shop-item-ico">${it.ico}</div>
+            <div class="shop-item-name">${it.name}</div>
+            <div class="shop-item-desc">${it.desc}</div>
+            <button onclick="useItem('${id}')" style="width:100%;margin-top:6px;padding:8px;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:var(--r-sm);font-family:'Baloo 2',cursive;font-size:.8rem;font-weight:800;color:#fff;cursor:pointer">
+              ⚡ Sử dụng ngay
+            </button>
+          </div>`;
+        });
+      }
+
+      // Vật phẩm permanent đã sở hữu
+      if(ownedItems.length > 0){
+        html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin:${inventory.length>0?'16px':0} 0 8px;grid-column:1/-1">🏆 Vật phẩm vĩnh viễn</div>`;
+        html += ownedItems.map(makeCard).join('');
+      }
+
+      go.innerHTML = html;
+    }
   }
   applyEquippedAvatar();
 }
