@@ -6748,31 +6748,39 @@ function openSpinWheel(vip){
   const prizes = vip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
   const cost   = vip ? 120 : 50;
 
+  const modal = document.getElementById('spinWheelModal');
+  if(!modal){ console.warn('spinWheelModal not found'); return; }
+
   // Title
   const titleEl = document.getElementById('spinWheelTitle');
   if(titleEl) titleEl.innerHTML = vip
     ? `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(167,139,250,.8)">🌟 Vòng Quay VIP</div>`
     : `<div style="font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,50,.6)">🎰 Vòng Quay May Mắn</div>`;
-  document.getElementById('spinWheelSubtitle').textContent = cost+' xu / lượt';
-  document.getElementById('spinResultBox').style.display='none';
+
+  const subtitleEl = document.getElementById('spinWheelSubtitle');
+  if(subtitleEl) subtitleEl.textContent = cost+' xu / lượt';
+
+  const resultBox = document.getElementById('spinResultBox');
+  if(resultBox) resultBox.style.display='none';
 
   const btn = document.getElementById('spinStartBtn');
-  btn.textContent = '🎰  QUAY NGAY!';
-  btn.disabled = false;
-  btn.style.background = vip
-    ? 'linear-gradient(135deg,#7C3AED,#5B21B6)'
-    : 'linear-gradient(135deg,#FF6B00,#FF4500)';
-  btn.style.animation = vip ? 'spinBtnPulseVip 2s ease-in-out infinite' : 'spinBtnPulse 2s ease-in-out infinite';
+  if(btn){
+    btn.textContent = '🎰  QUAY NGAY!';
+    btn.disabled = false;
+    btn.style.background = vip
+      ? 'linear-gradient(135deg,#7C3AED,#5B21B6)'
+      : 'linear-gradient(135deg,#FF6B00,#FF4500)';
+    btn.style.animation = vip ? 'spinBtnPulseVip 2s ease-in-out infinite' : 'spinBtnPulse 2s ease-in-out infinite';
+  }
 
-  // Glow color
   const glow = document.getElementById('spinGlowBg');
   if(glow) glow.style.background = vip
     ? 'radial-gradient(circle,rgba(124,58,237,.3) 0%,transparent 70%)'
     : 'radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%)';
 
-  document.getElementById('spinCoinInfo').textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  const coinInfo = document.getElementById('spinCoinInfo');
+  if(coinInfo) coinInfo.textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
 
-  // Prize preview grid
   const preview = document.getElementById('spinPrizePreview');
   if(preview) preview.innerHTML = prizes.map(p=>
     `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
@@ -6782,8 +6790,6 @@ function openSpinWheel(vip){
   ).join('');
 
   drawWheel(prizes, 0);
-
-  const modal = document.getElementById('spinWheelModal');
   modal.style.display = 'flex';
 }
 
