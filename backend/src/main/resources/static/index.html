@@ -8846,34 +8846,32 @@ function loadStrokeChar(){
   _hwWriters=[]; _skDoneCount=0;
 
   const target = document.getElementById('skHanziTarget');
-  target.innerHTML='';
+  target.innerHTML = '';
 
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
 
   const chars = [...w.h].filter(c=>c.trim());
-  // Kích thước mỗi ô: tổng luôn ~280px để trông như 1 canvas
-  const size = chars.length === 1 ? 280 : Math.floor(280 / chars.length);
+
+  // Mỗi ký tự luôn 220px — tổng 1 ký tự=220, 2 ký tự=440, 3 ký tự=660
+  const CELL = 220;
 
   chars.forEach((char, i) => {
     const cell = document.createElement('div');
     cell.id = `skCanvas_${i}`;
-    // Không có gap, không border giữa — liền mạch
-    // Chỉ có đường kẻ mờ phân cách nếu >1 ký tự
     cell.style.cssText = [
-      `width:${size}px`,
-      `height:${size}px`,
+      `width:${CELL}px`,
+      `height:${CELL}px`,
       `position:relative`,
       `flex-shrink:0`,
-      i > 0 && chars.length > 1 ? `border-left:1.5px solid #DDD6FE` : ''
+      i > 0 ? `border-left:1.5px solid #DDD6FE` : ''
     ].filter(Boolean).join(';');
     target.appendChild(cell);
 
     try{
       const writer = HanziWriter.create(`skCanvas_${i}`, char, {
-        width:size, height:size, padding: size > 200 ? 18 : 12,
+        width:CELL, height:CELL, padding:16,
         showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
-        highlightColor:'#A78BFA', drawingColor:'#4C1D95',
-        drawingWidth: chars.length===1 ? 8 : 6,
+        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:7,
         strokeAnimationSpeed:1, delayBetweenStrokes:200,
         charDataLoader:(ch, onLoad, onError)=>{
           fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
@@ -8885,17 +8883,16 @@ function loadStrokeChar(){
             onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
             onCorrectStroke:(d)=>{
               const el=document.getElementById('skGuide');
-              if(el) el.textContent = d.strokesRemaining>0 ? `✅ Còn ${d.strokesRemaining} nét...` : '🎉 Ký tự xong!';
+              if(el) el.textContent=d.strokesRemaining>0?`✅ Còn ${d.strokesRemaining} nét...`:'🎉 Ký tự xong!';
               try{haptic('medium');}catch(e){}
             },
             onComplete:()=>{
-              // Đánh dấu ô hoàn thành bằng overlay nhẹ
-              const done = document.createElement('div');
-              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;pointer-events:none`;
+              const done=document.createElement('div');
+              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;pointer-events:none;background:rgba(245,243,255,.55)`;
               done.textContent='✅';
               cell.appendChild(done);
               _skDoneCount++;
-              if(_skDoneCount >= chars.length){
+              if(_skDoneCount>=chars.length){
                 _hwDone=true;
                 setTimeout(()=>_skShowResult(_hwMistakes), 400);
               } else {
