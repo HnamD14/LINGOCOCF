@@ -7014,14 +7014,18 @@ function renderShop(){
 function switchShopTab(tab, btn){
   document.querySelectorAll('.shop-tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  document.querySelectorAll('.shop-panel').forEach(p=>p.classList.remove('active'));
-  const panel = document.getElementById('shopPanel' + tab.charAt(0).toUpperCase() + tab.slice(1));
-  if(panel) panel.classList.add('active');
-  if(tab === 'avatar') applyEquippedAvatar();
-  if(tab === 'spin'){
-    const prizes = SPIN_PRIZES_NORMAL;
-    const preview = document.getElementById('spinPrizePreview');
-    if(preview) preview.innerHTML = prizes.map(p=>
+  document.querySelectorAll('.shop-panel').forEach(p=>{
+    p.classList.remove('active');
+    p.style.pointerEvents='none';
+    p.style.zIndex='0';
+  });
+  const panel=document.getElementById('shopPanel'+tab.charAt(0).toUpperCase()+tab.slice(1));
+  if(panel){panel.classList.add('active');panel.style.pointerEvents='auto';panel.style.zIndex='1';}
+  if(tab==='avatar') applyEquippedAvatar();
+  if(tab==='spin'){
+    const prizes=SPIN_PRIZES_NORMAL;
+    const preview=document.getElementById('spinPrizePreview');
+    if(preview) preview.innerHTML=prizes.map(p=>
       `<div style="background:${p.color}22;border:1.5px solid ${p.color}55;border-radius:10px;padding:7px 6px;text-align:center">
         <div style="font-size:1.1rem">${p.ico}</div>
         <div style="font-size:.65rem;font-weight:800;color:#374151;margin-top:2px;line-height:1.2">${p.label}</div>
@@ -7036,6 +7040,11 @@ function goShop(){
   goScreen('shopScreen');
   document.querySelectorAll('.bottom-nav .nav-item').forEach(b => {
     b.classList.toggle('active', b.textContent.includes('Cửa hàng'));
+  });
+  document.querySelectorAll('.shop-panel').forEach(p=>{
+    const isActive=p.classList.contains('active');
+    p.style.pointerEvents=isActive?'auto':'none';
+    p.style.zIndex=isActive?'1':'0';
   });
   renderShop();
   updateCoinUI();
