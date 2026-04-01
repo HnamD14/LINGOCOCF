@@ -2514,26 +2514,40 @@
      ⑭ STROKE PRACTICE SCREEN
 ═══════════════════════════════════════════════ -->
 <div class="screen" id="strokeScreen">
+  <!-- Header -->
   <div class="sk-header">
     <button class="back-btn" style="background:rgba(255,255,255,.15);color:#fff" onclick="goBackToOrigin()">←</button>
     <div class="sk-title">🖊️ Tập viết</div>
-    <div style="font-size:.78rem;font-weight:800;color:rgba(255,255,255,.7)" id="skProgress">1/10</div>
+    <div class="sk-progress-badge" id="skProgress">1/10</div>
   </div>
-  <div style="height:4px;background:rgba(255,255,255,.2)">
-    <div style="height:100%;background:#A78BFA;transition:width .4s" id="skProgressBar"></div>
+
+  <!-- Progress bar -->
+  <div style="height:3px;background:rgba(255,255,255,.15);flex-shrink:0">
+    <div style="height:100%;background:linear-gradient(90deg,#A78BFA,#7C3AED);transition:width .4s;border-radius:0 2px 2px 0" id="skProgressBar"></div>
   </div>
+
   <div class="sk-body">
-    <div class="sk-guide" id="skGuide">✏️ Vẽ từng nét theo đúng thứ tự — hanzi-writer sẽ hướng dẫn từng bước!</div>
+
+    <!-- Guide pill -->
+    <div class="sk-guide" id="skGuide">✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!</div>
+
+    <!-- Word info card -->
     <div class="sk-info">
-      <div style="font-size:.7rem;font-weight:900;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Từ cần viết</div>
+      <div class="sk-info-label">Từ cần viết</div>
       <div class="sk-char" id="skChar">你</div>
-      <div style="font-size:.88rem;font-weight:700;color:var(--orange);margin-top:2px" id="skPinyin">Nǐ</div>
+      <div class="sk-pinyin" id="skPinyin">Nǐ</div>
       <div class="sk-meaning" id="skMeaning">Bạn</div>
     </div>
-    <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
-    <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:16px;overflow:hidden;background:#F5F3FF"></div>
+
+    <!-- Mistake row -->
+    <div id="skMistakeRow" style="display:flex;gap:5px;align-items:center;min-height:22px"></div>
+
+    <!-- Canvas area -->
+    <div class="sk-canvas-wrap">
+      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:20px;overflow:hidden;background:#F5F3FF"></div>
     </div>
+
+    <!-- Score ring -->
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
         <circle cx="45" cy="45" r="38" fill="none" stroke="#EDE9FE" stroke-width="7"/>
@@ -2543,15 +2557,20 @@
       </svg>
       <div class="sk-score-val" id="skScoreVal">0%</div>
     </div>
-    <div class="sk-feedback" id="skFeedback" style="display:none">Hãy vẽ để xem điểm!</div>
+    <div class="sk-feedback" id="skFeedback" style="display:none"></div>
+
+    <!-- Controls -->
     <div class="sk-controls">
-      <button class="sk-btn clear" onclick="skShowHint()">💡 Gợi ý</button>
-      <button class="sk-btn" style="background:var(--gray-100);color:var(--gray-600);flex:1;padding:12px;border:none;border-radius:var(--r-sm);font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;cursor:pointer" onclick="skAnimateChar()">▶ Xem mẫu</button>
+      <button class="sk-btn sk-btn-hint" onclick="skShowHint()">💡 Gợi ý</button>
+      <button class="sk-btn sk-btn-anim" onclick="skAnimateChar()">▶ Xem mẫu</button>
     </div>
+
+    <!-- Nav -->
     <div class="sk-nav" id="skNav" style="display:none">
       <button class="sk-nav-btn" onclick="prevStrokeChar()">← Trước</button>
       <button class="sk-nav-btn next" onclick="nextStrokeChar()">Tiếp theo →</button>
     </div>
+
   </div>
 </div>
 
@@ -8851,9 +8870,7 @@ function loadStrokeChar(){
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
 
   const chars = [...w.h].filter(c=>c.trim());
-
-  // Mỗi ký tự luôn 220px — tổng 1 ký tự=220, 2 ký tự=440, 3 ký tự=660
-  const CELL = 220;
+  const CELL = 220; // mỗi ký tự 220px — tổng 2 ký tự = 440px
 
   chars.forEach((char, i) => {
     const cell = document.createElement('div');
@@ -8888,7 +8905,7 @@ function loadStrokeChar(){
             },
             onComplete:()=>{
               const done=document.createElement('div');
-              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;pointer-events:none;background:rgba(245,243,255,.55)`;
+              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;pointer-events:none;background:rgba(245,243,255,.6)`;
               done.textContent='✅';
               cell.appendChild(done);
               _skDoneCount++;
