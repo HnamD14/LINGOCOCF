@@ -2532,7 +2532,7 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="width:280px;height:280px"></div>
+      <div id="skHanziTarget" style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
@@ -8826,6 +8826,9 @@ function startStrokeGame(){
   setTimeout(loadStrokeChar, 150);
 }
 
+let _hwWriters = []; // mảng writer cho từng ký tự
+let _skDoneCount = 0; // đếm số ký tự đã hoàn thành
+
 function loadStrokeChar(){
   if(skIdx>=skWords.length){ endStrokeGame(); return; }
   const w = skWords[skIdx];
@@ -8840,91 +8843,98 @@ function loadStrokeChar(){
   document.getElementById('skMistakeRow').innerHTML='';
   document.getElementById('skGuide').textContent='✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!';
   _hwMistakes=0; _hwTotalStrokes=0; _hwDone=false;
-
-  if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
-
-  // Tách từng ký tự — HanziWriter chỉ nhận 1 ký tự/lần
-  const chars = [...w.h].filter(c => c.trim()); // loại khoảng trắng
-  _skLoadChars(w, chars, 0);
-  speakText(w.h);
-}
-
-// Biến theo dõi ký tự hiện tại trong từ
-let _skCharIdx = 0;
-let _skChars = [];
-let _skCurrentWord = null;
-
-function _skLoadChars(w, chars, charIdx){
-  _skCurrentWord = w;
-  _skChars = chars;
-  _skCharIdx = charIdx;
+  _hwWriters=[]; _skDoneCount=0;
 
   const target = document.getElementById('skHanziTarget');
   target.innerHTML = '';
 
-  if(charIdx >= chars.length){ _skShowResult(_hwMistakes); return; }
+  if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
 
-  // Nếu từ nhiều ký tự, hiển thị tiến trình ký tự
-  const charProgress = chars.length > 1
-    ? `<div style="text-align:center;font-size:.75rem;color:#7C3AED;font-weight:700;margin-bottom:6px">Ký tự ${charIdx+1}/${chars.length}: ${chars[charIdx]}</div>`
-    : '';
-  target.innerHTML = charProgress + '<div id="skHanziCanvas"></div>';
+  const chars = [...w.h].filter(c=>c.trim());
+  // Kích thước mỗi canvas tùy số ký tự
+  const canvasSize = chars.length === 1 ? 272 : chars.length === 2 ? 200 : 160;
 
-  const char = chars[charIdx];
-  try{
-    _hwWriter = HanziWriter.create('skHanziCanvas', char, {
-      width:260, height:260, padding:16,
-      showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
-      highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:8,
-      strokeAnimationSpeed:1, delayBetweenStrokes:200,
-      charDataLoader: (char, onLoad, onError) => {
-        const url = `https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/${encodeURIComponent(char)}.json`;
-        fetch(url)
-          .then(r => { if(!r.ok) throw new Error('404'); return r.json(); })
-          .then(onLoad)
-          .catch(() => {
-            // Fallback URL thứ 2
-            fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`)
-              .then(r => { if(!r.ok) throw new Error('404'); return r.json(); })
-              .then(onLoad)
-              .catch(onError);
-          });
-      },
-      onLoadCharDataSuccess: () => {
-        const guideEl = document.getElementById('skGuide');
-        if(guideEl && chars.length > 1)
-          guideEl.textContent = `✏️ Ký tự ${charIdx+1}/${chars.length} — Vẽ từng nét theo thứ tự!`;
-        _hwWriter.quiz({
-          onMistake: () => { _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
-          onCorrectStroke: (d) => {
-            const el = document.getElementById('skGuide');
-            if(el) el.textContent = d.strokesRemaining > 0
-              ? `✅ Đúng! Còn ${d.strokesRemaining} nét...`
-              : (chars.length > 1 && charIdx < chars.length-1 ? '🎉 Ký tự xong! Tiếp theo...' : '🎉 Xong rồi!');
-            try{haptic('medium');}catch(e){}
-          },
-          onComplete: (d) => {
-            _hwTotalStrokes += d.totalMistakes;
-            if(charIdx + 1 < chars.length){
-              // Còn ký tự tiếp theo — chờ chút rồi load
-              setTimeout(() => _skLoadChars(w, chars, charIdx + 1), 800);
-            } else {
-              _hwDone = true;
-              _skShowResult(_hwMistakes);
+  chars.forEach((char, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px`;
+
+    // Label ký tự (chỉ hiện khi >1 ký tự)
+    if(chars.length > 1){
+      const lbl = document.createElement('div');
+      lbl.id = `skCharLabel_${i}`;
+      lbl.textContent = char;
+      lbl.style.cssText = `font-size:.7rem;font-weight:800;color:#7C3AED;letter-spacing:.05em`;
+      wrap.appendChild(lbl);
+    }
+
+    const canvasEl = document.createElement('div');
+    canvasEl.id = `skCanvas_${i}`;
+    canvasEl.style.cssText = `border-radius:14px;overflow:hidden;background:#F5F3FF;position:relative`;
+    wrap.appendChild(canvasEl);
+
+    // Vòng trạng thái
+    const statusEl = document.createElement('div');
+    statusEl.id = `skStatus_${i}`;
+    statusEl.textContent = '✏️';
+    statusEl.style.cssText = `font-size:.8rem;height:18px`;
+    wrap.appendChild(statusEl);
+
+    target.appendChild(wrap);
+
+    try{
+      const writer = HanziWriter.create(`skCanvas_${i}`, char, {
+        width: canvasSize, height: canvasSize, padding: 14,
+        showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
+        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth: chars.length===1?8:6,
+        strokeAnimationSpeed:1, delayBetweenStrokes:200,
+        charDataLoader: (ch, onLoad, onError) => {
+          fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
+            .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
+            .then(onLoad).catch(onError);
+        },
+        onLoadCharDataSuccess: () => {
+          writer.quiz({
+            onMistake: () => {
+              _hwMistakes++;
+              _skUpdateMistakeRow();
+              try{haptic('error');}catch(e){}
+            },
+            onCorrectStroke: (d) => {
+              const el = document.getElementById('skGuide');
+              if(el) el.textContent = d.strokesRemaining > 0
+                ? `✅ Còn ${d.strokesRemaining} nét...`
+                : chars.length > 1 ? `✅ Xong ký tự ${char}!` : '🎉 Hoàn thành!';
+              try{haptic('medium');}catch(e){}
+            },
+            onComplete: () => {
+              const st = document.getElementById(`skStatus_${i}`);
+              if(st) st.textContent = '✅';
+              _skDoneCount++;
+              if(_skDoneCount >= chars.length){
+                _hwDone = true;
+                _skShowResult(_hwMistakes);
+              } else {
+                const el = document.getElementById('skGuide');
+                if(el) el.textContent = `✅ Ký tự ${_skDoneCount}/${chars.length} xong! Tiếp tục các ký tự còn lại!`;
+              }
             }
-          }
-        });
-      },
-      onLoadCharDataError: () => {
-        if(charIdx + 1 < chars.length){
-          // Ký tự lỗi → bỏ qua, load ký tự tiếp
-          setTimeout(() => _skLoadChars(w, chars, charIdx + 1), 400);
-        } else {
-          _skFallback(w);
+          });
+        },
+        onLoadCharDataError: () => {
+          const st = document.getElementById(`skStatus_${i}`);
+          if(st) st.textContent = '❌';
+          _skDoneCount++;
+          if(_skDoneCount >= chars.length) _skFallback(w);
         }
-      }
-    });
-  } catch(e){ _skFallback(w); }
+      });
+      _hwWriters.push(writer);
+    }catch(e){
+      _skDoneCount++;
+      if(_skDoneCount >= chars.length) _skFallback(w);
+    }
+  });
+
+  speakText(w.h);
 }
 
 function _skUpdateMistakeRow(){
@@ -8964,8 +8974,8 @@ function _skFallback(w){
     </div>`;
   document.getElementById('skNav').style.display='flex';
 }
-function skShowHint(){ if(_hwWriter&&!_hwDone) _hwWriter.showHint(); }
-function skAnimateChar(){ if(_hwWriter) _hwWriter.animateCharacter(); }
+function skShowHint(){ _hwWriters.forEach(w=>{ try{ if(!_hwDone) w.showHint(); }catch(e){} }); }
+function skAnimateChar(){ _hwWriters.forEach(w=>{ try{ w.animateCharacter(); }catch(e){} }); }
 function prevStrokeChar(){ if(skIdx>0){skIdx--;loadStrokeChar();} }
 function nextStrokeChar(){ skIdx++; loadStrokeChar(); }
 function endStrokeGame(){
