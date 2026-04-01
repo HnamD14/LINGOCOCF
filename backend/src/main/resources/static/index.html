@@ -7808,6 +7808,8 @@ async function _loadRealPlayers(page=0){
   try {
     const {status, data} = await api('/api/user/leaderboard?page='+page+'&size=50','GET',null,true);
     if(status!==200 || !data.success) return;
+    // API mới trả {items, page, totalPages, hasNext}
+    // API cũ trả array trực tiếp — handle cả hai
     const list = Array.isArray(data.data) ? data.data : (data.data.items || []);
     const myUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
     const myEmo = _getMyAvatarEmo();
@@ -7818,6 +7820,7 @@ async function _loadRealPlayers(page=0){
       streak: p.streak || 0,
       isMe: p.username === myUser?.username,
     }));
+    // Nếu có nhiều trang thì load tiếp (tối đa 100 người)
     if(!Array.isArray(data.data) && data.data.hasNext && page === 0){
       const r2 = await api('/api/user/leaderboard?page=1&size=50','GET',null,true);
       if(r2.status===200 && r2.data.success){
@@ -7840,15 +7843,13 @@ function _emoForName(name){
   for(let i=0; i<(name||'').length; i++) h = (h*31 + name.charCodeAt(i)) & 0xfffff;
   return _EMO_POOL[Math.abs(h) % _EMO_POOL.length];
 }
-
 function _getMyAvatarEmo(){
-  try {
-    const equipped = localStorage.getItem(uk('lingococ_shop_equipped'));
-    if(!equipped || equipped === 'default') return '🐸';
-    const item = SHOP_ITEMS.avatar.find(i => i.id === equipped);
-    if(!item) return '🐸';
-    return item.ico || '🐸';  // chỉ dùng emoji ico cho gọn
-  } catch { return '🐸'; }
+  try{
+    const eq = localStorage.getItem(uk('lingococ_shop_equipped'));
+    if(!eq || eq==='default') return '🐸';
+    const item = SHOP_ITEMS.avatar.find(i=>i.id===eq);
+    return item ? (item.ico||'🐸') : '🐸';
+  }catch{ return '🐸'; }
 }
 
 function _genPlayers(type){
@@ -7857,7 +7858,9 @@ function _genPlayers(type){
   const myEmo  = _getMyAvatarEmo();
 
   if(_realLbPlayers && _realLbPlayers.length > 0){
+    // Dùng data thật từ API
     let players = _realLbPlayers.map(p => ({...p, val: type==='xp' ? p.xp : p.streak}));
+    // Đảm bảo user hiện tại luôn có trong danh sách
     if(!players.find(p=>p.isMe)){
       players.push({ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
     } else {
@@ -7865,11 +7868,6 @@ function _genPlayers(type){
       if(me){ me.val = Math.max(me.val, type==='xp'?state.xp:state.streak); me.emo = myEmo; }
     }
     players.sort((a,b)=>b.val-a.val);
-    return players;
-  }
-
-  return [{ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, isMe:true }];
-}
     return players;
   }
 
