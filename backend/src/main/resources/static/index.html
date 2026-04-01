@@ -2532,7 +2532,7 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="width:280px;height:280px"></div>
+      <div id="skHanziTarget" style="display:flex;align-items:stretch;justify-content:center;border-radius:20px;overflow:hidden;background:#F5F3FF"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 90 90" width="90" height="90">
@@ -8824,6 +8824,9 @@ function startStrokeGame(){
   setTimeout(loadStrokeChar, 150);
 }
 
+let _hwWriters = [];
+let _skDoneCount = 0;
+
 function loadStrokeChar(){
   if(skIdx>=skWords.length){ endStrokeGame(); return; }
   const w = skWords[skIdx];
@@ -8838,27 +8841,75 @@ function loadStrokeChar(){
   document.getElementById('skMistakeRow').innerHTML='';
   document.getElementById('skGuide').textContent='✏️ Vẽ từng nét theo thứ tự — theo chiều mũi tên hướng dẫn!';
   _hwMistakes=0; _hwTotalStrokes=0; _hwDone=false;
-  const target=document.getElementById('skHanziTarget'); target.innerHTML='';
+  _hwWriters=[]; _skDoneCount=0;
+
+  const target = document.getElementById('skHanziTarget');
+  target.innerHTML = '';
+
   if(typeof HanziWriter==='undefined'){ _skFallback(w); return; }
-  try{
-    _hwWriter = HanziWriter.create('skHanziTarget',w.h,{
-      width:280,height:280,padding:18,
-      showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
-      highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
-      strokeAnimationSpeed:1,delayBetweenStrokes:200,
-      onLoadCharDataSuccess:()=>{
-        _hwWriter.quiz({
-          onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
-          onCorrectStroke:(d)=>{
-            document.getElementById('skGuide').textContent=d.strokesRemaining>0?`✅ Đúng! Còn ${d.strokesRemaining} nét...`:'🎉 Xong rồi!';
-            try{haptic('medium');}catch(e){}
-          },
-          onComplete:(d)=>{ _hwDone=true; _skShowResult(d.totalMistakes); }
-        });
-      },
-      onLoadCharDataError:()=>_skFallback(w)
-    });
-  }catch(e){ _skFallback(w); }
+
+  const chars = [...w.h].filter(c=>c.trim());
+  const CELL = 220; // mỗi ký tự 220px — 2 ký tự = 440px tổng
+
+  chars.forEach((char, i) => {
+    const cell = document.createElement('div');
+    cell.id = `skCanvas_${i}`;
+    cell.style.cssText = [
+      `width:${CELL}px`,
+      `height:${CELL}px`,
+      `position:relative`,
+      `flex-shrink:0`,
+      i > 0 ? `border-left:1.5px solid #DDD6FE` : ''
+    ].filter(Boolean).join(';');
+    target.appendChild(cell);
+
+    try{
+      const writer = HanziWriter.create(`skCanvas_${i}`, char, {
+        width:CELL, height:CELL, padding:16,
+        showOutline:true, outlineColor:'#DDD6FE', strokeColor:'#6D28D9',
+        highlightColor:'#A78BFA', drawingColor:'#4C1D95', drawingWidth:7,
+        strokeAnimationSpeed:1, delayBetweenStrokes:200,
+        charDataLoader:(ch, onLoad, onError)=>{
+          fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(ch)}.json`)
+            .then(r=>{ if(!r.ok) throw 0; return r.json(); })
+            .then(onLoad).catch(onError);
+        },
+        onLoadCharDataSuccess:()=>{
+          writer.quiz({
+            onMistake:()=>{ _hwMistakes++; _skUpdateMistakeRow(); try{haptic('error');}catch(e){} },
+            onCorrectStroke:(d)=>{
+              const el=document.getElementById('skGuide');
+              if(el) el.textContent=d.strokesRemaining>0?`✅ Còn ${d.strokesRemaining} nét...`:'🎉 Ký tự xong!';
+              try{haptic('medium');}catch(e){}
+            },
+            onComplete:()=>{
+              const done=document.createElement('div');
+              done.style.cssText=`position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;pointer-events:none;background:rgba(245,243,255,.6)`;
+              done.textContent='✅';
+              cell.appendChild(done);
+              _skDoneCount++;
+              if(_skDoneCount>=chars.length){
+                _hwDone=true;
+                setTimeout(()=>_skShowResult(_hwMistakes), 400);
+              } else {
+                const el=document.getElementById('skGuide');
+                if(el) el.textContent=`✅ ${_skDoneCount}/${chars.length} ký tự xong — tiếp tục nhé!`;
+              }
+            }
+          });
+        },
+        onLoadCharDataError:()=>{
+          _skDoneCount++;
+          if(_skDoneCount>=chars.length) _skFallback(w);
+        }
+      });
+      _hwWriters.push(writer);
+    }catch(e){
+      _skDoneCount++;
+      if(_skDoneCount>=chars.length) _skFallback(w);
+    }
+  });
+
   speakText(w.h);
 }
 
@@ -8899,8 +8950,8 @@ function _skFallback(w){
     </div>`;
   document.getElementById('skNav').style.display='flex';
 }
-function skShowHint(){ if(_hwWriter&&!_hwDone) _hwWriter.showHint(); }
-function skAnimateChar(){ if(_hwWriter) _hwWriter.animateCharacter(); }
+function skShowHint(){ _hwWriters.forEach(w=>{ try{ if(!_hwDone) w.showHint(); }catch(e){} }); }
+function skAnimateChar(){ _hwWriters.forEach(w=>{ try{ w.animateCharacter(); }catch(e){} }); }
 function prevStrokeChar(){ if(skIdx>0){skIdx--;loadStrokeChar();} }
 function nextStrokeChar(){ skIdx++; loadStrokeChar(); }
 function endStrokeGame(){
