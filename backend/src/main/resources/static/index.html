@@ -4412,19 +4412,14 @@ function stopAllGames(){
 function goScreen(id){
   const GAME_SCREENS = ['matchingScreen','speedScreen','fillScreen','strokeScreen','pronunciationScreen'];
   const current = document.querySelector('.screen.active');
+  // Nếu đang ở game screen mà chuyển sang màn hình khác → dừng game
   if(current && GAME_SCREENS.includes(current.id) && !GAME_SCREENS.includes(id)){
     stopAllGames();
   }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Dừng đọc khi chuyển màn hình
   window.speechSynthesis && window.speechSynthesis.cancel();
-  // Load settings khi vào màn cài đặt
-  if(id === 'settingsScreen') { try{ cfgLoad(); }catch(e){} }
-  // Sync avatar & màu tên khi vào profile
-  if(id === 'profileScreen'){
-    if(typeof applyEquippedAvatar === 'function') applyEquippedAvatar();
-    if(typeof applyNameColorBadge === 'function') applyNameColorBadge();
-  }
 }
 function goHome(){ goScreen('homeScreen'); syncHomeStats(); loadAllDeckBars(); }
 
@@ -5532,13 +5527,10 @@ function cfgLoad(){
   // Sound fx
   const sf = document.getElementById('cfgSoundFx');
   if(sf) sf.checked = cfg.soundFx !== false;
-  // Font size — normalize old sm/md/lg/xl keys
-  const fontRemap = { sm:'small', md:'normal', lg:'large', xl:'xlarge' };
-  const savedFont = cfg.fontSize || 'normal';
-  const fontVal = fontRemap[savedFont] || savedFont;
+  // Font size
   const fs = document.getElementById('cfgFontSize');
-  if(fs) fs.value = fontVal;
-  cfgApplyFontSize(fontVal);
+  if(fs) fs.value = cfg.fontSize || 'md';
+  if(cfg.fontSize) cfgApplyFontSize(cfg.fontSize);
   // Haptic
   const hp = document.getElementById('cfgHaptic');
   if(hp) hp.checked = cfg.haptic !== false;
@@ -5577,13 +5569,8 @@ function cfgSetFontSize(val){
 
 function cfgApplyFontSize(val){
   const root = document.documentElement;
-  const sizes = { small:'13px', normal:'15px', large:'17px', xlarge:'19px',
-                  sm:'13px', md:'15px', lg:'17px', xl:'19px' };
+  const sizes = { sm:'13px', md:'15px', lg:'17px', xl:'19px' };
   if(sizes[val]) root.style.setProperty('--base-font', sizes[val]);
-  const sub = document.getElementById('cfgFontSub');
-  const labels = { small:'Nhỏ', normal:'Cỡ thường', large:'Lớn', xlarge:'Rất lớn',
-                   sm:'Nhỏ', md:'Cỡ thường', lg:'Lớn', xl:'Rất lớn' };
-  if(sub) sub.textContent = labels[val] || 'Cỡ thường';
 }
 
 function cfgSetHaptic(val){
@@ -6503,31 +6490,6 @@ function getOwned(){ try{ return JSON.parse(localStorage.getItem(uk(COIN_OWNED_K
 function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; }
 function isOwned(id){ return getOwned().includes(id); }
 
-/* ── Kho đồ: consumable đã mua chưa dùng ── */
-const INVENTORY_KEY = 'lingococ_inventory';
-function getInventory(){ try{ return JSON.parse(localStorage.getItem(uk(INVENTORY_KEY))||'[]'); }catch{ return []; } }
-function addToInventory(id){ const inv=getInventory(); inv.push(id); localStorage.setItem(uk(INVENTORY_KEY),JSON.stringify(inv)); }
-function removeFromInventory(id){ const inv=getInventory(); const i=inv.indexOf(id); if(i>-1){inv.splice(i,1);localStorage.setItem(uk(INVENTORY_KEY),JSON.stringify(inv));} }
-
-function applyNameColor(color){
-  localStorage.setItem(uk('lingococ_name_color'), color);
-  applyNameColorBadge();
-  const labels={gold:'✨ Tên màu vàng đang dùng!', purple:'💜 Tên màu tím đang dùng!', red:'❤️ Tên màu đỏ đang dùng!'};
-  showToast(labels[color]||'✅ Đã kích hoạt!');
-  renderShop();
-}
-
-function useItem(id){
-  const inv=getInventory();
-  if(!inv.includes(id)){ showToast('❌ Không tìm thấy vật phẩm!'); return; }
-  const allItems=[...SHOP_ITEMS.boost,...SHOP_ITEMS.special,...SHOP_ITEMS.avatar];
-  const item=allItems.find(i=>i.id===id);
-  if(!item){ showToast('❌ Vật phẩm không hợp lệ!'); return; }
-  removeFromInventory(id);
-  applyItemEffect(item);
-  renderShop();
-}
-
 function buyItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
@@ -6564,31 +6526,16 @@ function confirmBuy(){
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   if(!spendCoins(item.price)){ showToast('❌ Không đủ xu!'); closeShopModal(); return; }
-
-  const isAvatar = id.startsWith('av_');
-
   if(item.type === 'permanent'){
     const owned = getOwned();
     if(!owned.includes(id)){ owned.push(id); localStorage.setItem(uk(COIN_OWNED_KEY), JSON.stringify(owned)); }
-    if(item.weekly) markWeeklyBought(id);
-    if(isAvatar){
-      // Avatar: KHÔNG tự mặc — user chọn trong tab Đã mua
-      closeShopModal(); renderShop(); fireConfetti();
-      showToast(`🎒 Đã mua: ${item.name}! Vào "Đã mua" để trang bị.`);
-      setTimeout(()=> switchShopTab('owned', document.getElementById('shopTabOwned')), 700);
-    } else {
-      applyItemEffect(item);
-      closeShopModal(); renderShop(); fireConfetti();
-      showToast(`✅ ${item.name} đã kích hoạt!`);
-    }
-  } else {
-    // Consumable: lưu vào kho
-    if(item.weekly) markWeeklyBought(id);
-    addToInventory(id);
-    closeShopModal(); renderShop(); fireConfetti();
-    showToast(`🎒 Đã thêm vào kho: ${item.name}!`);
-    setTimeout(()=> switchShopTab('owned', document.getElementById('shopTabOwned')), 700);
   }
+  if(item.weekly) markWeeklyBought(id);
+  applyItemEffect(item);
+  closeShopModal();
+  renderShop();
+  fireConfetti();
+  showToast(`🪙 Mua thành công: ${item.name}!`);
 }
 
 function applyItemEffect(item){
@@ -6948,24 +6895,10 @@ function equipAvatar(id){
 function applyEquippedAvatar(){
   const equipped = getEquipped();
   const item = SHOP_ITEMS.avatar.find(i => i.id === equipped);
-  const avatarHTML = item && item.svg ? item.svg : '🐸';
-
-  // Cập nhật tất cả .pf2-avatar
-  document.querySelectorAll('.pf2-avatar').forEach(el => el.innerHTML = avatarHTML);
-
-  // Cập nhật con ếch ở home screen
-  const heroFrog = document.getElementById('roadmapBtn');
-  if(heroFrog){
-    if(item && item.svg){
-      heroFrog.innerHTML = `<div style="width:42px;height:42px;display:flex;align-items:center;justify-content:center">${item.svg.replace(/width="\d+" height="\d+"/, 'width="42" height="42"')}</div>`;
-    } else {
-      heroFrog.innerHTML = `<svg width="42" height="42" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="fbghero2" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#6EE7B7"/><stop offset="100%" stop-color="#059669"/></radialGradient></defs><ellipse cx="40" cy="48" rx="28" ry="22" fill="url(#fbghero2)"/><circle cx="27" cy="28" r="11" fill="url(#fbghero2)"/><circle cx="53" cy="28" r="11" fill="url(#fbghero2)"/><circle cx="27" cy="27" r="8" fill="#fff"/><circle cx="53" cy="27" r="8" fill="#fff"/><circle cx="29" cy="27" r="4.5" fill="#1F2937"/><circle cx="55" cy="27" r="4.5" fill="#1F2937"/><path d="M32 58 Q40 65 48 58" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/></svg>`;
-    }
-  }
-
-  // Shop preview
+  const pf = document.querySelector('.pf2-avatar');
+  if(pf) pf.innerHTML = item && item.svg ? item.svg : '🐸';
   const preview = document.getElementById('shopAvatarPreview');
-  if(preview){ preview.innerHTML = avatarHTML; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
+  if(preview){ preview.innerHTML = item && item.svg ? item.svg : '🐸'; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
   const lbl = document.getElementById('shopAvatarLabel');
   if(lbl) lbl.textContent = item ? item.name : 'Mặc định';
 }
@@ -7010,31 +6943,18 @@ function renderShop(){
     const weeklyBought = item.weekly && wp[item.id];
     const canAfford    = coins >= item.price;
     const isPerm       = item.type === 'permanent';
-    const isAvatar     = item.id.startsWith('av_');
     const isEquippedNow= equipped === item.id;
 
-    // Detect màu tên đang dùng
-    const activeNameColor = localStorage.getItem(uk('lingococ_name_color'));
-    const nameColorMap = { name_color:'gold', name_purple:'purple', name_red:'red' };
-    const isNameActive = nameColorMap[item.id] && activeNameColor === nameColorMap[item.id];
-    const isActive = isEquippedNow || isNameActive;
-
     let badge = '';
-    if(isActive)               badge = '<div class="shop-item-owned-badge" style="background:#0FD688">✓ Đang dùng</div>';
-    else if(ownedFlag && isPerm) badge = '<div class="shop-item-owned-badge" style="background:#6366F1">Đã sở hữu</div>';
-    else if(weeklyBought)      badge = `<div class="shop-item-owned-badge" style="background:#6B7280">Đã mua tuần này</div>`;
-    else if(item.isNew)        badge = '<div class="shop-item-new">MỚI</div>';
+    if(isEquippedNow)   badge = '<div class="shop-item-owned-badge" style="background:#0FD688">Đang dùng</div>';
+    else if(ownedFlag && isPerm) badge = '<div class="shop-item-owned-badge">Sở hữu</div>';
+    else if(weeklyBought) badge = `<div class="shop-item-owned-badge" style="background:#6B7280">Đã mua tuần này</div>`;
+    else if(item.isNew) badge = '<div class="shop-item-new">MỚI</div>';
     if(item.weekly && !weeklyBought) badge += `<div class="shop-weekly-tag">🔄 Tuần</div>`;
 
     let priceHtml;
     if(ownedFlag && isPerm){
-      if(isActive){
-        priceHtml = `<div class="shop-item-price" style="background:#D1FAF0;border-color:#0FD688;color:#065F46;font-weight:900">✓ Đang dùng</div>`;
-      } else if(isAvatar){
-        priceHtml = `<div class="shop-item-price" style="background:#EDE9FE;border-color:#7C3AED;color:#5B21B6;cursor:pointer">👕 Mặc vào</div>`;
-      } else {
-        priceHtml = `<div class="shop-item-price" style="background:#EDE9FE;border-color:#7C3AED;color:#5B21B6;cursor:pointer">⚡ Dùng ngay</div>`;
-      }
+      priceHtml = `<div class="shop-item-price" style="background:#D1FAF0;border-color:#6EE7B7;color:#065F46">${isEquippedNow?'✓ Đang mặc':'✓ Mặc vào'}</div>`;
     } else if(weeklyBought){
       priceHtml = `<div class="shop-item-price" style="background:#F3F4F6;border-color:#D1D5DB;color:#6B7280">🔄 ${resetIn} ngày</div>`;
     } else {
@@ -7046,14 +6966,12 @@ function renderShop(){
       ? `<div class="shop-item-ico" style="font-size:1rem;line-height:1">${item.svg}</div>`
       : `<div class="shop-item-ico">${item.ico}</div>`;
 
-    let clickFn;
-    if(ownedFlag && isAvatar)                   clickFn = `equipAvatar('${item.id}')`;
-    else if(ownedFlag && nameColorMap[item.id]) clickFn = `applyNameColor('${nameColorMap[item.id]}')`;
-    else                                         clickFn = `buyItem('${item.id}')`;
+    const clickFn = (ownedFlag && item.type==='avatar')
+      ? `equipAvatar('${item.id}')`
+      : `buyItem('${item.id}')`;
 
     const dimmed = weeklyBought ? 'opacity:.65;' : '';
-    const highlight = isActive ? 'box-shadow:0 0 0 2px #0FD688;' : '';
-    return `<div class="shop-item ${isActive?'equipped':ownedFlag&&isPerm?'owned':''}" style="${dimmed}${highlight}" onclick="${clickFn}">
+    return `<div class="shop-item ${isEquippedNow?'equipped':ownedFlag&&isPerm?'owned':''}" style="${dimmed}" onclick="${clickFn}">
       ${badge}${icoHtml}
       <div class="shop-item-name">${item.name}</div>
       <div class="shop-item-desc">${item.desc}</div>
@@ -7087,38 +7005,12 @@ function renderShop(){
 
   // Owned panel
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
-  const inventory = getInventory();
   const ownedItems = allItems.filter(i => owned.includes(i.id));
   const go = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
   if(go && empty){
-    const hasAnything = inventory.length > 0 || ownedItems.length > 0;
-    if(!hasAnything){ empty.style.display='block'; go.innerHTML=''; }
-    else{
-      empty.style.display='none';
-      let html = '';
-      if(inventory.length > 0){
-        html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;grid-column:1/-1">🎒 Kho đồ — chưa sử dụng</div>`;
-        const invCounts = {};
-        inventory.forEach(id => invCounts[id]=(invCounts[id]||0)+1);
-        Object.entries(invCounts).forEach(([id, count])=>{
-          const it = allItems.find(i=>i.id===id);
-          if(!it) return;
-          html += `<div class="shop-item" style="position:relative">
-            ${count>1?`<div class="shop-item-owned-badge" style="background:#6366F1">x${count}</div>`:''}
-            <div class="shop-item-ico">${it.ico}</div>
-            <div class="shop-item-name">${it.name}</div>
-            <div class="shop-item-desc">${it.desc}</div>
-            <button onclick="useItem('${id}')" style="width:100%;margin-top:6px;padding:8px;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:var(--r-sm);font-family:'Baloo 2',cursive;font-size:.8rem;font-weight:800;color:#fff;cursor:pointer">⚡ Sử dụng ngay</button>
-          </div>`;
-        });
-      }
-      if(ownedItems.length > 0){
-        html += `<div style="font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin:${inventory.length>0?'16px':0} 0 8px;grid-column:1/-1">🏆 Vật phẩm vĩnh viễn</div>`;
-        html += ownedItems.map(makeCard).join('');
-      }
-      go.innerHTML = html;
-    }
+    if(ownedItems.length === 0){ empty.style.display='block'; go.innerHTML=''; }
+    else{ empty.style.display='none'; go.innerHTML = ownedItems.map(makeCard).join(''); }
   }
   applyEquippedAvatar();
 }
@@ -7916,23 +7808,25 @@ async function _loadRealPlayers(page=0){
   try {
     const {status, data} = await api('/api/user/leaderboard?page='+page+'&size=50','GET',null,true);
     if(status!==200 || !data.success) return;
+    // API mới trả {items, page, totalPages, hasNext}
+    // API cũ trả array trực tiếp — handle cả hai
     const list = Array.isArray(data.data) ? data.data : (data.data.items || []);
     const myUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
-    const myEmo = _getMyAvatarEmo();
     _realLbPlayers = list.map(p => ({
       name: p.fullName || p.username,
-      emo: p.username === myUser?.username ? myEmo : _emoForName(p.username),
+      emo: p.username === myUser?.username ? '🐸' : _emoForName(p.username),
       xp: p.xp || 0,
       streak: p.streak || 0,
       isMe: p.username === myUser?.username,
     }));
+    // Nếu có nhiều trang thì load tiếp (tối đa 100 người)
     if(!Array.isArray(data.data) && data.data.hasNext && page === 0){
       const r2 = await api('/api/user/leaderboard?page=1&size=50','GET',null,true);
       if(r2.status===200 && r2.data.success){
         const list2 = r2.data.data.items || [];
         _realLbPlayers = _realLbPlayers.concat(list2.map(p => ({
           name: p.fullName || p.username,
-          emo: p.username === myUser?.username ? myEmo : _emoForName(p.username),
+          emo: p.username === myUser?.username ? '🐸' : _emoForName(p.username),
           xp: p.xp || 0,
           streak: p.streak || 0,
           isMe: p.username === myUser?.username,
@@ -7949,33 +7843,26 @@ function _emoForName(name){
   return _EMO_POOL[Math.abs(h) % _EMO_POOL.length];
 }
 
-function _getMyAvatarEmo(){
-  try{
-    const eq = localStorage.getItem(uk('lingococ_shop_equipped'));
-    if(!eq || eq==='default') return '🐸';
-    const item = SHOP_ITEMS.avatar.find(i=>i.id===eq);
-    return item ? (item.ico||'🐸') : '🐸';
-  }catch{ return '🐸'; }
-}
-
 function _genPlayers(type){
   const myUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
   const myName = myUser ? (myUser.fullName || myUser.username) : (state.myUsername || 'Bạn');
-  const myEmo  = _getMyAvatarEmo();
 
   if(_realLbPlayers && _realLbPlayers.length > 0){
+    // Dùng data thật từ API
     let players = _realLbPlayers.map(p => ({...p, val: type==='xp' ? p.xp : p.streak}));
+    // Đảm bảo user hiện tại luôn có trong danh sách
     if(!players.find(p=>p.isMe)){
-      players.push({ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
+      players.push({ name:myName, emo:'🐸', val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
     } else {
       const me = players.find(p=>p.isMe);
-      if(me){ me.val = Math.max(me.val, type==='xp'?state.xp:state.streak); me.emo = myEmo; }
+      if(me) me.val = Math.max(me.val, type==='xp'?state.xp:state.streak);
     }
     players.sort((a,b)=>b.val-a.val);
     return players;
   }
 
-  return [{ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, isMe:true }];
+  // Fallback: chỉ hiện mình user khi chưa có data
+  return [{ name:myName, emo:'🐸', val: type==='xp'?state.xp:state.streak, isMe:true }];
 }
 
 // Tính thời gian còn lại đến cuối tuần (Chủ nhật 23:59)
@@ -8963,7 +8850,11 @@ function loadStrokeChar(){
 
   const chars = [...w.h].filter(c=>c.trim());
   // 1 ký tự = 280px, 2 ký tự = 210px mỗi cái, 3+ = 170px
-  const CELL = chars.length === 1 ? 280 : chars.length === 2 ? 210 : 170;
+  // Tính CELL theo chiều rộng thực tế: tối đa (screenWidth - padding) / số ký tự
+  const maxW = Math.min(window.innerWidth, 480) - 60; // 60px cho padding + border
+  const CELL = chars.length === 1
+    ? Math.min(280, maxW)
+    : Math.min(200, Math.floor(maxW / chars.length));
 
   chars.forEach((char, i) => {
     const cell = document.createElement('div');
