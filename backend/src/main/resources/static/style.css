@@ -526,7 +526,7 @@ body{
   background:radial-gradient(circle,rgba(255,107,53,.1) 0%,transparent 65%);
 }
 .card-hanzi{
-  font-family:'Noto Sans SC',sans-serif;font-size:4.2rem;font-weight:900;
+  font-family:'Noto Sans SC',sans-serif;font-size:4.8rem;font-weight:900;
   color:var(--gray-800);margin-bottom:8px;
   text-shadow:0 2px 8px rgba(0,0,0,.08);
 }
@@ -535,14 +535,14 @@ body{
   letter-spacing:.04em;text-transform:uppercase;
 }
 .card-pinyin{
-  font-size:1.25rem;font-weight:800;
+  font-size:1.6rem;font-weight:800;
   background:linear-gradient(135deg,var(--orange),#FF3D70);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
-.card-meaning{font-size:1.35rem;font-weight:900;color:var(--gray-800);margin-bottom:12px}
+.card-meaning{font-size:1.7rem;font-weight:900;color:var(--gray-800);margin-bottom:14px}
 .card-example{
-  font-size:0.77rem;color:var(--gray-600);text-align:center;
+  font-size:0.9rem;color:var(--gray-600);text-align:center;
   line-height:1.75;font-weight:600;
 }
 
@@ -1717,10 +1717,11 @@ body{
 }
 .sk-meaning{font-size:.82rem;font-weight:700;color:var(--text-muted);margin-top:2px}
 .sk-canvas-wrap{
-  position:relative;width:100%;max-width:300px;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
   background:var(--white);border-radius:var(--r-lg);
   box-shadow:0 8px 28px rgba(0,0,0,.12);border:2px solid var(--gray-200);
-  overflow:hidden;
+  overflow:hidden;padding:8px;box-sizing:border-box;
 }
 .sk-ghost{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -2127,28 +2128,32 @@ body{
 
 /* Top bar */
 .h-topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;
+  display:flex;flex-direction:column;gap:8px;
+  padding:10px 16px;
   background:var(--bg);
   border-bottom:1px solid var(--gray-100);
   flex-shrink:0;position:sticky;top:0;z-index:50;
 }
+.h-topbar-row1{display:flex;align-items:center;justify-content:space-between;}
 .h-logo{display:flex;align-items:center;gap:6px}
 .h-logo-frog{display:inline-flex;align-items:center;line-height:0}
 .h-logo-text{font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:800;color:var(--gray-800);letter-spacing:-.02em}
 .h-logo-text span{background:linear-gradient(135deg,var(--orange),var(--orange2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.h-pills{display:flex;gap:6px;align-items:center}
+.h-pills{display:flex;gap:6px;align-items:center;justify-content:space-between;}
 .h-pill{
-  display:flex;align-items:center;gap:4px;
-  padding:5px 10px;border-radius:999px;
-  font-size:.78rem;font-weight:900;cursor:pointer;
+  flex:1;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  padding:6px 8px;border-radius:12px;
+  font-size:.82rem;font-weight:900;cursor:pointer;
   transition:transform .15s;
+  border:1.5px solid transparent;
 }
 .h-pill:active{transform:scale(.92)}
-.h-pill-fire{background:#FFF1EB;color:var(--orange);border:1.5px solid var(--orange-mid)}
-.h-pill-stone{background:linear-gradient(135deg,#EDE9FE,#DDD6FE);color:#4C1D95;border:1.5px solid #A78BFA;gap:4px}
-.h-pill-heart{background:#EDE9FE;color:#5B21B6;border:1.5px solid #C4B5FD}
-.h-pill-xp{background:#FFFBEB;color:#B45309;border:1.5px solid #FDE68A}
+.h-pill-fire{background:#FFF1EB;color:var(--orange);border-color:var(--orange-mid)}
+.h-pill-stone{background:linear-gradient(135deg,#EDE9FE,#DDD6FE);color:#4C1D95;border-color:#A78BFA}
+.h-pill-heart{background:#EDE9FE;color:#5B21B6;border-color:#C4B5FD}
+.h-pill-xp{background:#FFFBEB;color:#B45309;border-color:#FDE68A}
+.h-pill-coin{background:#FFF9EB;color:#92400E;border-color:#FDE68A}
 
 /* Body scroll */
 .h-body{padding:0 0 80px}
