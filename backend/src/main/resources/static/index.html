@@ -365,6 +365,7 @@
           <div class="card-pinyin" id="cardPinyin">Nǐ hǎo</div>
           <div class="card-meaning" id="cardMeaning">Xin chào</div>
           <div class="card-example" id="cardExample">你好！我叫小明。<br>Xin chào! Tôi tên Tiểu Minh.</div>
+          <div class="card-tap-hint" style="margin-top:8px;opacity:.5;font-size:.72rem">🔄 Nhấn để lật lại</div>
         </div>
       </div>
     </div>
@@ -4651,12 +4652,21 @@ function loadCard(firstCard){
   setTimeout(()=>{ try{ speakCurrent(); }catch(e){} }, 300);
 }
 function flipCard(){
-  if(state.fcFlipped) return;
-  state.fcFlipped = true;
-  document.getElementById('flashcard').classList.add('flipped');
-  document.getElementById('fcActions').style.display = 'flex';
-  // 🔊 Đọc lại khi lật thẻ
-  setTimeout(() => speakCurrent(), 200);
+  const fc = document.getElementById('flashcard');
+  if(!fc) return;
+
+  if(!state.fcFlipped){
+    // Mặt trước → mặt sau (xem nghĩa)
+    state.fcFlipped = true;
+    fc.classList.add('flipped');
+    document.getElementById('fcActions').style.display = 'flex';
+    setTimeout(() => speakCurrent(), 200);
+  } else {
+    // Mặt sau → mặt trước (lật lại xem chữ)
+    state.fcFlipped = false;
+    fc.classList.remove('flipped');
+    document.getElementById('fcActions').style.display = 'none';
+  }
 }
 
 // ── Prevent double-press ─────────────────────────────────────────
@@ -8850,11 +8860,7 @@ function loadStrokeChar(){
 
   const chars = [...w.h].filter(c=>c.trim());
   // 1 ký tự = 280px, 2 ký tự = 210px mỗi cái, 3+ = 170px
-  // Tính CELL theo chiều rộng thực tế: tối đa (screenWidth - padding) / số ký tự
-  const maxW = Math.min(window.innerWidth, 480) - 60; // 60px cho padding + border
-  const CELL = chars.length === 1
-    ? Math.min(280, maxW)
-    : Math.min(200, Math.floor(maxW / chars.length));
+  const CELL = chars.length === 1 ? 280 : chars.length === 2 ? 210 : 170;
 
   chars.forEach((char, i) => {
     const cell = document.createElement('div');
