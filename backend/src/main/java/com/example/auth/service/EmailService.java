@@ -1,6 +1,5 @@
 package com.example.auth.service;
 
-import lombok.extern.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -9,10 +8,12 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.logging.Logger;
 
-@Slf4j
 @Service
 public class EmailService {
+
+    private static final Logger log = Logger.getLogger(EmailService.class.getName());
 
     @Value("${resend.api-key}")
     private String resendApiKey;
@@ -25,13 +26,9 @@ public class EmailService {
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    // ══════════════════════════════════════════════════════════════
-    //  Reset password
-    // ══════════════════════════════════════════════════════════════
-
     @Async
     public void sendResetPasswordEmail(String toEmail, String username, String resetToken) {
-        log.info("📧 Sending reset password email to: {}", toEmail);
+        log.info("📧 Sending reset password email to: " + toEmail);
         String resetLink = frontendUrl + "/index.html?token=" + resetToken;
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
@@ -68,13 +65,8 @@ public class EmailService {
               </div>
             </body></html>
             """.formatted(username, resetLink, resetLink);
-
         sendHtml(toEmail, "🔐 Đặt lại mật khẩu LingoCóc", html);
     }
-
-    // ══════════════════════════════════════════════════════════════
-    //  Streak reminder
-    // ══════════════════════════════════════════════════════════════
 
     @Async
     public void sendStreakReminderEmail(String toEmail, String username, int currentStreak) {
@@ -118,29 +110,24 @@ public class EmailService {
               </div>
             </body></html>
             """.formatted(username, urgencyColor, currentStreak, urgencyMsg, studyLink, frontendUrl);
-
         sendHtml(toEmail, "🔥 " + (currentStreak > 0 ? currentStreak + " ngày streak" : "Bắt đầu streak") + " — học 5 phút thôi!", html);
-        log.info("📧 Streak reminder sent to {} (streak={})", toEmail, currentStreak);
+        log.info("📧 Streak reminder sent to " + toEmail + " (streak=" + currentStreak + ")");
     }
-
-    // ══════════════════════════════════════════════════════════════
-    //  Gửi qua Resend HTTP API (không dùng SMTP)
-    // ══════════════════════════════════════════════════════════════
 
     public void sendHtml(String toEmail, String subject, String htmlBody) {
         try {
-            String json = """
-                {
-                  "from": "%s",
-                  "to": ["%s"],
-                  "subject": "%s",
-                  "html": %s
-                }
-                """.formatted(
+            String escapedHtml = htmlBody
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "");
+
+            String json = String.format(
+                "{\"from\":\"%s\",\"to\":[\"%s\"],\"subject\":\"%s\",\"html\":\"%s\"}",
                 fromEmail,
                 toEmail,
                 subject.replace("\"", "\\\""),
-                "\"" + htmlBody.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "") + "\""
+                escapedHtml
             );
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -153,12 +140,12 @@ public class EmailService {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200 || response.statusCode() == 201) {
-                log.info("✅ Email sent via Resend to: {}", toEmail);
+                log.info("✅ Email sent via Resend to: " + toEmail);
             } else {
-                log.error("❌ Resend error {}: {}", response.statusCode(), response.body());
+                log.severe("❌ Resend error " + response.statusCode() + ": " + response.body());
             }
         } catch (Exception e) {
-            log.error("❌ Failed to send email to {}: {}", toEmail, e.getMessage(), e);
+            log.severe("❌ Failed to send email to " + toEmail + ": " + e.getMessage());
         }
     }
 }
