@@ -169,32 +169,42 @@
 
   <!-- TOP BAR -->
   <div class="h-topbar">
-    <!-- Row 1: Logo + Plan badge -->
-    <div class="h-topbar-row1">
-      <div class="h-logo">
-        <span class="h-logo-frog"><svg width="22" height="22" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="fbglogo" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#6EE7B7"/><stop offset="100%" stop-color="#059669"/></radialGradient><radialGradient id="fbellylogo" cx="50%" cy="60%" r="45%"><stop offset="0%" stop-color="#D1FAE5"/><stop offset="100%" stop-color="#6EE7B7"/></radialGradient></defs><ellipse cx="40" cy="48" rx="28" ry="22" fill="url(#fbglogo)"/><ellipse cx="40" cy="52" rx="18" ry="14" fill="url(#fbellylogo)" opacity=".85"/><circle cx="27" cy="28" r="11" fill="url(#fbglogo)"/><circle cx="53" cy="28" r="11" fill="url(#fbglogo)"/><circle cx="27" cy="27" r="8" fill="#fff"/><circle cx="53" cy="27" r="8" fill="#fff"/><circle cx="29" cy="27" r="4.5" fill="#1F2937"/><circle cx="55" cy="27" r="4.5" fill="#1F2937"/><circle cx="30.5" cy="25" r="1.8" fill="#fff"/><circle cx="56.5" cy="25" r="1.8" fill="#fff"/><path d="M32 58 Q40 65 48 58" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="22" cy="54" rx="5" ry="3" fill="#FCA5A5" opacity=".5"/><ellipse cx="58" cy="54" rx="5" ry="3" fill="#FCA5A5" opacity=".5"/><ellipse cx="16" cy="62" rx="8" ry="5" fill="url(#fbglogo)" transform="rotate(-20,16,62)"/><ellipse cx="64" cy="62" rx="8" ry="5" fill="url(#fbglogo)" transform="rotate(20,64,62)"/><circle cx="9" cy="67" r="3" fill="url(#fbglogo)"/><circle cx="14" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="19" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="71" cy="67" r="3" fill="url(#fbglogo)"/><circle cx="66" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="61" cy="70" r="3" fill="url(#fbglogo)"/><ellipse cx="34" cy="22" rx="6" ry="3.5" fill="#fff" opacity=".25" transform="rotate(-15,34,22)"/></svg></span>
-        <span class="h-logo-text">Lingo<span>Cóc</span></span>
-      </div>
-      <div id="xp2xPill" style="display:none;align-items:center;gap:3px;background:#FFF1EB;color:var(--orange);border:1.5px solid var(--orange-mid);border-radius:999px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800"></div>
+    <div class="h-logo">
+      <span class="h-logo-frog"><svg width="22" height="22" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="fbglogo" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#6EE7B7"/><stop offset="100%" stop-color="#059669"/></radialGradient><radialGradient id="fbellylogo" cx="50%" cy="60%" r="45%"><stop offset="0%" stop-color="#D1FAE5"/><stop offset="100%" stop-color="#6EE7B7"/></radialGradient></defs><ellipse cx="40" cy="48" rx="28" ry="22" fill="url(#fbglogo)"/><ellipse cx="40" cy="52" rx="18" ry="14" fill="url(#fbellylogo)" opacity=".85"/><circle cx="27" cy="28" r="11" fill="url(#fbglogo)"/><circle cx="53" cy="28" r="11" fill="url(#fbglogo)"/><circle cx="27" cy="27" r="8" fill="#fff"/><circle cx="53" cy="27" r="8" fill="#fff"/><circle cx="29" cy="27" r="4.5" fill="#1F2937"/><circle cx="55" cy="27" r="4.5" fill="#1F2937"/><circle cx="30.5" cy="25" r="1.8" fill="#fff"/><circle cx="56.5" cy="25" r="1.8" fill="#fff"/><path d="M32 58 Q40 65 48 58" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="22" cy="54" rx="5" ry="3" fill="#FCA5A5" opacity=".5"/><ellipse cx="58" cy="54" rx="5" ry="3" fill="#FCA5A5" opacity=".5"/><ellipse cx="16" cy="62" rx="8" ry="5" fill="url(#fbglogo)" transform="rotate(-20,16,62)"/><ellipse cx="64" cy="62" rx="8" ry="5" fill="url(#fbglogo)" transform="rotate(20,64,62)"/><circle cx="9" cy="67" r="3" fill="url(#fbglogo)"/><circle cx="14" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="19" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="71" cy="67" r="3" fill="url(#fbglogo)"/><circle cx="66" cy="70" r="3" fill="url(#fbglogo)"/><circle cx="61" cy="70" r="3" fill="url(#fbglogo)"/><ellipse cx="34" cy="22" rx="6" ry="3.5" fill="#fff" opacity=".25" transform="rotate(-15,34,22)"/></svg></span>
+      <span class="h-logo-text">Lingo<span>Cóc</span></span>
     </div>
-    <!-- Row 2: Stats pills -->
     <div class="h-pills">
       <div class="h-pill h-pill-fire" onclick="openStreakModal()">
-        <svg width="16" height="16" viewBox="0 0 40 40"><defs><radialGradient id="fircpill" cx="50%" cy="80%" r="70%"><stop offset="0%" stop-color="#FEF08A"/><stop offset="40%" stop-color="#F97316"/><stop offset="100%" stop-color="#DC2626"/></radialGradient></defs><path d="M20 36 C10 32 6 24 8 16 C9 11 12 8 14 5 C14 10 16 12 18 13 C16 8 20 3 23 2 C21 8 24 13 27 15 C29 11 28 7 26 5 C32 10 35 18 34 26 C32 33 27 36 20 36Z" fill="url(#fircpill)"/><path d="M20 33 C14 30 12 24 13 18 C14 15 16 13 18 13 C17 17 19 20 21 21 C20 17 22 13 25 12 C24 16 26 20 28 22 C29 26 27 31 20 33Z" fill="#FEF9C3" opacity=".7"/></svg>
-        <span id="homeStreak">0</span>
+        <svg width="18" height="18" viewBox="0 0 40 40"><defs><radialGradient id="fircpill" cx="50%" cy="80%" r="70%"><stop offset="0%" stop-color="#FEF08A"/><stop offset="40%" stop-color="#F97316"/><stop offset="100%" stop-color="#DC2626"/></radialGradient></defs><path d="M20 36 C10 32 6 24 8 16 C9 11 12 8 14 5 C14 10 16 12 18 13 C16 8 20 3 23 2 C21 8 24 13 27 15 C29 11 28 7 26 5 C32 10 35 18 34 26 C32 33 27 36 20 36Z" fill="url(#fircpill)"/><path d="M20 33 C14 30 12 24 13 18 C14 15 16 13 18 13 C17 17 19 20 21 21 C20 17 22 13 25 12 C24 16 26 20 28 22 C29 26 27 31 20 33Z" fill="#FEF9C3" opacity=".7"/><ellipse cx="20" cy="27" rx="4" ry="5" fill="#FEF9C3" opacity=".5"/></svg><span id="homeStreak" style="margin-left:2px">0</span>
       </div>
       <div class="h-pill h-pill-stone" onclick="openStoneModal()">
-        <svg width="16" height="16" viewBox="0 0 40 40"><defs><radialGradient id="sg1" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#E0D7FF"/><stop offset="60%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#2E1065"/></radialGradient></defs><polygon points="20,2 32,10 36,24 20,38 4,24 8,10" fill="url(#sg1)" stroke="#A78BFA" stroke-width="1.2"/></svg>
-        <span id="homeHearts">5</span>
+        <svg width="22" height="22" viewBox="0 0 40 40" style="flex-shrink:0;vertical-align:middle">
+  <defs>
+    <radialGradient id="sg1" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#E0D7FF"/>
+      <stop offset="60%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#2E1065"/>
+    </radialGradient>
+    <radialGradient id="sg2" cx="35%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".9"/>
+      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <polygon points="20,2 32,10 36,24 20,38 4,24 8,10" fill="url(#sg1)" stroke="#A78BFA" stroke-width="1.2"/>
+  <polygon points="20,6 29,12 32,23 20,34 8,23 11,12" fill="none" stroke="#C4B5FD" stroke-width="0.7" opacity=".6"/>
+  <line x1="20" y1="2"  x2="20" y2="38" stroke="#C4B5FD" stroke-width="0.5" opacity=".4"/>
+  <line x1="8"  y1="10" x2="32" y2="24" stroke="#C4B5FD" stroke-width="0.5" opacity=".4"/>
+  <line x1="32" y1="10" x2="8"  y2="24" stroke="#C4B5FD" stroke-width="0.5" opacity=".4"/>
+  <ellipse cx="16" cy="14" rx="4" ry="2.5" fill="url(#sg2)" opacity=".8" transform="rotate(-20,16,14)"/>
+</svg><span id="homeHearts" style="margin-left:3px">5</span>
       </div>
       <div class="h-pill h-pill-xp">
-        <svg width="16" height="16" viewBox="0 0 40 40"><defs><radialGradient id="stargpill" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="50%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#D97706"/></radialGradient></defs><polygon points="20,3 24,14 36,14 27,22 30,34 20,27 10,34 13,22 4,14 16,14" fill="url(#stargpill)" stroke="#D97706" stroke-width=".8"/></svg>
-        <span id="homeXP">0</span>
+        <svg width="18" height="18" viewBox="0 0 40 40"><defs><radialGradient id="stargpill" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="50%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#D97706"/></radialGradient></defs><polygon points="20,3 24,14 36,14 27,22 30,34 20,27 10,34 13,22 4,14 16,14" fill="url(#stargpill)" stroke="#D97706" stroke-width=".8"/><polygon points="20,7 23,15 32,15 25,21 28,30 20,25 12,30 15,21 8,15 17,15" fill="#FEF3C7" opacity=".5"/><ellipse cx="17" cy="13" rx="3.5" ry="2" fill="#fff" opacity=".5" transform="rotate(-30,17,13)"/></svg><span id="homeXP" style="margin-left:2px">0</span>
       </div>
-      <div class="h-pill h-pill-coin" onclick="goShop()">
-        <svg width="16" height="16" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="coinG18" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="35%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="#B45309" opacity=".35"/><circle cx="20" cy="19" r="18" fill="url(#coinG18)" stroke="#D97706" stroke-width="1.2"/><text x="20" y="24" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
-        <span id="homeCoin">0</span>
+      <div class="h-pill" style="background:#FFF9EB;color:#92400E;border:1.5px solid #FDE68A;cursor:pointer" onclick="goShop()">
+        <svg width="18" height="18" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="coinG18" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="35%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient><radialGradient id="coinRim18" cx="50%" cy="50%" r="50%"><stop offset="75%" stop-color="transparent"/><stop offset="100%" stop-color="#D97706"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="#B45309" opacity=".35"/><circle cx="20" cy="19" r="18" fill="url(#coinG18)" stroke="#D97706" stroke-width="1.2"/><circle cx="20" cy="19" r="13.5" fill="none" stroke="#FCD34D" stroke-width="1.2" opacity=".55"/><text x="20" y="24" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text><ellipse cx="14" cy="12" rx="5.5" ry="3" fill="#fff" opacity=".38" transform="rotate(-25,14,12)"/></svg><span id="homeCoin" style="margin-left:2px">0</span>
       </div>
+      <div id="xp2xPill" style="display:none;align-items:center;gap:3px;background:#FFF1EB;color:var(--orange);border:1.5px solid var(--orange-mid);border-radius:999px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800"></div>
     </div>
   </div>
 
@@ -2108,20 +2118,23 @@
 ═══════════════════════════════════════════════ -->
 <div class="screen" id="mistakeScreen">
   <div class="mi-header">
-    <button class="back-btn" onclick="goBackToOrigin()">←</button>
+    <button class="back-btn" style="background:rgba(255,255,255,.15);color:#fff" onclick="goBackToOrigin()">←</button>
     <div class="mi-title">📮 Hộp thư lỗi sai</div>
     <button class="mi-clear-btn" onclick="miClearAll()">Xóa hết</button>
   </div>
   <div class="mi-body" id="miBody">
     <div class="mi-empty" id="miEmpty">
-      <div style="font-size:3rem;margin-bottom:12px">📭</div>
-      <div style="font-size:.95rem;font-weight:800;color:var(--gray-600)">Hộp thư trống!</div>
-      <div style="font-size:.78rem;color:var(--gray-400);margin-top:6px">Các từ bạn trả lời sai sẽ tự động xuất hiện ở đây</div>
+      <div style="font-size:4rem;margin-bottom:16px">📭</div>
+      <div style="font-size:1.1rem;font-weight:900;color:var(--gray-700)">Hộp thư trống!</div>
+      <div style="font-size:.82rem;color:var(--gray-400);margin-top:8px;line-height:1.6;text-align:center">Những từ bạn trả lời sai<br>sẽ tự động xuất hiện ở đây</div>
     </div>
     <div id="miList" style="display:none">
       <div class="mi-info-bar">
-        <span id="miCount">0 từ cần ôn</span>
-        <button class="mi-study-btn" onclick="miStartStudy()">🔄 Ôn lại tất cả</button>
+        <div>
+          <div class="mi-count-label" id="miCount">0 từ cần ôn</div>
+          <div class="mi-count-sub">Ôn đúng 1 lần → tự động xóa</div>
+        </div>
+        <button class="mi-study-btn" onclick="miStartStudy()">▶ Ôn tất cả</button>
       </div>
       <div id="miCards" class="mi-cards"></div>
     </div>
@@ -11511,14 +11524,12 @@ function miMarkRight(hanzi){
   const list = miLoad();
   const item = list.find(w => w.h === hanzi);
   if(!item) return;
-  item.right = (item.right||0) + 1;
-  // Đúng 2 lần liên tiếp → xóa khỏi hộp thư
-  if(item.right >= 2){
-    const idx = list.indexOf(item);
-    list.splice(idx, 1);
-    showToast('✅ Đã thuộc — xóa khỏi hộp thư!');
-  }
+  // Đúng 1 lần → xóa khỏi hộp thư ngay
+  const idx = list.indexOf(item);
+  list.splice(idx, 1);
+  showToast('✅ Đã thuộc — xóa khỏi hộp thư!');
   miSave(list);
+  miUpdateBanner();
 }
 
 function miGetCount(){ return miLoad().length; }
@@ -11565,24 +11576,25 @@ function miRender(){
 
   cardsEl.innerHTML = sorted.map(w => {
     const wc = w.wrong || 1;
-    // Phân cấp: critical ≥5 lần, high ≥3 lần, normal
-    const cardClass = wc >= 5 ? 'mi-card mi-card--critical' : wc >= 3 ? 'mi-card mi-card--high' : 'mi-card';
-    const badgeClass = wc >= 5 ? 'mi-wrong-badge mi-wrong-badge--critical' : wc >= 3 ? 'mi-wrong-badge mi-wrong-badge--high' : 'mi-wrong-badge';
-    const fireIcon = wc >= 5 ? ' 🔥' : wc >= 3 ? ' ⚠️' : '';
+    const level = wc >= 5 ? 'critical' : wc >= 3 ? 'high' : 'normal';
+    const levelColor = { critical:'#DC2626', high:'#D97706', normal:'#6366F1' }[level];
+    const levelBg    = { critical:'#FEF2F2', high:'#FFFBEB', normal:'#EEF2FF' }[level];
+    const levelBorder= { critical:'#FECACA', high:'#FDE68A', normal:'#C7D2FE' }[level];
+    const levelLabel = { critical:'🔥 Khó nhớ', high:'⚠️ Cần ôn', normal:'📝 Đang học' }[level];
     return `
-    <div class="${cardClass}" id="miCard_${w.h.replace(/[^a-z0-9]/gi,'_')}">
-      <div class="mi-card-left">
-        <div class="mi-hanzi">${w.h}</div>
+    <div class="mi-card" style="border-color:${levelBorder};background:${levelBg}" id="miCard_${w.h.replace(/[^a-z0-9]/gi,'_')}">
+      <div class="mi-card-accent" style="background:${levelColor}"></div>
+      <div class="mi-card-body">
+        <div class="mi-card-top">
+          <div class="mi-hanzi">${w.h}</div>
+          <span class="mi-level-badge" style="background:${levelBg};color:${levelColor};border:1.5px solid ${levelBorder}">${levelLabel}</span>
+        </div>
         <div class="mi-pinyin">${w.p}</div>
         <div class="mi-meaning">${w.m}</div>
-      </div>
-      <div class="mi-card-right">
-        <div class="${badgeClass}">${wc}× sai${fireIcon}</div>
-        <div class="mi-right-dots">
-          <div class="mi-dot ${(w.right||0)>=1?'filled':''}"></div>
-          <div class="mi-dot ${(w.right||0)>=2?'filled':''}"></div>
+        <div class="mi-card-footer">
+          <span class="mi-wrong-count" style="color:${levelColor}">Sai ${wc} lần</span>
+          <button class="mi-remove-btn" onclick="miRemoveOne('${w.h}')">✕ Xóa</button>
         </div>
-        <button class="mi-remove-btn" onclick="miRemoveOne('${w.h}')">✕</button>
       </div>
     </div>`;
   }).join('');
