@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -20,43 +21,42 @@ public class ShopDataController {
 
     private final UserRepository userRepository;
 
-    /** Lấy toàn bộ shop data của user */
     @GetMapping
-    public ResponseEntity<ApiResponse<Map<String,Object>>> getShopData(
-            @AuthenticationPrincipal UserDetails ud) {
-        User user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
-        Map<String,Object> data = Map.of(
-            "coins",        user.getCoins()        != null ? user.getCoins()        : 0,
-            "shopOwned",    user.getShopOwned()    != null ? user.getShopOwned()    : "[]",
-            "shopEquipped", user.getShopEquipped() != null ? user.getShopEquipped() : "default",
-            "shopInventory",user.getShopInventory()!= null ? user.getShopInventory(): "[]",
-            "spinCount",    user.getSpinCount()    != null ? user.getSpinCount()    : 0,
-            "spinDate",     user.getSpinDate()     != null ? user.getSpinDate()     : ""
-        );
-        return ResponseEntity.ok(ApiResponse.success(data));
+    public ResponseEntity<?> getShopData(@AuthenticationPrincipal UserDetails ud) {
+        try {
+            User user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+            Map<String, Object> data = new HashMap<>();
+            data.put("coins",         user.getCoins()         != null ? user.getCoins()         : 0);
+            data.put("shopOwned",     user.getShopOwned()     != null ? user.getShopOwned()     : "[]");
+            data.put("shopEquipped",  user.getShopEquipped()  != null ? user.getShopEquipped()  : "default");
+            data.put("shopInventory", user.getShopInventory() != null ? user.getShopInventory() : "[]");
+            data.put("spinCount",     user.getSpinCount()     != null ? user.getSpinCount()     : 0);
+            data.put("spinDate",      user.getSpinDate()      != null ? user.getSpinDate()      : "");
+            return ResponseEntity.ok(Map.of("success", true, "data", data));
+        } catch (Exception e) {
+            log.error("getShopData error: {}", e.getMessage());
+            return ResponseEntity.ok(Map.of("success", false, "data", new HashMap<>()));
+        }
     }
 
-    /** Lưu toàn bộ shop data */
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> saveShopData(
+    public ResponseEntity<?> saveShopData(
             @AuthenticationPrincipal UserDetails ud,
-            @RequestBody Map<String,Object> body) {
-        User user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
-
-        if (body.containsKey("coins"))
-            user.setCoins(((Number) body.get("coins")).intValue());
-        if (body.containsKey("shopOwned"))
-            user.setShopOwned((String) body.get("shopOwned"));
-        if (body.containsKey("shopEquipped"))
-            user.setShopEquipped((String) body.get("shopEquipped"));
-        if (body.containsKey("shopInventory"))
-            user.setShopInventory((String) body.get("shopInventory"));
-        if (body.containsKey("spinCount"))
-            user.setSpinCount(((Number) body.get("spinCount")).intValue());
-        if (body.containsKey("spinDate"))
-            user.setSpinDate((String) body.get("spinDate"));
-
-        userRepository.save(user);
-        return ResponseEntity.ok(ApiResponse.success(null));
+            @RequestBody Map<String, Object> body) {
+        try {
+            User user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+            if (body.containsKey("coins"))         user.setCoins(((Number) body.get("coins")).intValue());
+            if (body.containsKey("shopOwned"))     user.setShopOwned((String) body.get("shopOwned"));
+            if (body.containsKey("shopEquipped"))  user.setShopEquipped((String) body.get("shopEquipped"));
+            if (body.containsKey("shopInventory")) user.setShopInventory((String) body.get("shopInventory"));
+            if (body.containsKey("spinCount"))     user.setSpinCount(((Number) body.get("spinCount")).intValue());
+            if (body.containsKey("spinDate"))      user.setSpinDate((String) body.get("spinDate"));
+            userRepository.save(user);
+            log.info("✅ Shop saved for user: {}", ud.getUsername());
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            log.error("saveShopData error: {}", e.getMessage());
+            return ResponseEntity.ok(Map.of("success", false));
+        }
     }
 }
