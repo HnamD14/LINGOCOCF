@@ -2907,6 +2907,14 @@ function saveWordLearned_OLD(newWords){
 }
 
 function saveQuizResult(isCorrect){
+  // Track quiz hôm nay cho spin wheel limit
+  const _today = new Date().toDateString();
+  if(localStorage.getItem(uk('lc_quiz_date_str')) !== _today){
+    localStorage.setItem(uk('lc_quiz_date_str'), _today);
+    localStorage.setItem(uk('lc_quiz_today'), '1');
+  } else {
+    localStorage.setItem(uk('lc_quiz_today'), String(parseInt(localStorage.getItem(uk('lc_quiz_today'))||'0')+1));
+  }
   // uk() key là nguồn chính (per-user); lc_ là shadow key
   const cBase = Math.max(
     parseInt(localStorage.getItem('lc_correct')||'0'),
@@ -4402,9 +4410,7 @@ function stopAllGames(){
 function goScreen(id){
   const GAME_SCREENS = ['matchingScreen','speedScreen','fillScreen','strokeScreen','pronunciationScreen'];
   const current = document.querySelector('.screen.active');
-  if(current && GAME_SCREENS.includes(current.id) && !GAME_SCREENS.includes(id)){
-    stopAllGames();
-  }
+  if(current && GAME_SCREENS.includes(current.id) && !GAME_SCREENS.includes(id)) stopAllGames();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.speechSynthesis && window.speechSynthesis.cancel();
@@ -4428,6 +4434,7 @@ function goBackToOrigin(){
   }
   // Nếu quay về mistakeScreen thì render lại ngay để phản ánh từ đã xóa
   if(origin === 'mistakeScreen') try{ miRender(); miUpdateBanner(); }catch(e){}
+  if(origin === 'mistakeScreen'){ try{ miRender(); miUpdateBanner(); }catch(e){} }
   state._navOrigin = null;
 }
 
@@ -5533,7 +5540,7 @@ function cfgLoad(){
   // Sound fx
   const sf = document.getElementById('cfgSoundFx');
   if(sf) sf.checked = cfg.soundFx !== false;
-  // Font size — normalize old sm/md/lg/xl keys
+  // Font size — normalize old sm/md/lg/xl → small/normal/large/xlarge
   const fontRemap = { sm:'small', md:'normal', lg:'large', xl:'xlarge' };
   const savedFont = cfg.fontSize || 'normal';
   const fontVal = fontRemap[savedFont] || savedFont;
@@ -6692,6 +6699,40 @@ let _spinIsRunning = false;
 let _spinCurrentAngle = 0;
 let _spinSelectedIdx = 0;
 
+/* ── Spin daily limit ──────────────────────────────────────────────
+   Normal: lần 1-2 tốn xu bình thường, lần 3+ cần đã làm quiz hôm nay
+   VIP:    lần 1-4 tốn xu bình thường, lần 5+ cần đã làm quiz hôm nay
+────────────────────────────────────────────────────────────────── */
+const SPIN_COUNT_KEY   = 'lingococ_spin_count';
+const SPIN_DATE_KEY    = 'lingococ_spin_date';
+const SPIN_FREE_NORMAL = 2;
+const SPIN_FREE_VIP    = 4;
+
+function _getSpinToday(){
+  const today = new Date().toDateString();
+  if(localStorage.getItem(uk(SPIN_DATE_KEY)) !== today){
+    localStorage.setItem(uk(SPIN_DATE_KEY), today);
+    localStorage.setItem(uk(SPIN_COUNT_KEY), '0');
+  }
+  return parseInt(localStorage.getItem(uk(SPIN_COUNT_KEY))||'0');
+}
+function _incSpinCount(){
+  localStorage.setItem(uk(SPIN_COUNT_KEY), String(_getSpinToday()+1));
+}
+function _hasPlayedQuizToday(){
+  const today = new Date().toDateString();
+  if(localStorage.getItem(uk('lingococ_studied_date')) === today) return true;
+  const qDate  = localStorage.getItem(uk('lc_quiz_date_str'));
+  const qCount = parseInt(localStorage.getItem(uk('lc_quiz_today'))||'0');
+  return qDate === today && qCount >= 1;
+}
+function _spinLimitLabel(vip){
+  const count = _getSpinToday();
+  const free  = vip ? SPIN_FREE_VIP : SPIN_FREE_NORMAL;
+  if(count < free) return `Lượt ${count+1}/${free} miễn kiểm tra`;
+  return `Lượt ${count+1} — cần đã làm quiz`;
+}
+
 function _weightedRandom(prizes){
   const total = prizes.reduce((s,p)=>s+p.weight,0);
   let r = Math.random()*total;
@@ -6825,7 +6866,12 @@ function openSpinWheel(vip){
     : 'radial-gradient(circle,rgba(255,180,0,.25) 0%,transparent 70%)';
 
   const coinInfo = document.getElementById('spinCoinInfo');
-  if(coinInfo) coinInfo.textContent = 'Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  if(coinInfo){
+    const _cnt = _getSpinToday();
+    const _free = vip ? SPIN_FREE_VIP : SPIN_FREE_NORMAL;
+    const _locked = _cnt >= _free && !_hasPlayedQuizToday();
+    coinInfo.innerHTML = `Số dư: <b>${getCoins().toLocaleString('vi-VN')} xu</b> · ${_spinLimitLabel(vip)}${_locked?' <span style="color:#EF4444;font-size:.7rem">⚠️ Cần làm quiz!</span>':''}`;
+  }
 
   const preview = document.getElementById('spinPrizePreview');
   if(preview) preview.innerHTML = prizes.map(p=>
@@ -6848,11 +6894,24 @@ function doSpin(){
   if(_spinIsRunning) return;
   const prizes = _spinIsVip ? SPIN_PRIZES_VIP : SPIN_PRIZES_NORMAL;
   const cost   = _spinIsVip ? 120 : 50;
+  const free   = _spinIsVip ? SPIN_FREE_VIP : SPIN_FREE_NORMAL;
+  const count  = _getSpinToday();
+
+  // Lần 3+ (normal) hoặc lần 5+ (VIP) cần đã làm quiz hôm nay
+  if(count >= free && !_hasPlayedQuizToday()){
+    showToast('⚠️ Cần hoàn thành ít nhất 1 bài quiz hôm nay để quay thêm!');
+    return;
+  }
 
   if(getCoins()<cost){ showToast('❌ Không đủ xu!'); return; }
   if(!spendCoins(cost)){ showToast('❌ Không đủ xu!'); return; }
+  _incSpinCount();
   updateCoinUI();
-  document.getElementById('spinCoinInfo').textContent='Số dư: '+getCoins().toLocaleString('vi-VN')+' xu';
+  const _ci = document.getElementById('spinCoinInfo');
+  if(_ci){
+    const _locked2 = _getSpinToday() >= free && !_hasPlayedQuizToday();
+    _ci.innerHTML = `Số dư: <b>${getCoins().toLocaleString('vi-VN')} xu</b> · ${_spinLimitLabel(_spinIsVip)}${_locked2?' <span style="color:#EF4444;font-size:.7rem">⚠️ Cần quiz!</span>':''}`;
+  }
 
   _spinIsRunning = true;
   document.getElementById('spinStartBtn').disabled=true;
@@ -7944,7 +8003,7 @@ function _genPlayers(type){
     let players = _realLbPlayers.map(p => ({...p, val: type==='xp' ? p.xp : p.streak}));
     // Đảm bảo user hiện tại luôn có trong danh sách
     if(!players.find(p=>p.isMe)){
-      const myEmo=_getMyAvatarEmo(); players.push({ name:myName, emo:myEmo, val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
+      const myEmo2=_getMyAvatarEmo(); players.push({ name:myName, emo:myEmo2, val: type==='xp'?state.xp:state.streak, xp:state.xp, streak:state.streak, isMe:true });
     } else {
       const me = players.find(p=>p.isMe);
       if(me) me.val = Math.max(me.val, type==='xp'?state.xp:state.streak);

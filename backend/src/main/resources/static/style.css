@@ -2145,8 +2145,7 @@ body{
   display:flex;align-items:center;justify-content:center;gap:4px;
   padding:6px 8px;border-radius:12px;
   font-size:.82rem;font-weight:900;cursor:pointer;
-  transition:transform .15s;
-  border:1.5px solid transparent;
+  transition:transform .15s;border:1.5px solid transparent;
 }
 .h-pill:active{transform:scale(.92)}
 .h-pill-fire{background:#FFF1EB;color:var(--orange);border-color:var(--orange-mid)}
