@@ -6785,7 +6785,7 @@ function _hasPlayedQuizToday(){
   const qCount = parseInt(localStorage.getItem(uk('lc_quiz_today'))||'0');
   return qDate === today && qCount >= 1;
 }
-function _spinStatusText(vip){
+function _spinStatus(vip){
   const count = _getSpinToday();
   const max   = vip ? SPIN_MAX_VIP : SPIN_MAX_NORMAL;
   const free  = vip ? SPIN_FREE_VIP : SPIN_FREE_NORMAL;
