@@ -5282,16 +5282,7 @@ function shopSaveToServer(){
    AFTER LOGIN / AUTO-LOGIN ON LOAD
 ──────────────────────────────────────────────── */
 function onAuthSuccess(user, token, isNew = false){
-  // Restore shop data từ login response (không cần API call thêm)
-  if(user.coins !== undefined) localStorage.setItem(uk(COIN_KEY), String(user.coins));
-  if(user.shopOwned)     localStorage.setItem(uk(COIN_OWNED_KEY), user.shopOwned);
-  if(user.shopEquipped)  localStorage.setItem(uk(COIN_EQUIPPED_KEY), user.shopEquipped);
-  if(user.shopInventory) localStorage.setItem(uk(INVENTORY_KEY), user.shopInventory);
-  if(user.spinCount !== undefined) localStorage.setItem(uk(SPIN_COUNT_KEY), String(user.spinCount));
-  if(user.spinDate)      localStorage.setItem(uk(SPIN_DATE_KEY), user.spinDate);
-  // Fallback: load từ server nếu response không có shop data
-  if(user.shopOwned === undefined) setTimeout(shopLoadFromServer, 500);
-  // ① Set userId trước để uk() dùng đúng suffix
+  // ① Set userId TRƯỚC để uk() dùng đúng suffix
   const newUserId = (user.username || user.email || String(user.id) || 'default').toLowerCase().trim();
   const prevUserId = state.userId;
 
@@ -5319,6 +5310,16 @@ function onAuthSuccess(user, token, isNew = false){
   }
 
   state.userId = newUserId;
+
+  // Restore shop data từ login response — PHẢI sau khi set state.userId để uk() dùng đúng suffix
+  if(user.coins !== undefined) localStorage.setItem(uk(COIN_KEY), String(user.coins));
+  if(user.shopOwned)     localStorage.setItem(uk(COIN_OWNED_KEY), user.shopOwned);
+  if(user.shopEquipped)  localStorage.setItem(uk(COIN_EQUIPPED_KEY), user.shopEquipped);
+  if(user.shopInventory) localStorage.setItem(uk(INVENTORY_KEY), user.shopInventory);
+  if(user.spinCount !== undefined) localStorage.setItem(uk(SPIN_COUNT_KEY), String(user.spinCount));
+  if(user.spinDate)      localStorage.setItem(uk(SPIN_DATE_KEY), user.spinDate);
+  // Fallback: load từ server nếu response không có shop data
+  if(user.shopOwned === undefined) setTimeout(shopLoadFromServer, 500);
   // Reset state sạch cho user này
   state.xp = 0;
   state.streak = 0;
