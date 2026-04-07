@@ -66,5 +66,5 @@ anthropic:
 
 # ── Resend Email API ──────────────────────────────────────────────
 resend:
-  api-key: ${RESEND_API_KEY:}
+  api-key: ${RESEND_API_KEY:re_3BEZsoxf_LkTg8RPHEQpb2YBRDag9551B}
   from:    ${MAIL_FROM:onboarding@resend.dev}
