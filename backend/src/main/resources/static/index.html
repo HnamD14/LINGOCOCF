@@ -2105,20 +2105,23 @@
 ═══════════════════════════════════════════════ -->
 <div class="screen" id="mistakeScreen">
   <div class="mi-header">
-    <button class="back-btn" onclick="goBackToOrigin()">←</button>
+    <button class="back-btn" style="background:rgba(255,255,255,.15);color:#fff" onclick="goBackToOrigin()">←</button>
     <div class="mi-title">📮 Hộp thư lỗi sai</div>
     <button class="mi-clear-btn" onclick="miClearAll()">Xóa hết</button>
   </div>
   <div class="mi-body" id="miBody">
     <div class="mi-empty" id="miEmpty">
-      <div style="font-size:3rem;margin-bottom:12px">📭</div>
-      <div style="font-size:.95rem;font-weight:800;color:var(--gray-600)">Hộp thư trống!</div>
-      <div style="font-size:.78rem;color:var(--gray-400);margin-top:6px">Các từ bạn trả lời sai sẽ tự động xuất hiện ở đây</div>
+      <div style="font-size:4rem;margin-bottom:16px">📭</div>
+      <div style="font-size:1.1rem;font-weight:900;color:var(--gray-700)">Hộp thư trống!</div>
+      <div style="font-size:.82rem;color:var(--gray-400);margin-top:8px;line-height:1.6;text-align:center">Những từ bạn trả lời sai<br>sẽ tự động xuất hiện ở đây</div>
     </div>
     <div id="miList" style="display:none">
       <div class="mi-info-bar">
-        <span id="miCount">0 từ cần ôn</span>
-        <button class="mi-study-btn" onclick="miStartStudy()">🔄 Ôn lại tất cả</button>
+        <div>
+          <div class="mi-count-label" id="miCount">0 từ cần ôn</div>
+          <div class="mi-count-sub">Ôn đúng 1 lần → tự động xóa</div>
+        </div>
+        <button class="mi-study-btn" onclick="miStartStudy()">▶ Ôn tất cả</button>
       </div>
       <div id="miCards" class="mi-cards"></div>
     </div>
@@ -11663,24 +11666,25 @@ function miRender(){
 
   cardsEl.innerHTML = sorted.map(w => {
     const wc = w.wrong || 1;
-    // Phân cấp: critical ≥5 lần, high ≥3 lần, normal
-    const cardClass = wc >= 5 ? 'mi-card mi-card--critical' : wc >= 3 ? 'mi-card mi-card--high' : 'mi-card';
-    const badgeClass = wc >= 5 ? 'mi-wrong-badge mi-wrong-badge--critical' : wc >= 3 ? 'mi-wrong-badge mi-wrong-badge--high' : 'mi-wrong-badge';
-    const fireIcon = wc >= 5 ? ' 🔥' : wc >= 3 ? ' ⚠️' : '';
+    const level = wc >= 5 ? 'critical' : wc >= 3 ? 'high' : 'normal';
+    const levelColor  = { critical:'#DC2626', high:'#D97706', normal:'#6366F1' }[level];
+    const levelBg     = { critical:'#FEF2F2', high:'#FFFBEB', normal:'#EEF2FF' }[level];
+    const levelBorder = { critical:'#FECACA', high:'#FDE68A', normal:'#C7D2FE' }[level];
+    const levelLabel  = { critical:'🔥 Khó nhớ', high:'⚠️ Cần ôn', normal:'📝 Đang học' }[level];
     return `
-    <div class="${cardClass}" id="miCard_${w.h.replace(/[^a-z0-9]/gi,'_')}">
-      <div class="mi-card-left">
-        <div class="mi-hanzi">${w.h}</div>
+    <div class="mi-card" style="border-color:${levelBorder}" id="miCard_${w.h.replace(/[^a-z0-9]/gi,'_')}">
+      <div class="mi-card-accent" style="background:${levelColor}"></div>
+      <div class="mi-card-body">
+        <div class="mi-card-top">
+          <div class="mi-hanzi">${w.h}</div>
+          <span class="mi-level-badge" style="background:${levelBg};color:${levelColor};border:1.5px solid ${levelBorder}">${levelLabel}</span>
+        </div>
         <div class="mi-pinyin">${w.p}</div>
         <div class="mi-meaning">${w.m}</div>
-      </div>
-      <div class="mi-card-right">
-        <div class="${badgeClass}">${wc}× sai${fireIcon}</div>
-        <div class="mi-right-dots">
-          <div class="mi-dot ${(w.right||0)>=1?'filled':''}"></div>
-          <div class="mi-dot ${(w.right||0)>=2?'filled':''}"></div>
+        <div class="mi-card-footer">
+          <span class="mi-wrong-count" style="color:${levelColor}">Sai ${wc} lần</span>
+          <button class="mi-remove-btn" onclick="miRemoveOne('${w.h}')">✕ Xóa</button>
         </div>
-        <button class="mi-remove-btn" onclick="miRemoveOne('${w.h}')">✕</button>
       </div>
     </div>`;
   }).join('');
