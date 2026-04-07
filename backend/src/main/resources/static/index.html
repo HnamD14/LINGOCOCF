@@ -6576,6 +6576,8 @@ function removeFromInventory(id){ const inv=getInventory(); const i=inv.indexOf(
 function applyNameColor(color){
   localStorage.setItem(uk('lingococ_name_color'), color);
   applyNameColorBadge();
+  // Tương thích key cũ
+  localStorage.setItem(uk('lingococ_name_gold'), color==='gold'?'1':'0');
   const labels={gold:'✨ Tên màu vàng!',purple:'💜 Tên màu tím!',red:'❤️ Tên màu đỏ!'};
   showToast(labels[color]||'✅ Đã kích hoạt!');
   renderShop();
@@ -6705,14 +6707,11 @@ function applyItemEffect(item){
       localStorage.setItem(uk('lingococ_daily2x_until'), Date.now() + 7*24*60*60*1000);
       showToast('🎁 Xu hàng ngày x2 trong 7 ngày!'); break;
     case 'name_gold':
-      localStorage.setItem(uk('lingococ_name_color'), 'gold');
-      applyNameColorBadge(); showToast('✨ Tên màu vàng đã kích hoạt!'); break;
+      applyNameColor('gold'); break;
     case 'name_purple':
-      localStorage.setItem(uk('lingococ_name_color'), 'purple');
-      applyNameColorBadge(); showToast('💜 Tên màu tím đã kích hoạt!'); break;
+      applyNameColor('purple'); break;
     case 'name_red':
-      localStorage.setItem(uk('lingococ_name_color'), 'red');
-      applyNameColorBadge(); showToast('❤️ Tên màu đỏ đã kích hoạt!'); break;
+      applyNameColor('red'); break;
   }
   if(item.type === 'avatar' || item.type === 'permanent' && item.effect && item.effect.startsWith('av_')){
     if(item.type === 'avatar'){
@@ -6790,10 +6789,11 @@ function _spinStatus(vip){
   const max   = vip ? SPIN_MAX_VIP : SPIN_MAX_NORMAL;
   const free  = vip ? SPIN_FREE_VIP : SPIN_FREE_NORMAL;
   const left  = Math.max(0, max - count);
-  if(count >= max) return `<span style="color:#EF4444;font-weight:900">Hết lượt hôm nay (${max}/${max})</span>`;
+  if(count >= max)
+    return { ok:false, msg:`Hết lượt hôm nay (${max}/${max})`, color:'#EF4444' };
   if(count >= free && !_hasPlayedQuizToday())
-    return `Còn ${left} lượt · <span style="color:#F59E0B;font-weight:900">⚠️ Cần làm quiz để tiếp tục</span>`;
-  return `Còn <b>${left}</b>/${max} lượt hôm nay`;
+    return { ok:false, msg:`Còn ${left} lượt · ⚠️ Cần làm quiz để tiếp tục`, color:'#F59E0B' };
+  return { ok:true, msg:`Còn ${left}/${max} lượt hôm nay`, color:'#059669' };
 }
 
 function _weightedRandom(prizes){
@@ -8190,7 +8190,7 @@ function _renderBoard(type){
         ${rk===1 ? '<span class="podium-crown">👑</span>' : ''}
         ${p.emo}
       </div>
-      <div class="podium-name" ${p.isMe && localStorage.getItem(uk('lingococ_name_gold'))==='1' ? 'style="color:#F59E0B;font-weight:900;text-shadow:0 0 8px rgba(245,158,11,.4)"' : ''}>${p.isMe ? '🐸 '+p.name : p.name}</div>
+      <div class="podium-name" ${p.isMe && localStorage.getItem(uk('lingococ_name_color'))==='gold' ? 'style="color:#F59E0B;font-weight:900;text-shadow:0 0 8px rgba(245,158,11,.4)"' : ''}>${p.isMe ? '🐸 '+p.name : p.name}</div>
       <div class="podium-val">${fmt(p.val)}</div>
       <div class="podium-gift">🎁 ${prizes[0].name.substring(0,14)}…</div>
       <div class="podium-block ${rankClass[i]}">
@@ -8216,7 +8216,7 @@ function _renderBoard(type){
     const rank = i + 4;
     const row  = document.createElement('div');
     row.className = 'lb-row' + (p.isMe ? ' me' : '');
-    const nameStyle = p.isMe && localStorage.getItem(uk('lingococ_name_gold'))==='1'
+    const nameStyle = p.isMe && localStorage.getItem(uk('lingococ_name_color'))==='gold'
       ? 'style="color:#F59E0B;font-weight:900"' : '';
     row.innerHTML = `
       <div class="lb-rank-num">${rank}</div>
