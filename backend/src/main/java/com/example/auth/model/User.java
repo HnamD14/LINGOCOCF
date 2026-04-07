@@ -82,5 +82,25 @@ public class User {
     @Column(name = "weekly_xp")
     private Long weeklyXp = 0L;         // XP tích lũy trong tuần hiện tại (reset mỗi thứ Hai)
 
+    // ── Shop & Inventory ──────────────────────────────────────────
+    @Builder.Default
+    @Column(name = "shop_owned", columnDefinition = "TEXT")
+    private String shopOwned = "[]";    // JSON array: ["av_dragon","name_color",...]
+
+    @Builder.Default
+    @Column(name = "shop_equipped")
+    private String shopEquipped = "default"; // ID avatar đang mặc
+
+    @Builder.Default
+    @Column(name = "shop_inventory", columnDefinition = "TEXT")
+    private String shopInventory = "[]"; // JSON array: consumable chưa dùng
+
+    @Builder.Default
+    @Column(name = "spin_count")
+    private Integer spinCount = 0;
+
+    @Column(name = "spin_date")
+    private String spinDate;            // "Mon Apr 07 2026"
+
     public enum Role { USER, PLUS, PRO, ADMIN }
 }

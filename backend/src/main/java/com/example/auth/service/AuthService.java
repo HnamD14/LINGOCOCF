@@ -161,6 +161,11 @@ public class AuthService {
                         .hearts(user.getHearts() != null ? user.getHearts() : 5)
                         .heartsRegenAt(user.getHeartsRegenAt() != null ? user.getHeartsRegenAt().toString() : null)
                         .coins(user.getCoins() != null ? user.getCoins() : 0)
+                        .shopOwned(user.getShopOwned() != null ? user.getShopOwned() : "[]")
+                        .shopEquipped(user.getShopEquipped() != null ? user.getShopEquipped() : "default")
+                        .shopInventory(user.getShopInventory() != null ? user.getShopInventory() : "[]")
+                        .spinCount(user.getSpinCount() != null ? user.getSpinCount() : 0)
+                        .spinDate(user.getSpinDate() != null ? user.getSpinDate() : "")
                         .build())
                 .build();
     }

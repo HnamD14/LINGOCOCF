@@ -2,6 +2,7 @@ package com.example.auth.controller;
 
 import com.example.auth.dto.*;
 import com.example.auth.service.AuthService;
+import com.example.auth.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
 
     @Operation(
         summary     = "Đăng ký tài khoản mới",
@@ -101,4 +103,18 @@ public class AuthController {
         if (ud != null) authService.revokeRefreshToken(ud.getUsername());
         return ResponseEntity.ok(ApiResponse.success("Đã đăng xuất thành công"));
     }
+
+    // ── TEST MAIL ENDPOINT (xóa sau khi debug) ──
+    @PostMapping("/test-mail")
+    public ResponseEntity<ApiResponse<String>> testMail(@RequestBody Map<String, String> body) {
+        String email = body.getOrDefault("email", "");
+        if (email.isBlank()) return ResponseEntity.badRequest().body(ApiResponse.error("email required"));
+        try {
+            emailService.sendHtml(email, "🧪 Test mail từ LingoCoc", "<h1>Test thành công!</h1><p>Mail đã gửi được từ Railway.</p>");
+            return ResponseEntity.ok(ApiResponse.success("✅ Email đã gửi tới " + email));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("❌ Lỗi: " + e.getMessage()));
+        }
+    }
+
 }

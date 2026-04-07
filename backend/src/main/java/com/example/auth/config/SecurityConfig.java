@@ -71,6 +71,7 @@ public class SecurityConfig {
 
                 // ── Admin only ─────────────────────────────────────────────
                 .requestMatchers("/api/community/sets").permitAll()
+                .requestMatchers("/api/user/shop").authenticated()
                 .requestMatchers("/api/community/sets/{id}").permitAll()
                 .requestMatchers("/api/payment/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/vocab/admin/**").hasRole("ADMIN")

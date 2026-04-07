@@ -23,8 +23,8 @@ public class PaymentService {
        ⚙ CẤU HÌNH NGÂN HÀNG — SỬA 3 DÒNG NÀY
     ══════════════════════════════════════════════ */
     public static final String BANK_ID      = "MB";            // Mã ngân hàng (VietQR)
-    public static final String ACCOUNT_NO   = "0936215959";    // ← Số tài khoản của bạn
-    public static final String ACCOUNT_NAME = "NGUYEN DUY MANH";  // ← Tên chủ TK (HOA, không dấu)
+    public static final String ACCOUNT_NO   = "0123456789";    // ← Số tài khoản của bạn
+    public static final String ACCOUNT_NAME = "NGUYEN VAN A";  // ← Tên chủ TK (HOA, không dấu)
 
     // PLUS: mở HSK2 | PRO: mở HSK2 + HSK3
     public static final Map<String, Long>   PLAN_PRICE = Map.of(

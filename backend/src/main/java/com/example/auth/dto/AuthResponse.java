@@ -28,5 +28,10 @@ public class AuthResponse {
         private String  heartsRegenAt;
         // Coins
         private Integer coins;
+        private String  shopOwned;
+        private String  shopEquipped;
+        private String  shopInventory;
+        private Integer spinCount;
+        private String  spinDate;
     }
 }
