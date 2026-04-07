@@ -4650,12 +4650,18 @@ function loadCard(firstCard){
   setTimeout(()=>{ try{ speakCurrent(); }catch(e){} }, 300);
 }
 function flipCard(){
-  if(state.fcFlipped) return;
-  state.fcFlipped = true;
-  document.getElementById('flashcard').classList.add('flipped');
-  document.getElementById('fcActions').style.display = 'flex';
-  // 🔊 Đọc lại khi lật thẻ
-  setTimeout(() => speakCurrent(), 200);
+  const fc = document.getElementById('flashcard');
+  if(!fc) return;
+  if(!state.fcFlipped){
+    state.fcFlipped = true;
+    fc.classList.add('flipped');
+    document.getElementById('fcActions').style.display = 'flex';
+    setTimeout(() => speakCurrent(), 200);
+  } else {
+    state.fcFlipped = false;
+    fc.classList.remove('flipped');
+    document.getElementById('fcActions').style.display = 'none';
+  }
 }
 
 // ── Prevent double-press ─────────────────────────────────────────
