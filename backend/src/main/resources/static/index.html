@@ -219,11 +219,9 @@
       <div class="h-pill" style="background:#FFF9EB;color:#92400E;border:1.5px solid #FDE68A;cursor:pointer" onclick="goShop()">
         <svg width="18" height="18" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="coinG18" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="35%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient><radialGradient id="coinRim18" cx="50%" cy="50%" r="50%"><stop offset="75%" stop-color="transparent"/><stop offset="100%" stop-color="#D97706"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="#B45309" opacity=".35"/><circle cx="20" cy="19" r="18" fill="url(#coinG18)" stroke="#D97706" stroke-width="1.2"/><circle cx="20" cy="19" r="13.5" fill="none" stroke="#FCD34D" stroke-width="1.2" opacity=".55"/><text x="20" y="24" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text><ellipse cx="14" cy="12" rx="5.5" ry="3" fill="#fff" opacity=".38" transform="rotate(-25,14,12)"/></svg><span id="homeCoin" style="margin-left:2px">0</span>
       </div>
+      <div id="xp2xPill" style="display:none;align-items:center;gap:3px;background:#FFF1EB;color:var(--orange);border:1.5px solid var(--orange-mid);border-radius:999px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800"></div>
     </div>
   </div>
-
-  <!-- XP x2 boost banner (hiện bên dưới topbar, không làm vỡ layout) -->
-  <div id="xp2xPill" style="display:none;align-items:center;justify-content:center;gap:6px;background:linear-gradient(90deg,#FF6B00,#FF8C00);color:#fff;padding:5px 16px;font-family:'Nunito',sans-serif;font-size:.73rem;font-weight:800;letter-spacing:.01em;position:sticky;top:57px;z-index:49;flex-shrink:0"></div>
 
   <div class="scroll-area h-body">
 
@@ -1378,7 +1376,7 @@
           </div>
           <div style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg1" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg1)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
-            50 xu
+            500 xu
           </div>
         </div>
 
@@ -1392,7 +1390,7 @@
           </div>
           <div style="background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg2" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg2)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
-            120 xu
+            1.200 xu
           </div>
         </div>
 
@@ -1406,7 +1404,7 @@
           </div>
           <div style="background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
             <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg3" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg3)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
-            300 xu
+            3.000 xu
           </div>
         </div>
 
@@ -6422,50 +6420,50 @@ window.addXP = function(amount){
 /* consumable   → dùng được nhiều lần, không giới hạn tuần           */
 const SHOP_ITEMS = {
   boost: [
-    { id:'heart_refill',   ico:'💎', name:'Hồi Linh Thạch',      desc:'Phục hồi ngay 5 Linh Thạch',                  price:80,  type:'consumable', effect:'hearts',   weekly:true },
-    { id:'freeze_shield',  ico:'🧊', name:'Đóng băng Streak',     desc:'+1 lá chắn streak, dùng khi quên học',        price:100, type:'consumable', effect:'freeze',   weekly:true },
-    { id:'xp_boost_2x',   ico:'⚡', name:'XP x2 (30 phút)',      desc:'Nhân đôi XP & xu trong 30 phút tới',          price:150, type:'consumable', effect:'xp2x',    weekly:true },
-    { id:'hint_pack',      ico:'💡', name:'Gói gợi ý x5',         desc:'Nhấn 💡 trong quiz để tô sáng đáp án đúng',  price:60,  type:'consumable', effect:'hint',    weekly:true },
-    { id:'xp_boost_60',   ico:'🚀', name:'XP x2 (60 phút)',      desc:'Nhân đôi XP & xu trong 60 phút tới',          price:250, type:'consumable', effect:'xp2x60',  weekly:true },
-    { id:'heart_shield',  ico:'🛡', name:'Bảo vệ tim (1 ngày)', desc:'Tim không bị trừ trong 24 giờ',               price:200, type:'consumable', effect:'heart_shield', weekly:true },
-    { id:'hint_pack10',   ico:'🔦', name:'Gói gợi ý x10',        desc:'10 lượt gợi ý cho quiz',                      price:100, type:'consumable', effect:'hint10',  weekly:true },
-    { id:'double_coins',  ico:'🪙', name:'Xu x2 (1 ngày)',        desc:'Nhân đôi xu kiếm được trong 24 giờ',          price:180, type:'consumable', effect:'coin2x',  weekly:true },
-    { id:'xp_bomb',       ico:'💣', name:'Bom XP +200',           desc:'Cộng ngay 200 XP vào tài khoản',              price:300, type:'consumable', effect:'xp_bomb', weekly:true },
-    { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
+    { id:'heart_refill',   ico:'💎', name:'Hồi Linh Thạch',      desc:'Phục hồi ngay 5 Linh Thạch',                  price:800,  type:'consumable', effect:'hearts',   weekly:true },
+    { id:'freeze_shield',  ico:'🧊', name:'Đóng băng Streak',     desc:'+1 lá chắn streak, dùng khi quên học',        price:1000, type:'consumable', effect:'freeze',   weekly:true },
+    { id:'xp_boost_2x',   ico:'⚡', name:'XP x2 (30 phút)',      desc:'Nhân đôi XP & xu trong 30 phút tới',          price:1500, type:'consumable', effect:'xp2x',    weekly:true },
+    { id:'hint_pack',      ico:'💡', name:'Gói gợi ý x5',         desc:'Nhấn 💡 trong quiz để tô sáng đáp án đúng',  price:600,  type:'consumable', effect:'hint',    weekly:true },
+    { id:'xp_boost_60',   ico:'🚀', name:'XP x2 (60 phút)',      desc:'Nhân đôi XP & xu trong 60 phút tới',          price:2500, type:'consumable', effect:'xp2x60',  weekly:true },
+    { id:'heart_shield',  ico:'🛡', name:'Bảo vệ tim (1 ngày)', desc:'Tim không bị trừ trong 24 giờ',               price:2000, type:'consumable', effect:'heart_shield', weekly:true },
+    { id:'hint_pack10',   ico:'🔦', name:'Gói gợi ý x10',        desc:'10 lượt gợi ý cho quiz',                      price:1000, type:'consumable', effect:'hint10',  weekly:true },
+    { id:'double_coins',  ico:'🪙', name:'Xu x2 (1 ngày)',        desc:'Nhân đôi xu kiếm được trong 24 giờ',          price:1800, type:'consumable', effect:'coin2x',  weekly:true },
+    { id:'xp_bomb',       ico:'💣', name:'Bom XP +200',           desc:'Cộng ngay 200 XP vào tài khoản',              price:3000, type:'consumable', effect:'xp_bomb', weekly:true },
+    { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:3500, type:'consumable', effect:'streak_restore', weekly:true },
   ],
   spin: [
-    { id:'lucky_draw',      ico:'🎰', name:'Vòng quay Thường',   desc:'Ngẫu nhiên xu · XP · tim hoặc jackpot 500xu',       price:50,   type:'consumable', effect:'lucky',       weekly:false },
-    { id:'lucky_draw_ex',   ico:'💎', name:'Vòng quay VIP',      desc:'Phần thưởng gấp đôi · jackpot 1000xu · tỉ lệ cao',  price:120,  type:'consumable', effect:'lucky_ex',    weekly:true  },
-    { id:'lucky_draw_mega', ico:'🌟', name:'Vòng quay MEGA',     desc:'Siêu phần thưởng · jackpot 2000xu · toàn bộ bao gồm XP Bomb & Tim đầy', price:300, type:'consumable', effect:'lucky_mega', weekly:true, isNew:true },
+    { id:'lucky_draw',      ico:'🎰', name:'Vòng quay Thường',   desc:'Ngẫu nhiên xu · XP · tim hoặc jackpot 500xu',       price:500,   type:'consumable', effect:'lucky',       weekly:false },
+    { id:'lucky_draw_ex',   ico:'💎', name:'Vòng quay VIP',      desc:'Phần thưởng gấp đôi · jackpot 1000xu · tỉ lệ cao',  price:1200,  type:'consumable', effect:'lucky_ex',    weekly:true  },
+    { id:'lucky_draw_mega', ico:'🌟', name:'Vòng quay MEGA',     desc:'Siêu phần thưởng · jackpot 2000xu · toàn bộ bao gồm XP Bomb & Tim đầy', price:3000, type:'consumable', effect:'lucky_mega', weekly:true, isNew:true },
     { id:'lucky_draw_free', ico:'🎁', name:'Vòng quay Miễn phí', desc:'1 lượt quay miễn phí · không tốn xu · reset mỗi ngày', price:0,  type:'consumable', effect:'lucky_free',  weekly:false, isNew:true },
-    { id:'lucky_bundle3',   ico:'🎪', name:'Gói 3 lượt Thường',  desc:'3 vòng quay thường · tiết kiệm 30xu',               price:120,  type:'consumable', effect:'lucky_bundle3',weekly:false },
-    { id:'lucky_bundle5',   ico:'🎠', name:'Gói 5 lượt VIP',     desc:'5 vòng quay VIP · cơ hội jackpot siêu cao',          price:500,  type:'consumable', effect:'lucky_bundle5',weekly:true, isNew:true },
+    { id:'lucky_bundle3',   ico:'🎪', name:'Gói 3 lượt Thường',  desc:'3 vòng quay thường · tiết kiệm 30xu',               price:1200,  type:'consumable', effect:'lucky_bundle3',weekly:false },
+    { id:'lucky_bundle5',   ico:'🎠', name:'Gói 5 lượt VIP',     desc:'5 vòng quay VIP · cơ hội jackpot siêu cao',          price:5000,  type:'consumable', effect:'lucky_bundle5',weekly:true, isNew:true },
   ],
   special: [
-    { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
-    { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:280, type:'permanent',  effect:'name_purple' },
-    { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:280, type:'permanent',  effect:'name_red' },
-    { id:'daily_bonus',   ico:'🎁', name:'Xu hàng ngày x2',       desc:'Nhân đôi xu bonus đăng nhập trong 7 ngày',    price:200, type:'consumable', effect:'daily2x',  weekly:true },
-    { id:'vocab_reveal',  ico:'📖', name:'Mở bí mật từ vựng',    desc:'Hiển thị đáp án + ví dụ trong 1 phiên học',   price:90,  type:'consumable', effect:'vocab_reveal', weekly:true },
-    { id:'league_shield', ico:'🏆', name:'Bảo vệ hạng League',   desc:'Không bị xuống hạng League tuần này',         price:400, type:'consumable', effect:'league_shield', weekly:true, isNew:true },
-    { id:'xp_pack_week',  ico:'📦', name:'Gói XP Tuần',           desc:'Nhận ngay 500 XP vào tài khoản',              price:500, type:'consumable', effect:'xp_pack_week', weekly:true, isNew:true },
+    { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:3000, type:'permanent',  effect:'name_gold' },
+    { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:2800, type:'permanent',  effect:'name_purple' },
+    { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:2800, type:'permanent',  effect:'name_red' },
+    { id:'daily_bonus',   ico:'🎁', name:'Xu hàng ngày x2',       desc:'Nhân đôi xu bonus đăng nhập trong 7 ngày',    price:2000, type:'consumable', effect:'daily2x',  weekly:true },
+    { id:'vocab_reveal',  ico:'📖', name:'Mở bí mật từ vựng',    desc:'Hiển thị đáp án + ví dụ trong 1 phiên học',   price:900,  type:'consumable', effect:'vocab_reveal', weekly:true },
+    { id:'league_shield', ico:'🏆', name:'Bảo vệ hạng League',   desc:'Không bị xuống hạng League tuần này',         price:4000, type:'consumable', effect:'league_shield', weekly:true, isNew:true },
+    { id:'xp_pack_week',  ico:'📦', name:'Gói XP Tuần',           desc:'Nhận ngay 500 XP vào tài khoản',              price:5000, type:'consumable', effect:'xp_pack_week', weekly:true, isNew:true },
   ],
   avatar: [
-    { id:'av_crown',  ico:'👑', name:'Cóc Hoàng Gia', desc:'Đội vương miện vàng', price:500, type:'permanent',
+    { id:'av_crown',  ico:'👑', name:'Cóc Hoàng Gia', desc:'Đội vương miện vàng', price:5000, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="46" rx="26" ry="22" fill="#2D9E4A"/><ellipse cx="40" cy="44" rx="22" ry="19" fill="#3ABF5A"/><ellipse cx="28" cy="30" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="52" cy="30" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="28" cy="29" rx="6" ry="6" fill="#fff"/><ellipse cx="52" cy="29" rx="6" ry="6" fill="#fff"/><circle cx="28" cy="29" r="3.5" fill="#1a1a2e"/><circle cx="52" cy="29" r="3.5" fill="#1a1a2e"/><circle cx="29.5" cy="27.5" r="1.2" fill="#fff"/><circle cx="53.5" cy="27.5" r="1.2" fill="#fff"/><ellipse cx="40" cy="54" rx="12" ry="6" fill="#2a8f40"/><path d="M33 54 Q40 60 47 54" fill="none" stroke="#1a5c28" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="32" cy="57" rx="4" ry="2.5" fill="#ff9999" opacity=".5"/><ellipse cx="48" cy="57" rx="4" ry="2.5" fill="#ff9999" opacity=".5"/><path d="M26 24 L29 14 L34 21 L40 11 L46 21 L51 14 L54 24 Z" fill="#F59E0B" stroke="#D97706" stroke-width="1"/><circle cx="40" cy="11" r="3" fill="#EF4444"/><circle cx="29" cy="14" r="2" fill="#3B82F6"/><circle cx="51" cy="14" r="2" fill="#10B981"/><rect x="26" y="22" width="28" height="4" rx="2" fill="#F59E0B" stroke="#D97706" stroke-width="0.8"/></svg>`, emoji:'🐸' },
-    { id:'av_ninja',  ico:'🥷', name:'Cóc Ninja', desc:'Bí ẩn và nhanh nhẹn', price:400, type:'permanent',
+    { id:'av_ninja',  ico:'🥷', name:'Cóc Ninja', desc:'Bí ẩn và nhanh nhẹn', price:4000, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="46" rx="26" ry="22" fill="#2D9E4A"/><ellipse cx="40" cy="44" rx="22" ry="19" fill="#3ABF5A"/><ellipse cx="28" cy="30" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="52" cy="30" rx="9" ry="9" fill="#3ABF5A"/><rect x="19" y="36" width="42" height="22" rx="8" fill="#1a1a2e"/><ellipse cx="28" cy="30" rx="6" ry="6" fill="#fff"/><ellipse cx="52" cy="30" rx="6" ry="6" fill="#fff"/><ellipse cx="28" cy="30" rx="4" ry="3.5" fill="#C0392B"/><ellipse cx="52" cy="30" rx="4" ry="3.5" fill="#C0392B"/><circle cx="28" cy="30" r="2.2" fill="#1a1a2e"/><circle cx="52" cy="30" r="2.2" fill="#1a1a2e"/><circle cx="29" cy="28.8" r="0.9" fill="#fff"/><circle cx="53" cy="28.8" r="0.9" fill="#fff"/><rect x="18" y="20" width="44" height="8" rx="4" fill="#1a1a2e"/><rect x="18" y="22" width="44" height="4" rx="2" fill="#EF4444" opacity=".7"/><g transform="translate(62,15) rotate(20)"><polygon points="0,-7 2,-2 7,0 2,2 0,7 -2,2 -7,0 -2,-2" fill="#888" stroke="#555" stroke-width="0.5"/></g></svg>`, emoji:'🐸' },
-    { id:'av_grad',   ico:'🎓', name:'Cóc Tiến Sĩ', desc:'Học giỏi tột đỉnh', price:350, type:'permanent',
+    { id:'av_grad',   ico:'🎓', name:'Cóc Tiến Sĩ', desc:'Học giỏi tột đỉnh', price:3500, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="47" rx="26" ry="22" fill="#2D9E4A"/><ellipse cx="40" cy="45" rx="22" ry="19" fill="#3ABF5A"/><ellipse cx="28" cy="31" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="52" cy="31" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="28" cy="30" rx="6" ry="6" fill="#fff"/><ellipse cx="52" cy="30" rx="6" ry="6" fill="#fff"/><circle cx="28" cy="30" r="3.5" fill="#1a1a2e"/><circle cx="52" cy="30" r="3.5" fill="#1a1a2e"/><circle cx="29.5" cy="28.5" r="1.2" fill="#fff"/><circle cx="53.5" cy="28.5" r="1.2" fill="#fff"/><circle cx="28" cy="30" r="7" fill="none" stroke="#4B5563" stroke-width="1.8"/><circle cx="52" cy="30" r="7" fill="none" stroke="#4B5563" stroke-width="1.8"/><line x1="35" y1="30" x2="45" y2="30" stroke="#4B5563" stroke-width="1.8"/><ellipse cx="40" cy="55" rx="12" ry="6" fill="#2a8f40"/><path d="M33 55 Q40 61 47 55" fill="none" stroke="#1a5c28" stroke-width="1.5" stroke-linecap="round"/><rect x="24" y="16" width="32" height="5" rx="1" fill="#1a1a2e"/><polygon points="40,8 56,17 40,20 24,17" fill="#1a1a2e"/><line x1="56" y1="17" x2="60" y2="26" stroke="#1a1a2e" stroke-width="2"/><circle cx="60" cy="27" r="2.5" fill="#F59E0B"/></svg>`, emoji:'🐸' },
-    { id:'av_fire',   ico:'🔥', name:'Cóc Lửa', desc:'Streak không bao giờ tắt', price:450, type:'permanent',
+    { id:'av_fire',   ico:'🔥', name:'Cóc Lửa', desc:'Streak không bao giờ tắt', price:4500, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="50" rx="30" ry="24" fill="#FEF3C7" opacity=".6"/><path d="M20 60 Q15 40 25 30 Q22 45 30 42 Q20 32 30 15 Q32 30 40 28 Q35 20 42 10 Q48 22 44 30 Q52 25 50 38 Q58 30 55 45 Q62 38 60 60Z" fill="#F97316" opacity=".8"/><path d="M24 62 Q18 45 28 35 Q26 48 33 45 Q25 37 33 22 Q36 34 42 32 Q38 25 44 15 Q49 25 46 33 Q53 28 51 40 Q57 34 55 50 Q60 42 57 62Z" fill="#FBBF24" opacity=".9"/><ellipse cx="40" cy="48" rx="22" ry="19" fill="#2D9E4A"/><ellipse cx="28" cy="33" rx="9" ry="9" fill="#2D9E4A"/><ellipse cx="52" cy="33" rx="9" ry="9" fill="#2D9E4A"/><ellipse cx="28" cy="32" rx="6" ry="6" fill="#fff"/><ellipse cx="52" cy="32" rx="6" ry="6" fill="#fff"/><circle cx="28" cy="32" r="3.8" fill="#EF4444"/><circle cx="52" cy="32" r="3.8" fill="#EF4444"/><circle cx="28" cy="32" r="2" fill="#1a1a2e"/><circle cx="52" cy="32" r="2" fill="#1a1a2e"/><ellipse cx="40" cy="56" rx="12" ry="6" fill="#237534"/><path d="M33 56 Q40 62 47 56" fill="none" stroke="#1a5c28" stroke-width="1.5" stroke-linecap="round"/></svg>`, emoji:'🐸' },
-    { id:'av_star',   ico:'⭐', name:'Cóc Ngôi Sao', desc:'Tỏa sáng như siêu sao', price:600, type:'permanent',
+    { id:'av_star',   ico:'⭐', name:'Cóc Ngôi Sao', desc:'Tỏa sáng như siêu sao', price:6000, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><circle cx="15" cy="15" r="2" fill="#F59E0B" opacity=".8"/><circle cx="65" cy="12" r="1.5" fill="#F59E0B" opacity=".7"/><ellipse cx="40" cy="48" rx="29" ry="25" fill="#FEF3C7" opacity=".5"/><ellipse cx="40" cy="48" rx="22" ry="19" fill="#3ABF5A"/><ellipse cx="28" cy="33" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="52" cy="33" rx="9" ry="9" fill="#3ABF5A"/><rect x="20" y="28" width="14" height="10" rx="5" fill="#1a1a2e"/><rect x="46" y="28" width="14" height="10" rx="5" fill="#1a1a2e"/><line x1="34" y1="33" x2="46" y2="33" stroke="#1a1a2e" stroke-width="2"/><ellipse cx="40" cy="56" rx="12" ry="6" fill="#2a8f40"/><path d="M32 56 Q40 64 48 56" fill="none" stroke="#1a5c28" stroke-width="2" stroke-linecap="round"/><polygon points="40,15 41.8,20.5 47.5,20.5 43,23.8 44.8,29.5 40,26 35.2,29.5 37,23.8 32.5,20.5 38.2,20.5" fill="#F59E0B" stroke="#D97706" stroke-width="0.5"/></svg>`, emoji:'🐸' },
-    { id:'av_dragon', ico:'🐉', name:'Cóc Rồng', desc:'Huyền thoại bất bại', price:999, type:'permanent', isNew:true,
+    { id:'av_dragon', ico:'🐉', name:'Cóc Rồng', desc:'Huyền thoại bất bại', price:9990, type:'permanent', isNew:true,
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="50" rx="32" ry="26" fill="#EDE9FE" opacity=".6"/><path d="M14 35 Q5 20 15 12 Q18 25 25 30Z" fill="#7C3AED" opacity=".8"/><path d="M66 35 Q75 20 65 12 Q62 25 55 30Z" fill="#7C3AED" opacity=".8"/><path d="M31 22 Q28 10 33 6" fill="none" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/><path d="M49 22 Q52 10 47 6" fill="none" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/><circle cx="33" cy="6" r="2.5" fill="#A78BFA"/><circle cx="47" cy="6" r="2.5" fill="#A78BFA"/><ellipse cx="40" cy="48" rx="23" ry="20" fill="#2D9E4A"/><ellipse cx="28" cy="33" rx="9" ry="9" fill="#2D9E4A"/><ellipse cx="52" cy="33" rx="9" ry="9" fill="#2D9E4A"/><ellipse cx="28" cy="32" rx="6.5" ry="6.5" fill="#fff"/><ellipse cx="52" cy="32" rx="6.5" ry="6.5" fill="#fff"/><ellipse cx="28" cy="32" rx="5" ry="5" fill="#7C3AED"/><ellipse cx="52" cy="32" rx="5" ry="5" fill="#7C3AED"/><ellipse cx="28" cy="32" rx="1.5" ry="4" fill="#1a1a2e"/><ellipse cx="52" cy="32" rx="1.5" ry="4" fill="#1a1a2e"/><circle cx="29.5" cy="30" r="1" fill="#fff"/><circle cx="53.5" cy="30" r="1" fill="#fff"/><ellipse cx="40" cy="57" rx="13" ry="6" fill="#237534"/><path d="M33 56 Q40 64 47 56" fill="none" stroke="#1a5c28" stroke-width="2" stroke-linecap="round"/><line x1="37" y1="57" x2="37" y2="62" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><line x1="43" y1="57" x2="43" y2="62" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>`, emoji:'🐸' },
-    { id:'av_angel',  ico:'😇', name:'Cóc Thiên Thần', desc:'Thuần khiết và mạnh mẽ', price:700, type:'permanent', isNew:true,
+    { id:'av_angel',  ico:'😇', name:'Cóc Thiên Thần', desc:'Thuần khiết và mạnh mẽ', price:7000, type:'permanent', isNew:true,
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="50" rx="28" ry="22" fill="#FEF9C3" opacity=".4"/><ellipse cx="40" cy="46" rx="26" ry="22" fill="#2D9E4A"/><ellipse cx="40" cy="44" rx="22" ry="19" fill="#3ABF5A"/><ellipse cx="28" cy="30" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="52" cy="30" rx="9" ry="9" fill="#3ABF5A"/><ellipse cx="28" cy="29" rx="6" ry="6" fill="#fff"/><ellipse cx="52" cy="29" rx="6" ry="6" fill="#fff"/><circle cx="28" cy="29" r="3.2" fill="#60A5FA"/><circle cx="52" cy="29" r="3.2" fill="#60A5FA"/><circle cx="29" cy="28" r="1" fill="#fff"/><circle cx="53" cy="28" r="1" fill="#fff"/><ellipse cx="40" cy="54" rx="12" ry="6" fill="#2a8f40"/><path d="M33 54 Q40 60 47 54" fill="none" stroke="#1a5c28" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="32" cy="57" rx="4" ry="2" fill="#ff9999" opacity=".4"/><ellipse cx="48" cy="57" rx="4" ry="2" fill="#ff9999" opacity=".4"/><ellipse cx="40" cy="12" rx="14" ry="4" fill="#F59E0B" opacity=".9" transform="rotate(-5,40,12)"/><ellipse cx="40" cy="10" rx="14" ry="3" fill="none" stroke="#D97706" stroke-width="1.5"/><ellipse cx="16" cy="42" rx="10" ry="6" fill="#fff" opacity=".6" transform="rotate(-20,16,42)"/><ellipse cx="64" cy="42" rx="10" ry="6" fill="#fff" opacity=".6" transform="rotate(20,64,42)"/></svg>`, emoji:'🐸' },
-    { id:'av_ice',    ico:'❄️', name:'Cóc Băng Giá', desc:'Lạnh lùng và điềm tĩnh', price:550, type:'permanent',
+    { id:'av_ice',    ico:'❄️', name:'Cóc Băng Giá', desc:'Lạnh lùng và điềm tĩnh', price:5500, type:'permanent',
       svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="72" height="72"><ellipse cx="40" cy="50" rx="30" ry="24" fill="#DBEAFE" opacity=".5"/><ellipse cx="40" cy="46" rx="26" ry="22" fill="#1E4D5C"/><ellipse cx="40" cy="44" rx="22" ry="19" fill="#2D7A8A"/><ellipse cx="28" cy="30" rx="9" ry="9" fill="#2D7A8A"/><ellipse cx="52" cy="30" rx="9" ry="9" fill="#2D7A8A"/><ellipse cx="28" cy="29" rx="6" ry="6" fill="#E0F2FE"/><ellipse cx="52" cy="29" rx="6" ry="6" fill="#E0F2FE"/><circle cx="28" cy="29" r="3.5" fill="#0EA5E9"/><circle cx="52" cy="29" r="3.5" fill="#0EA5E9"/><circle cx="29.5" cy="27.5" r="1.2" fill="#fff"/><circle cx="53.5" cy="27.5" r="1.2" fill="#fff"/><ellipse cx="40" cy="54" rx="12" ry="6" fill="#1a5c6b"/><path d="M33 54 Q40 60 47 54" fill="none" stroke="#0e3d48" stroke-width="1.5" stroke-linecap="round"/><line x1="40" y1="4" x2="40" y2="20" stroke="#BAE6FD" stroke-width="2" stroke-linecap="round"/><line x1="33" y1="8" x2="47" y2="16" stroke="#BAE6FD" stroke-width="1.5" stroke-linecap="round"/><line x1="47" y1="8" x2="33" y2="16" stroke="#BAE6FD" stroke-width="1.5" stroke-linecap="round"/><circle cx="40" cy="12" r="2" fill="#7DD3FC"/></svg>`, emoji:'🐸' },
   ],
 };
@@ -6641,37 +6639,37 @@ function _runLuckyDraw(mode){
   const isFree = mode === 'free';
 
   const normalPrizes = [
-    {msg:'🪙 +200 xu!',         coins:200,  weight:20},
-    {msg:'🪙 +100 xu!',         coins:100,  weight:25},
-    {msg:'🪙 +30 xu',           coins:30,   weight:30},
+    {msg:'🪙 +100 xu!',         coins:100,  weight:20},
+    {msg:'🪙 +50 xu!',          coins:50,   weight:25},
+    {msg:'🪙 +15 xu',           coins:15,   weight:30},
     {msg:'⭐ +50 XP!',          xp:50,      weight:15},
     {msg:'💎 Tim đầy!',         hearts:true,weight:8 },
-    {msg:'🎉 May mắn! +500 xu!',coins:500,  weight:2 },
+    {msg:'🎉 May mắn! +250 xu!',coins:250,  weight:2 },
   ];
   const vipPrizes = [
-    {msg:'🪙 +400 xu!',         coins:400,  weight:20},
-    {msg:'🪙 +200 xu!',         coins:200,  weight:25},
+    {msg:'🪙 +200 xu!',         coins:200,  weight:20},
+    {msg:'🪙 +100 xu!',         coins:100,  weight:25},
     {msg:'⭐ +150 XP!',         xp:150,     weight:15},
     {msg:'💎 Tim đầy!',         hearts:true,weight:10},
     {msg:'⚡ XP x2 (30p)!',     xp2x:true,  weight:10},
-    {msg:'🌟 JACKPOT +1000 xu!',coins:1000, weight:3 },
-    {msg:'🪙 +80 xu',           coins:80,   weight:17},
+    {msg:'🌟 JACKPOT +500 xu!', coins:500,  weight:3 },
+    {msg:'🪙 +40 xu',           coins:40,   weight:17},
   ];
   const megaPrizes = [
-    {msg:'🪙 +800 xu!',         coins:800,  weight:18},
-    {msg:'🪙 +500 xu!',         coins:500,  weight:20},
-    {msg:'⭐ +300 XP!',         xp:300,     weight:15},
-    {msg:'💎 Tim đầy!',         hearts:true,weight:10},
-    {msg:'⚡ XP x2 (60p)!',     xp2x60:true,weight:8 },
-    {msg:'💣 XP Bomb +200!',    xpbomb:true,weight:10},
-    {msg:'🌟 MEGA JACKPOT 2000xu!',coins:2000,weight:2},
-    {msg:'🪙 +150 xu',          coins:150,  weight:17},
+    {msg:'🪙 +400 xu!',             coins:400,  weight:18},
+    {msg:'🪙 +250 xu!',             coins:250,  weight:20},
+    {msg:'⭐ +300 XP!',             xp:300,     weight:15},
+    {msg:'💎 Tim đầy!',             hearts:true,weight:10},
+    {msg:'⚡ XP x2 (60p)!',         xp2x60:true,weight:8 },
+    {msg:'💣 XP Bomb +200!',        xpbomb:true,weight:10},
+    {msg:'🌟 MEGA JACKPOT 1000xu!', coins:1000, weight:2 },
+    {msg:'🪙 +75 xu',               coins:75,   weight:17},
   ];
   const freePrizes = [
-    {msg:'🪙 +50 xu!',          coins:50,   weight:35},
-    {msg:'🪙 +20 xu',           coins:20,   weight:35},
-    {msg:'⭐ +30 XP!',          xp:30,      weight:20},
-    {msg:'💎 +1 Tim',           heart1:true,weight:10},
+    {msg:'🪙 +25 xu!',  coins:25,   weight:35},
+    {msg:'🪙 +10 xu',   coins:10,   weight:35},
+    {msg:'⭐ +30 XP!',  xp:30,      weight:20},
+    {msg:'💎 +1 Tim',   heart1:true,weight:10},
   ];
 
   const pool = isMega ? megaPrizes : isVip ? vipPrizes : isFree ? freePrizes : normalPrizes;
@@ -6725,7 +6723,7 @@ function _showSpinResult(prize, label){
 }
 
 function doSpinDirect(mode){
-  const costs = { free:0, normal:50, vip:120, mega:300 };
+  const costs = { free:0, normal:500, vip:1200, mega:3000 };
   const cost = costs[mode] || 0;
 
   // Check free spin
@@ -6758,171 +6756,98 @@ function _showSpinAnimation(mode){
   const existing = document.getElementById('spinAnimModal');
   if(existing) existing.remove();
 
-  const isVip  = mode === 'vip';
-  const isMega = mode === 'mega';
-  const isFree = mode === 'free';
-
-  // ── 1. Chọn phần thưởng TRƯỚC khi quay ──
-  const normalPrizes = [
-    {msg:'🪙 +200 xu!',          coins:200,  weight:20},
-    {msg:'🪙 +100 xu!',          coins:100,  weight:25},
-    {msg:'🪙 +30 xu',            coins:30,   weight:30},
-    {msg:'⭐ +50 XP!',           xp:50,      weight:15},
-    {msg:'💎 Tim đầy!',          hearts:true,weight:8 },
-    {msg:'🎉 May mắn! +500 xu!', coins:500,  weight:2 },
-  ];
-  const vipPrizes = [
-    {msg:'🪙 +400 xu!',          coins:400,  weight:20},
-    {msg:'🪙 +200 xu!',          coins:200,  weight:25},
-    {msg:'⭐ +150 XP!',          xp:150,     weight:15},
-    {msg:'💎 Tim đầy!',          hearts:true,weight:10},
-    {msg:'⚡ XP x2 (30p)!',      xp2x:true,  weight:10},
-    {msg:'🌟 JACKPOT +1000 xu!', coins:1000, weight:3 },
-    {msg:'🪙 +80 xu',            coins:80,   weight:17},
-  ];
-  const megaPrizes = [
-    {msg:'🪙 +800 xu!',              coins:800,  weight:18},
-    {msg:'🪙 +500 xu!',              coins:500,  weight:20},
-    {msg:'⭐ +300 XP!',             xp:300,     weight:15},
-    {msg:'💎 Tim đầy!',             hearts:true,weight:10},
-    {msg:'⚡ XP x2 (60p)!',         xp2x60:true,weight:8 },
-    {msg:'💣 XP Bomb +200!',        xpbomb:true,weight:10},
-    {msg:'🌟 MEGA JACKPOT 2000xu!', coins:2000, weight:2 },
-    {msg:'🪙 +150 xu',              coins:150,  weight:17},
-  ];
-  const freePrizes = [
-    {msg:'🪙 +50 xu!',  coins:50,   weight:35},
-    {msg:'🪙 +20 xu',   coins:20,   weight:35},
-    {msg:'⭐ +30 XP!',  xp:30,      weight:20},
-    {msg:'💎 +1 Tim',   heart1:true,weight:10},
-  ];
-
-  const pool = isMega ? megaPrizes : isVip ? vipPrizes : isFree ? freePrizes : normalPrizes;
-  const totalWeight = pool.reduce((s,p) => s + p.weight, 0);
-  let rand = Math.random() * totalWeight;
-  let prize = pool[pool.length - 1];
-  for(const p of pool){ rand -= p.weight; if(rand <= 0){ prize = p; break; } }
-
-  // ── 2. Map phần thưởng → ô trên bánh xe ──
-  // Thứ tự ô: 0=XuNhỏ, 1=XP, 2=Tim, 3=XuVừa, 4=XPx2, 5=XuLớn, 6=XPBomb, 7=JACKPOT
+  // Wheel segments với label + màu
   const segs = [
-    { label:'🪙 Xu nhỏ',  color:'#FBBF24', border:'#D97706' },
-    { label:'⭐ +XP',     color:'#8B5CF6', border:'#7C3AED' },
-    { label:'💎 Tim',     color:'#EC4899', border:'#DB2777' },
-    { label:'🪙 Xu vừa', color:'#10B981', border:'#059669' },
-    { label:'⚡ XP x2',  color:'#3B82F6', border:'#2563EB' },
-    { label:'🪙 Xu lớn', color:'#F97316', border:'#EA580C' },
-    { label:'💣 XP Bomb',color:'#06B6D4', border:'#0891B2' },
-    { label:'🌟 JACKPOT',color:'#EF4444', border:'#DC2626' },
+    { label:'🪙 +100xu',  color:'#F59E0B', dark:'#92400E' },
+    { label:'⭐ +50 XP',  color:'#7C3AED', dark:'#5B21B6' },
+    { label:'💎 Tim đầy', color:'#DB2777', dark:'#9D174D' },
+    { label:'🪙 +30xu',   color:'#059669', dark:'#065F46' },
+    { label:'⚡ XP x2',   color:'#2563EB', dark:'#1E40AF' },
+    { label:'🪙 +200xu',  color:'#DC2626', dark:'#991B1B' },
+    { label:'💣 XP+200',  color:'#0891B2', dark:'#155E75' },
+    { label:'🌟 JACKPOT', color:'#D97706', dark:'#92400E' },
   ];
-
-  function getPrizeSegIdx(p){
-    if(p.msg && (p.msg.includes('JACKPOT') || p.msg.includes('MEGA'))) return 7;
-    if(p.xpbomb)            return 6;
-    if(p.xp2x || p.xp2x60) return 4;
-    if(p.hearts || p.heart1)return 2;
-    if(p.xp)                return 1;
-    if((p.coins||0) >= 300) return 5;
-    if((p.coins||0) >= 100) return 3;
-    return 0;
-  }
-  const segIdx = getPrizeSegIdx(prize);
-
-  // ── 3. Build SVG bánh xe (lớn hơn & đẹp hơn) ──
   const n = segs.length;
   const sliceDeg = 360 / n;
-  const sz = 310, cx = sz/2, cy = sz/2, r = sz/2 - 8;
 
-  function pxy(angle){ // angle: 0 = top, clockwise
-    const rad = (angle - 90) * Math.PI / 180;
-    return { x:(cx + r*Math.cos(rad)).toFixed(2), y:(cy + r*Math.sin(rad)).toFixed(2) };
+  // Build SVG wheel
+  function polarToXY(cx, cy, r, angleDeg){
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function makeSlice(cx, cy, r, startDeg, endDeg, color){
+    const s = polarToXY(cx,cy,r,startDeg);
+    const e = polarToXY(cx,cy,r,endDeg);
+    const large = endDeg - startDeg > 180 ? 1 : 0;
+    return `<path d="M${cx},${cy} L${s.x},${s.y} A${r},${r} 0 ${large},1 ${e.x},${e.y} Z" fill="${color}"/>`;
+  }
+  function makeLabel(cx, cy, r, midDeg, text, darkColor){
+    const pos = polarToXY(cx, cy, r*0.65, midDeg);
+    const lines = text.split(' ');
+    return lines.map((ln, i) =>
+      `<text x="${pos.x}" y="${pos.y + (i - (lines.length-1)/2)*13}" text-anchor="middle" dominant-baseline="middle"
+        font-size="11" font-weight="800" fill="#fff" font-family="system-ui,sans-serif"
+        style="text-shadow:0 1px 3px rgba(0,0,0,.5)">${ln}</text>`
+    ).join('');
   }
 
+  const sz = 240, cx = sz/2, cy = sz/2, r = sz/2 - 4;
   let svgParts = [`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">`];
-  // Shadow/glow layer
-  svgParts.push(`<defs><filter id="glowF"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`);
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+7}" fill="#0f0f1e"/>`);
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+7}" fill="none" stroke="#F59E0B" stroke-width="2" opacity=".3"/>`);
-
+  // outer ring
+  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+2}" fill="#1a1a2e"/>`);
   segs.forEach((seg, i) => {
-    const start = i * sliceDeg, end = start + sliceDeg, mid = start + sliceDeg/2;
-    const s = pxy(start), e = pxy(end);
-    svgParts.push(`<path d="M${cx},${cy} L${s.x},${s.y} A${r},${r} 0 0,1 ${e.x},${e.y} Z" fill="${seg.color}" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>`);
-    // Separator dot on rim
-    const dot = pxy(end);
-    svgParts.push(`<circle cx="${dot.x}" cy="${dot.y}" r="4.5" fill="#fff" opacity=".9"/>`);
-    // Label
-    const lp = { x: cx + (r*0.64)*Math.cos((mid-90)*Math.PI/180), y: cy + (r*0.64)*Math.sin((mid-90)*Math.PI/180) };
-    const lines = seg.label.split(' ');
-    lines.forEach((ln, li) => {
-      const dy = (li - (lines.length-1)/2) * 13;
-      svgParts.push(`<text x="${lp.x.toFixed(2)}" y="${(lp.y+dy).toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="10.5" font-weight="900" fill="#fff" font-family="Nunito,system-ui,sans-serif" paint-order="stroke" stroke="rgba(0,0,0,.5)" stroke-width="2">${ln}</text>`);
-    });
+    const start = i * sliceDeg;
+    const end   = start + sliceDeg;
+    const mid   = start + sliceDeg / 2;
+    svgParts.push(makeSlice(cx,cy,r, start, end, seg.color));
+    // divider line
+    const dEnd = polarToXY(cx,cy,r,end);
+    svgParts.push(`<line x1="${cx}" y1="${cy}" x2="${dEnd.x}" y2="${dEnd.y}" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>`);
+    svgParts.push(makeLabel(cx,cy,r, mid, seg.label, seg.dark));
   });
-
-  // Outer gold ring
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#F59E0B" stroke-width="5"/>`);
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+4}" fill="none" stroke="rgba(245,158,11,.3)" stroke-width="3"/>`);
-  // Center hub
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="28" fill="#1a1a2e" stroke="#F59E0B" stroke-width="3.5"/>`);
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="24" fill="none" stroke="rgba(245,158,11,.4)" stroke-width="1.5"/>`);
-  svgParts.push(`<text x="${cx}" y="${cy+2}" text-anchor="middle" dominant-baseline="middle" font-size="22">🐸</text>`);
+  // center circle
+  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="22" fill="#fff" stroke="#E5E7EB" stroke-width="2"/>`);
+  svgParts.push(`<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="18">🐸</text>`);
+  // outer border
+  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+2}" fill="none" stroke="#F59E0B" stroke-width="4"/>`);
   svgParts.push('</svg>');
   const wheelSVG = svgParts.join('');
 
-  // ── 4. Tính góc dừng chính xác tại ô trúng ──
-  const segCenter = segIdx * sliceDeg + sliceDeg / 2;
-  const landAngle = (360 - segCenter + 360) % 360;
-  const totalDeg  = 6 * 360 + landAngle; // 6 vòng + dừng đúng ô
-
-  const label = isMega ? '🌟 MEGA' : isVip ? '💎 VIP' : isFree ? '🎁 Free' : '🎰';
-
-  // ── 5. Render modal ──
   const modal = document.createElement('div');
   modal.id = 'spinAnimModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(5,5,18,.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .25s ease';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .2s ease';
 
   modal.innerHTML = `
-    <div style="text-align:center;padding:16px 20px;width:100%;max-width:380px">
-      <div style="font-size:.8rem;font-weight:900;color:#F59E0B;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px">${label} · Vòng Quay May Mắn 🎡</div>
+    <div style="text-align:center;padding:20px">
+      <div style="font-size:.85rem;font-weight:900;color:#F59E0B;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">🎡 Đang quay...</div>
+
       <!-- Pointer -->
-      <div style="font-size:2.4rem;line-height:1;margin-bottom:-10px;z-index:2;position:relative;
-                  filter:drop-shadow(0 0 10px #F59E0B);color:#F59E0B;animation:bounce .7s infinite alternate">▼</div>
+      <div style="font-size:2rem;line-height:1;margin-bottom:-4px;filter:drop-shadow(0 2px 4px rgba(245,158,11,.8))">▼</div>
+
       <!-- Wheel -->
-      <div id="spinWheelWrap" style="display:inline-block;transition:transform 5s cubic-bezier(.2,.8,.1,1);transform-origin:center center;
-                                     filter:drop-shadow(0 0 24px rgba(245,158,11,.5))">
+      <div id="spinWheelWrap" style="display:inline-block;transition:transform 3.5s cubic-bezier(.17,.67,.12,.99);transform-origin:center center">
         ${wheelSVG}
       </div>
-      <div id="spinStatusTxt" style="margin-top:10px;font-size:.8rem;color:rgba(255,255,255,.5);font-weight:700">Đang quay...</div>
+
+      <div style="margin-top:12px;font-size:.78rem;color:rgba(255,255,255,.6);font-weight:600">Chờ xíu nhé...</div>
     </div>`;
 
   document.body.appendChild(modal);
 
-  // ── 6. Kích hoạt animation ──
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const wheel = document.getElementById('spinWheelWrap');
-    if(wheel) wheel.style.transform = `rotate(${totalDeg}deg)`;
-  }));
+  // Start spin after short delay (render frame)
+  const totalDeg = 1440 + Math.floor(Math.random() * 360);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const wheel = document.getElementById('spinWheelWrap');
+      if(wheel) wheel.style.transform = 'rotate(' + totalDeg + 'deg)';
+    });
+  });
 
-  // ── 7. Sau animation: apply phần thưởng đúng với ô đã dừng ──
-  setTimeout(() => {
-    const st = document.getElementById('spinStatusTxt');
-    if(st) st.textContent = '✨ Đã dừng!';
-  }, 5100);
-
+  // Show result after animation completes
   setTimeout(() => {
     modal.remove();
-    // Apply đúng prize đã chọn từ đầu (không random lại)
-    if(prize.coins)  addCoins(prize.coins);
-    if(prize.xp)     addXP(prize.xp);
-    if(prize.hearts){ state.hearts = MAX_HEARTS; _saveHearts(null); loadHearts(); }
-    if(prize.heart1){ state.hearts = Math.min(state.hearts + 1, MAX_HEARTS); _saveHearts(null); loadHearts(); }
-    if(prize.xp2x)  { localStorage.setItem(uk('lingococ_xp2x_until'), Date.now()+30*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
-    if(prize.xp2x60){ localStorage.setItem(uk('lingococ_xp2x_until'), Date.now()+60*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
-    if(prize.xpbomb){ addXP(200); }
-    _showSpinResult(prize, label);
-    fireConfetti();
-  }, 5500);
+    _runLuckyDraw(mode);
+  }, 3800);
 }
 
 function updateFreeSpinStatus(){
@@ -7105,7 +7030,7 @@ function showXP2xIndicator(){
   if(!pill) return;
   if(until > Date.now()){
     const mins = Math.ceil((until - Date.now()) / 60000);
-    pill.textContent = '⚡ XP x2 đang hoạt động — còn ' + mins + ' phút';
+    pill.textContent = '⚡ x2 còn ' + mins + 'p';
     pill.style.display = 'flex';
     clearTimeout(pill._timer);
     pill._timer = setTimeout(() => { pill.style.display = 'none'; }, until - Date.now());
