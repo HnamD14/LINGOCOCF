@@ -6952,29 +6952,51 @@ function applyEquippedAvatar(){
         (isEmoji ? avatarContent : `<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">${avatarContent}</div>`);
     }
   });
+  // ── Nếu leaderboard đang mở → re-render để áp dụng avatar mới ──
+  if(document.getElementById('leaderboardScreen')?.classList.contains('active')){
+    setTimeout(renderLeaderboard, 80);
+  }
 }
 
 function applyNameColorBadge(){
   const color = localStorage.getItem(uk('lingococ_name_color'));
-  const nameEl = document.getElementById('profileName');
-  if(!nameEl) return;
   const gradients = {
     gold:   'linear-gradient(135deg,#F59E0B,#D97706)',
     purple: 'linear-gradient(135deg,#7C3AED,#A855F7)',
     red:    'linear-gradient(135deg,#DC2626,#EF4444)',
   };
-  if(color && gradients[color]){
-    nameEl.style.background = gradients[color];
-    nameEl.style.webkitBackgroundClip = 'text';
-    nameEl.style.webkitTextFillColor = 'transparent';
-    nameEl.style.backgroundClip = 'text';
-    nameEl.style.fontWeight = '900';
-  } else {
-    nameEl.style.background = '';
-    nameEl.style.webkitBackgroundClip = '';
-    nameEl.style.webkitTextFillColor = '';
-    nameEl.style.backgroundClip = '';
+  // ── Profile name ──
+  const nameEl = document.getElementById('profileName');
+  if(nameEl){
+    if(color && gradients[color]){
+      nameEl.style.background = gradients[color];
+      nameEl.style.webkitBackgroundClip = 'text';
+      nameEl.style.webkitTextFillColor = 'transparent';
+      nameEl.style.backgroundClip = 'text';
+      nameEl.style.fontWeight = '900';
+    } else {
+      nameEl.style.cssText = '';
+    }
   }
+  // ── Leaderboard: re-render nếu đang mở để áp dụng màu tên ──
+  if(document.getElementById('leaderboardScreen')?.classList.contains('active')){
+    setTimeout(renderLeaderboard, 50);
+  }
+  // ── Leaderboard list rows đang hiển thị ──
+  const lbGrad = color && gradients[color]
+    ? gradients[color] + ';-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900'
+    : null;
+  document.querySelectorAll('.lb-row.me .lb-name, .lb-row.me .podium-name').forEach(el => {
+    if(lbGrad){
+      el.style.background = gradients[color] || '';
+      el.style.webkitBackgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.backgroundClip = 'text';
+      el.style.fontWeight = '900';
+    } else {
+      el.style.cssText = '';
+    }
+  });
 }
 /* backward compat */
 function applyNameGoldBadge(){ applyNameColorBadge(); }
@@ -8154,7 +8176,12 @@ function _renderBoard(type){
         ${rk===1 ? '<span class="podium-crown">👑</span>' : ''}
         ${p.emo}
       </div>
-      <div class="podium-name" ${p.isMe && localStorage.getItem(uk('lingococ_name_gold'))==='1' ? 'style="color:#F59E0B;font-weight:900;text-shadow:0 0 8px rgba(245,158,11,.4)"' : ''}>${p.isMe ? '🐸 '+p.name : p.name}</div>
+      <div class="podium-name" ${(()=>{
+        if(!p.isMe) return '';
+        const nc=localStorage.getItem(uk('lingococ_name_color'));
+        const gs={gold:'background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',purple:'background:linear-gradient(135deg,#7C3AED,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',red:'background:linear-gradient(135deg,#DC2626,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900'};
+        return nc&&gs[nc]?'style="'+gs[nc]+'"':'';
+      })()}>${p.isMe ? '🐸 '+p.name : p.name}</div>
       <div class="podium-val">${fmt(p.val)}</div>
       <div class="podium-gift">🎁 ${prizes[0].name.substring(0,14)}…</div>
       <div class="podium-block ${rankClass[i]}">
@@ -8180,8 +8207,13 @@ function _renderBoard(type){
     const rank = i + 4;
     const row  = document.createElement('div');
     row.className = 'lb-row' + (p.isMe ? ' me' : '');
-    const nameStyle = p.isMe && localStorage.getItem(uk('lingococ_name_gold'))==='1'
-      ? 'style="color:#F59E0B;font-weight:900"' : '';
+    const nameColor = p.isMe ? localStorage.getItem(uk('lingococ_name_color')) : null;
+    const nameGradients = {
+      gold:   'background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
+      purple: 'background:linear-gradient(135deg,#7C3AED,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
+      red:    'background:linear-gradient(135deg,#DC2626,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
+    };
+    const nameStyle = nameColor && nameGradients[nameColor] ? 'style="' + nameGradients[nameColor] + '"' : '';
     // Tính avatar trước để tránh nested backtick
     const meAvaHtml = (() => {
       if(!p.isMe) return p.emo;
