@@ -6,6 +6,21 @@
 <title>LingoCóc 🐸 — Học Tiếng Trung</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+@keyframes popIn {
+  from { transform: scale(.6); opacity:0; }
+  to   { transform: scale(1);  opacity:1; }
+}
+@keyframes spin2 {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.3); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+</style>
 </head>
 <body>
 
@@ -1329,13 +1344,65 @@
 
     <!-- Panel: Vòng quay -->
     <div id="shopPanelSpin" class="shop-panel">
-      <div class="shop-section-label">Vòng quay may mắn 🎡</div>
-      <div style="background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:1.5px solid #FCD34D;border-radius:14px;padding:16px;margin-bottom:14px;font-size:.8rem;color:#92400E;font-weight:700;display:flex;align-items:center;gap:8px">
-        <span style="font-size:1.2rem">💡</span>
-        <span>Mua vật phẩm Vòng quay bên dưới rồi dùng từ mục <strong>Đã mua</strong> để quay!</span>
+
+      <!-- Hero banner -->
+      <div style="background:linear-gradient(135deg,#7C3AED,#DB2777,#F59E0B);border-radius:18px;padding:20px 16px;margin-bottom:18px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-10px;left:-10px;font-size:3rem;opacity:.15;transform:rotate(-20deg)">🎡</div>
+        <div style="position:absolute;top:-5px;right:-5px;font-size:2.5rem;opacity:.15;transform:rotate(15deg)">⭐</div>
+        <div style="font-size:2.2rem;margin-bottom:6px">🎡</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.04em;margin-bottom:4px">VÒNG QUAY MAY MẮN</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.85);font-weight:600">Quay để nhận xu · XP · tim và phần thưởng siêu hấp dẫn!</div>
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:12px">
+          <div style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:800;color:#fff">🪙 Tối đa 2000xu</div>
+          <div style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:800;color:#fff">⭐ Tối đa 500 XP</div>
+        </div>
       </div>
-      <div class="shop-section-label" style="margin-top:4px">Lượt quay</div>
+
+      <!-- Prize preview -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎁 Bảng phần thưởng</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #F59E0B;border-radius:12px;padding:10px 6px;text-align:center">
+            <div style="font-size:1.4rem">🪙</div>
+            <div style="font-size:.68rem;font-weight:800;color:#92400E;margin-top:3px">+30 ~ 500 xu</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border:1.5px solid #7C3AED;border-radius:12px;padding:10px 6px;text-align:center">
+            <div style="font-size:1.4rem">⭐</div>
+            <div style="font-size:.68rem;font-weight:800;color:#5B21B6;margin-top:3px">+50 ~ 500 XP</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#FCE7F3,#FBCFE8);border:1.5px solid #DB2777;border-radius:12px;padding:10px 6px;text-align:center">
+            <div style="font-size:1.4rem">💎</div>
+            <div style="font-size:.68rem;font-weight:800;color:#9D174D;margin-top:3px">Tim đầy!</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:1.5px solid #059669;border-radius:12px;padding:10px 6px;text-align:center">
+            <div style="font-size:1.4rem">💣</div>
+            <div style="font-size:.68rem;font-weight:800;color:#065F46;margin-top:3px">+200 XP Bomb</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE);border:1.5px solid #2563EB;border-radius:12px;padding:10px 6px;text-align:center">
+            <div style="font-size:1.4rem">⚡</div>
+            <div style="font-size:.68rem;font-weight:800;color:#1E40AF;margin-top:3px">XP x2 (30p)</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#FEF9C3,#FEF08A);border:1.5px solid #CA8A04;border-radius:12px;padding:10px 6px;text-align:center;position:relative">
+            <div style="position:absolute;top:-6px;right:-4px;background:#EF4444;color:#fff;font-size:.55rem;font-weight:900;padding:2px 5px;border-radius:6px">HIẾM</div>
+            <div style="font-size:1.4rem">🌟</div>
+            <div style="font-size:.68rem;font-weight:800;color:#92400E;margin-top:3px">JACKPOT 2000xu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spin items -->
+      <div style="font-size:.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎟 Mua lượt quay</div>
       <div class="shop-grid" id="shopGridSpin"></div>
+
+      <!-- How to use tip -->
+      <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:12px;padding:12px 14px;margin-top:4px;display:flex;align-items:flex-start;gap:10px">
+        <span style="font-size:1.3rem;flex-shrink:0">💡</span>
+        <div>
+          <div style="font-size:.78rem;font-weight:800;color:#14532D;margin-bottom:2px">Cách sử dụng</div>
+          <div style="font-size:.73rem;color:#166534;line-height:1.5">Sau khi mua lượt quay, vào tab <strong>Đã mua</strong> → chọn vật phẩm → nhấn <strong>Dùng ngay</strong> để quay và nhận thưởng!</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Panel: Đã mua -->
@@ -6328,8 +6395,12 @@ const SHOP_ITEMS = {
     { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
   ],
   spin: [
-    { id:'lucky_draw',    ico:'🎰', name:'Vòng quay may mắn',    desc:'Ngẫu nhiên: xu, XP, tim hoặc jackpot 500xu',  price:50,  type:'consumable', effect:'lucky',    weekly:false },
-    { id:'lucky_draw_ex', ico:'🌟', name:'Vòng quay VIP',        desc:'Phần thưởng gấp đôi, tỉ lệ jackpot cao hơn', price:120, type:'consumable', effect:'lucky_ex', weekly:true },
+    { id:'lucky_draw',      ico:'🎰', name:'Vòng quay Thường',   desc:'Ngẫu nhiên xu · XP · tim hoặc jackpot 500xu',       price:50,   type:'consumable', effect:'lucky',       weekly:false },
+    { id:'lucky_draw_ex',   ico:'💎', name:'Vòng quay VIP',      desc:'Phần thưởng gấp đôi · jackpot 1000xu · tỉ lệ cao',  price:120,  type:'consumable', effect:'lucky_ex',    weekly:true  },
+    { id:'lucky_draw_mega', ico:'🌟', name:'Vòng quay MEGA',     desc:'Siêu phần thưởng · jackpot 2000xu · toàn bộ bao gồm XP Bomb & Tim đầy', price:300, type:'consumable', effect:'lucky_mega', weekly:true, isNew:true },
+    { id:'lucky_draw_free', ico:'🎁', name:'Vòng quay Miễn phí', desc:'1 lượt quay miễn phí · không tốn xu · reset mỗi ngày', price:0,  type:'consumable', effect:'lucky_free',  weekly:false, isNew:true },
+    { id:'lucky_bundle3',   ico:'🎪', name:'Gói 3 lượt Thường',  desc:'3 vòng quay thường · tiết kiệm 30xu',               price:120,  type:'consumable', effect:'lucky_bundle3',weekly:false },
+    { id:'lucky_bundle5',   ico:'🎠', name:'Gói 5 lượt VIP',     desc:'5 vòng quay VIP · cơ hội jackpot siêu cao',          price:500,  type:'consumable', effect:'lucky_bundle5',weekly:true, isNew:true },
   ],
   special: [
     { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
@@ -6486,9 +6557,17 @@ function applyItemEffect(item){
       else { showToast('ℹ️ Không có streak nào cần phục hồi.'); }
       break;
     case 'lucky':
-      _runLuckyDraw(false); break;
+      _runLuckyDraw('normal'); break;
     case 'lucky_ex':
-      _runLuckyDraw(true); break;
+      _runLuckyDraw('vip'); break;
+    case 'lucky_mega':
+      _runLuckyDraw('mega'); break;
+    case 'lucky_free':
+      _runLuckyDraw('free'); break;
+    case 'lucky_bundle3':
+      _runLuckyDraw('normal'); setTimeout(()=>_runLuckyDraw('normal'),600); setTimeout(()=>_runLuckyDraw('normal'),1200); break;
+    case 'lucky_bundle5':
+      _runLuckyDraw('vip'); setTimeout(()=>_runLuckyDraw('vip'),500); setTimeout(()=>_runLuckyDraw('vip'),1000); setTimeout(()=>_runLuckyDraw('vip'),1500); setTimeout(()=>_runLuckyDraw('vip'),2000); break;
     case 'vocab_reveal':
       localStorage.setItem(uk('lingococ_vocab_reveal'), '1');
       showToast('📖 Đáp án & ví dụ sẽ hiển thị trong phiên này!'); break;
@@ -6516,22 +6595,94 @@ function applyItemEffect(item){
   }
 }
 
-function _runLuckyDraw(vip){
-  const prizes = vip ? [
-    {msg:'🪙 +400 xu!', coins:400},{msg:'🪙 +200 xu!', coins:200},
-    {msg:'⭐ +150 XP!', xp:150},{msg:'💎 Tim đầy!', hearts:true},
-    {msg:'🌟 JACKPOT +1000 xu!', coins:1000},{msg:'🪙 +80 xu', coins:80},
-  ] : [
-    {msg:'🪙 +200 xu!', coins:200},{msg:'🪙 +100 xu!', coins:100},
-    {msg:'⭐ +50 XP!', xp:50},{msg:'💎 Tim đầy!', hearts:true},
-    {msg:'🪙 +500 xu! May mắn!', coins:500},{msg:'🪙 +30 xu', coins:30},
+function _runLuckyDraw(mode){
+  // mode: 'normal' | 'vip' | 'mega' | 'free'
+  const isVip  = mode === 'vip'  || mode === true;
+  const isMega = mode === 'mega';
+  const isFree = mode === 'free';
+
+  const normalPrizes = [
+    {msg:'🪙 +200 xu!',         coins:200,  weight:20},
+    {msg:'🪙 +100 xu!',         coins:100,  weight:25},
+    {msg:'🪙 +30 xu',           coins:30,   weight:30},
+    {msg:'⭐ +50 XP!',          xp:50,      weight:15},
+    {msg:'💎 Tim đầy!',         hearts:true,weight:8 },
+    {msg:'🎉 May mắn! +500 xu!',coins:500,  weight:2 },
   ];
-  const prize = prizes[Math.floor(Math.random()*prizes.length)];
-  if(prize.coins) addCoins(prize.coins);
-  if(prize.xp) addXP(prize.xp);
-  if(prize.hearts){ state.hearts=MAX_HEARTS; _saveHearts(null); loadHearts(); }
-  showToast((vip?'🌟 VIP: ':'🎰 ') + prize.msg);
+  const vipPrizes = [
+    {msg:'🪙 +400 xu!',         coins:400,  weight:20},
+    {msg:'🪙 +200 xu!',         coins:200,  weight:25},
+    {msg:'⭐ +150 XP!',         xp:150,     weight:15},
+    {msg:'💎 Tim đầy!',         hearts:true,weight:10},
+    {msg:'⚡ XP x2 (30p)!',     xp2x:true,  weight:10},
+    {msg:'🌟 JACKPOT +1000 xu!',coins:1000, weight:3 },
+    {msg:'🪙 +80 xu',           coins:80,   weight:17},
+  ];
+  const megaPrizes = [
+    {msg:'🪙 +800 xu!',         coins:800,  weight:18},
+    {msg:'🪙 +500 xu!',         coins:500,  weight:20},
+    {msg:'⭐ +300 XP!',         xp:300,     weight:15},
+    {msg:'💎 Tim đầy!',         hearts:true,weight:10},
+    {msg:'⚡ XP x2 (60p)!',     xp2x60:true,weight:8 },
+    {msg:'💣 XP Bomb +200!',    xpbomb:true,weight:10},
+    {msg:'🌟 MEGA JACKPOT 2000xu!',coins:2000,weight:2},
+    {msg:'🪙 +150 xu',          coins:150,  weight:17},
+  ];
+  const freePrizes = [
+    {msg:'🪙 +50 xu!',          coins:50,   weight:35},
+    {msg:'🪙 +20 xu',           coins:20,   weight:35},
+    {msg:'⭐ +30 XP!',          xp:30,      weight:20},
+    {msg:'💎 +1 Tim',           heart1:true,weight:10},
+  ];
+
+  const pool = isMega ? megaPrizes : isVip ? vipPrizes : isFree ? freePrizes : normalPrizes;
+
+  // Weighted random
+  const totalWeight = pool.reduce((s,p) => s + p.weight, 0);
+  let rand = Math.random() * totalWeight;
+  let prize = pool[pool.length - 1];
+  for(const p of pool){ rand -= p.weight; if(rand <= 0){ prize = p; break; } }
+
+  // Apply prize
+  if(prize.coins)  addCoins(prize.coins);
+  if(prize.xp)     addXP(prize.xp);
+  if(prize.hearts){ state.hearts = MAX_HEARTS; _saveHearts(null); loadHearts(); }
+  if(prize.heart1){ state.hearts = Math.min(state.hearts + 1, MAX_HEARTS); _saveHearts(null); loadHearts(); }
+  if(prize.xp2x)  { localStorage.setItem(uk('lingococ_xp2x_until'), Date.now() + 30*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
+  if(prize.xp2x60){ localStorage.setItem(uk('lingococ_xp2x_until'), Date.now() + 60*60*1000); if(typeof showXP2xIndicator==='function') showXP2xIndicator(); }
+  if(prize.xpbomb){ addXP(200); }
+
+  // Show result modal
+  _showSpinResult(prize, isMega ? '🌟 MEGA' : isVip ? '💎 VIP' : isFree ? '🎁 Free' : '🎰');
   fireConfetti();
+}
+
+function _showSpinResult(prize, label){
+  // Remove existing modal if any
+  const existing = document.getElementById('spinResultModal');
+  if(existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'spinResultModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn .25s ease';
+  
+  const ico = prize.coins ? '🪙' : prize.xp || prize.xpbomb ? '⭐' : prize.hearts || prize.heart1 ? '💎' : prize.xp2x || prize.xp2x60 ? '⚡' : '🎁';
+  const isJackpot = prize.coins >= 1000 || prize.msg.includes('JACKPOT') || prize.msg.includes('MEGA');
+  
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:32px 28px;text-align:center;max-width:300px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:popIn .35s cubic-bezier(.175,.885,.32,1.275)">
+      <div style="font-size:.75rem;font-weight:800;color:#7C3AED;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">${label} Kết quả</div>
+      <div style="font-size:4rem;margin-bottom:8px;${isJackpot?'animation:spin2 .6s ease':''}">
+        ${isJackpot ? '🌟' : ico}
+      </div>
+      <div style="font-size:1.4rem;font-weight:900;color:${isJackpot?'#F59E0B':'#1a1a2e'};margin-bottom:6px">${prize.msg}</div>
+      ${isJackpot ? '<div style="font-size:.8rem;color:#F59E0B;font-weight:800;margin-bottom:10px">🎉 CHÚC MỪNG! 🎉</div>' : ''}
+      <div style="font-size:.78rem;color:#6B7280;margin-bottom:20px">Phần thưởng đã được cộng vào tài khoản!</div>
+      <button onclick="document.getElementById('spinResultModal').remove()" style="background:linear-gradient(135deg,#7C3AED,#DB2777);color:#fff;border:none;border-radius:50px;padding:12px 32px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;width:100%">Tuyệt vời! 🎉</button>
+    </div>`;
+  
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
 }
 
 function equipAvatar(id){
