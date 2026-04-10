@@ -1303,6 +1303,7 @@
   <div class="shop-tabs">
     <button class="shop-tab active" id="shopTabBoost"   onclick="switchShopTab('boost',this)">⚡ Vật phẩm</button>
     <button class="shop-tab"        id="shopTabAvatar"  onclick="switchShopTab('avatar',this)">🐸 Linh vật</button>
+    <button class="shop-tab"        id="shopTabSpin"    onclick="switchShopTab('spin',this)">🎡 Vòng quay</button>
     <button class="shop-tab"        id="shopTabOwned"   onclick="switchShopTab('owned',this)">📦 Đã mua</button>
   </div>
 
@@ -1324,6 +1325,17 @@
         <div id="shopAvatarLabel" style="font-size:.78rem;color:var(--gray-400);margin-top:6px;font-weight:700">Mặc định</div>
       </div>
       <div class="shop-grid" id="shopGridAvatar"></div>
+    </div>
+
+    <!-- Panel: Vòng quay -->
+    <div id="shopPanelSpin" class="shop-panel">
+      <div class="shop-section-label">Vòng quay may mắn 🎡</div>
+      <div style="background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:1.5px solid #FCD34D;border-radius:14px;padding:16px;margin-bottom:14px;font-size:.8rem;color:#92400E;font-weight:700;display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.2rem">💡</span>
+        <span>Mua vật phẩm Vòng quay bên dưới rồi dùng từ mục <strong>Đã mua</strong> để quay!</span>
+      </div>
+      <div class="shop-section-label" style="margin-top:4px">Lượt quay</div>
+      <div class="shop-grid" id="shopGridSpin"></div>
     </div>
 
     <!-- Panel: Đã mua -->
@@ -1508,7 +1520,7 @@
     <!-- Giao diện -->
     <div class="cfg-section-label">🎨 Giao diện</div>
     <div class="cfg-card">
-      <div class="cfg-row cfg-row-last">
+      <div class="cfg-row">
         <div class="cfg-row-left">
           <div class="cfg-icon" style="background:#FFFBEB;color:#D97706"><svg width="20" height="20" viewBox="0 0 24 24"><text x="2" y="18" font-family="Georgia,serif" font-size="17" font-weight="900" fill="currentColor">A</text><text x="13" y="20" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="currentColor" opacity=".7">a</text></svg></div>
           <div class="cfg-row-text">
@@ -1523,7 +1535,19 @@
           <option value="xlarge">Rất lớn</option>
         </select>
       </div>
-
+      <div class="cfg-row cfg-row-last">
+        <div class="cfg-row-left">
+          <div class="cfg-icon" style="background:#F0FDF4;color:#15803D"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"><rect x="8" y="4" width="8" height="16" rx="2" fill="currentColor" fill-opacity=".12"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/><line x1="4" y1="8" x2="4" y2="16" stroke-opacity=".7"/><line x1="2" y1="9.5" x2="2" y2="14.5" stroke-opacity=".4"/><line x1="20" y1="8" x2="20" y2="16" stroke-opacity=".7"/><line x1="22" y1="9.5" x2="22" y2="14.5" stroke-opacity=".4"/></svg></div>
+          <div class="cfg-row-text">
+            <div class="cfg-row-name">Rung phản hồi</div>
+            <div class="cfg-row-sub">Rung nhẹ khi trả lời</div>
+          </div>
+        </div>
+        <label class="cfg-toggle">
+          <input type="checkbox" id="cfgHaptic" checked onchange="cfgSetHaptic(this.checked)">
+          <span class="cfg-toggle-track"></span>
+        </label>
+      </div>
     </div>
 
     <!-- Tài khoản -->
@@ -2408,13 +2432,13 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget"></div>
+      <div id="skHanziTarget" style="width:280px;height:280px"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
-      <svg viewBox="0 0 120 120" width="120" height="120">
-        <circle cx="60" cy="60" r="52" fill="none" stroke="#EDE9FE" stroke-width="9"/>
-        <circle cx="60" cy="60" r="52" fill="none" stroke="#8B5CF6" stroke-width="9"
-          stroke-dasharray="326.73" stroke-dashoffset="326.73" id="skRingCircle"
+      <svg viewBox="0 0 90 90" width="90" height="90">
+        <circle cx="45" cy="45" r="38" fill="none" stroke="#EDE9FE" stroke-width="7"/>
+        <circle cx="45" cy="45" r="38" fill="none" stroke="#8B5CF6" stroke-width="7"
+          stroke-dasharray="238.76" stroke-dashoffset="238.76" id="skRingCircle"
           stroke-linecap="round"/>
       </svg>
       <div class="sk-score-val" id="skScoreVal">0%</div>
@@ -5122,19 +5146,6 @@ function onAuthSuccess(user, token, isNew = false){
   }
 
   state.userId = newUserId;
-
-  // ── Migration: nếu có achievements lưu ở key _guest → chuyển sang key user thật ──
-  try {
-    const guestKey = ACH_KEY + '_guest';
-    const userKey  = uk(ACH_KEY);
-    const guestData = localStorage.getItem(guestKey);
-    const userData  = localStorage.getItem(userKey);
-    if(guestData && !userData){
-      localStorage.setItem(userKey, guestData);
-      localStorage.removeItem(guestKey);
-    }
-  } catch(e) {}
-
   // Reset state sạch cho user này
   state.xp = 0;
   state.streak = 0;
@@ -5204,8 +5215,6 @@ function onAuthSuccess(user, token, isNew = false){
   setTimeout(syncStatsFromServer, 500);
   setTimeout(_preloadHanziIdMap, 1200);
   setTimeout(miLoadFromServer, 2000);
-  // ── Achievements: chạy SAU khi userId đã set và stats đã seed ──
-  setTimeout(checkAchievements, 2500);
 
   // ── Progress sync mỗi 5 phút ──
   startProgressSync();
@@ -6318,9 +6327,11 @@ const SHOP_ITEMS = {
     { id:'xp_bomb',       ico:'💣', name:'Bom XP +200',           desc:'Cộng ngay 200 XP vào tài khoản',              price:300, type:'consumable', effect:'xp_bomb', weekly:true },
     { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
   ],
-  special: [
+  spin: [
     { id:'lucky_draw',    ico:'🎰', name:'Vòng quay may mắn',    desc:'Ngẫu nhiên: xu, XP, tim hoặc jackpot 500xu',  price:50,  type:'consumable', effect:'lucky',    weekly:false },
     { id:'lucky_draw_ex', ico:'🌟', name:'Vòng quay VIP',        desc:'Phần thưởng gấp đôi, tỉ lệ jackpot cao hơn', price:120, type:'consumable', effect:'lucky_ex', weekly:true },
+  ],
+  special: [
     { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
     { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:280, type:'permanent',  effect:'name_purple' },
     { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:280, type:'permanent',  effect:'name_red' },
@@ -6383,7 +6394,7 @@ function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'd
 function isOwned(id){ return getOwned().includes(id); }
 
 function buyItem(id){
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   // Permanent: can't rebuy
@@ -6414,7 +6425,7 @@ function closeShopModal(){
 
 function confirmBuy(){
   const id = document.getElementById('shopModalBuyBtn').dataset.itemId;
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   if(!spendCoins(item.price)){ showToast('❌ Không đủ xu!'); closeShopModal(); return; }
@@ -6631,6 +6642,8 @@ function renderShop(){
   if(gs) gs.innerHTML = SHOP_ITEMS.special.map(makeCard).join('');
   const ga = document.getElementById('shopGridAvatar');
   if(ga) ga.innerHTML = SHOP_ITEMS.avatar.map(makeCard).join('');
+  const gsp = document.getElementById('shopGridSpin');
+  if(gsp) gsp.innerHTML = SHOP_ITEMS.spin.map(makeCard).join('');
 
   // Add reset banner to boost panel
   const boostPanel = document.getElementById('shopPanelBoost');
@@ -6644,7 +6657,7 @@ function renderShop(){
   }
 
   // Owned panel
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const ownedItems = allItems.filter(i => owned.includes(i.id));
   const go = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
@@ -7996,8 +8009,8 @@ function mgTap(side, slotIdx){
 
 function mgDrawLine(leftEl, rightEl){
   const svg = document.getElementById('mgLineSVG');
-  // Dùng mg-arena (parent của SVG) làm gốc tọa độ — không phải matchingScreen
-  const arenaRect = svg.parentElement.getBoundingClientRect();
+  const arena = document.getElementById('matchingScreen');
+  const arenaRect = arena.getBoundingClientRect();
   const lRect = leftEl.getBoundingClientRect();
   const rRect = rightEl.getBoundingClientRect();
 
@@ -8006,15 +8019,16 @@ function mgDrawLine(leftEl, rightEl){
   const x2 = rRect.left   - arenaRect.left;
   const y2 = rRect.top    - arenaRect.top  + rRect.height / 2;
 
+  // Bezier curve through midpoint
   const mx = (x1 + x2) / 2;
-  const dist = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
   const line = document.createElementNS('http://www.w3.org/2000/svg','path');
   line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
   line.setAttribute('class','mg-line');
-  line.setAttribute('stroke-dasharray', dist + 50);
-  line.setAttribute('stroke-dashoffset', dist + 50);
+  line.setAttribute('stroke-dasharray','200');
+  line.setAttribute('stroke-dashoffset','200');
   svg.appendChild(line);
 
+  // Animate dashoffset
   requestAnimationFrame(() => {
     line.style.transition = 'stroke-dashoffset .35s ease';
     line.setAttribute('stroke-dashoffset','0');
@@ -8485,13 +8499,8 @@ function loadStrokeChar(){
         .then(onOK)
         .catch(function(){ _tryLoadChar(urls.slice(1), onOK, onFail); });
     }
-    const _skWrap = document.querySelector('.sk-canvas-wrap');
-    const _skSize = Math.round(_skWrap ? _skWrap.offsetWidth - 4 : 340) || 340;
-    const _skEl = document.getElementById('skHanziTarget');
-    _skEl.style.width = _skSize + 'px';
-    _skEl.style.height = _skSize + 'px';
     _hwWriter = HanziWriter.create('skHanziTarget', singleChar,{
-      width:_skSize,height:_skSize,padding:Math.round(_skSize*0.06),
+      width:280,height:280,padding:18,
       charDataLoader: function(ch, onDone, onErr){ _tryLoadChar(_cdnList, onDone, onErr); },
       showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
       highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
@@ -8539,7 +8548,7 @@ function _skShowResult(totalMistakes){
   const xpGain=Math.round(score/10);
   if(xpGain>0) addXP(xpGain);
   const ring=document.getElementById('skRingCircle');
-  ring.style.strokeDashoffset=326.73*(1-score/100);
+  ring.style.strokeDashoffset=238.76*(1-score/100);
   ring.style.transition='stroke-dashoffset 0.8s cubic-bezier(.34,1.56,.64,1)';
   ring.style.stroke=score>=80?'#0FD688':score>=50?'#F59E0B':'#F23054';
   document.getElementById('skScoreVal').textContent=score+'%';
@@ -8555,7 +8564,7 @@ function _skShowResult(totalMistakes){
 
 function _skFallback(w){
   document.getElementById('skHanziTarget').innerHTML=
-    `<div style="width:100%;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#F5F3FF;border-radius:12px">
+    `<div style="width:280px;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#F5F3FF;border-radius:12px">
       <div style="font-size:6rem;font-family:'Noto Sans SC',sans-serif;font-weight:900;color:#6D28D9;opacity:.7">${w.h}</div>
       <div style="font-size:.75rem;color:#7C3AED;font-weight:700;text-align:center;padding:0 20px">Không tải được dữ liệu nét<br>Hãy thử lại khi có mạng</div>
       <button onclick="nextStrokeChar()" style="padding:8px 20px;background:#6D28D9;color:#fff;border:none;border-radius:999px;font-weight:700;cursor:pointer">Bỏ qua →</button>
@@ -9058,8 +9067,10 @@ window.addXP = function(amount){
    🎨 UI/UX: Haptic feedback on mobile
 ════════════════════════════════════════════════ */
 function haptic(type='light'){
-  // Đã tắt rung phản hồi
-  return;
+  if(!navigator.vibrate) return;
+  if(cfgGet().haptic === false) return;
+  var patterns={light:10, medium:25, heavy:50, error:[50,30,50]};
+  navigator.vibrate(patterns[type]||10);
 }
 
 /* haptic merged into answerQuiz directly */
@@ -11236,7 +11247,7 @@ function miClearAll(){
 /* ── Init on load ── */
 window.addEventListener('load',()=>{
   setTimeout(renderQuests,800);
-  // checkAchievements chỉ chạy sau khi userId đã set — xem onAuthSuccess
+  setTimeout(checkAchievements,1500);
   if(localStorage.getItem(CFG.TOKEN_KEY)){
     setTimeout(_fetchSetsIndex,1000);
     setTimeout(_checkSrsReviewDue, 2000);

@@ -1303,6 +1303,7 @@
   <div class="shop-tabs">
     <button class="shop-tab active" id="shopTabBoost"   onclick="switchShopTab('boost',this)">⚡ Vật phẩm</button>
     <button class="shop-tab"        id="shopTabAvatar"  onclick="switchShopTab('avatar',this)">🐸 Linh vật</button>
+    <button class="shop-tab"        id="shopTabSpin"    onclick="switchShopTab('spin',this)">🎡 Vòng quay</button>
     <button class="shop-tab"        id="shopTabOwned"   onclick="switchShopTab('owned',this)">📦 Đã mua</button>
   </div>
 
@@ -1324,6 +1325,17 @@
         <div id="shopAvatarLabel" style="font-size:.78rem;color:var(--gray-400);margin-top:6px;font-weight:700">Mặc định</div>
       </div>
       <div class="shop-grid" id="shopGridAvatar"></div>
+    </div>
+
+    <!-- Panel: Vòng quay -->
+    <div id="shopPanelSpin" class="shop-panel">
+      <div class="shop-section-label">Vòng quay may mắn 🎡</div>
+      <div style="background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:1.5px solid #FCD34D;border-radius:14px;padding:16px;margin-bottom:14px;font-size:.8rem;color:#92400E;font-weight:700;display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.2rem">💡</span>
+        <span>Mua vật phẩm Vòng quay bên dưới rồi dùng từ mục <strong>Đã mua</strong> để quay!</span>
+      </div>
+      <div class="shop-section-label" style="margin-top:4px">Lượt quay</div>
+      <div class="shop-grid" id="shopGridSpin"></div>
     </div>
 
     <!-- Panel: Đã mua -->
@@ -6315,9 +6327,11 @@ const SHOP_ITEMS = {
     { id:'xp_bomb',       ico:'💣', name:'Bom XP +200',           desc:'Cộng ngay 200 XP vào tài khoản',              price:300, type:'consumable', effect:'xp_bomb', weekly:true },
     { id:'streak_restore',ico:'🔥', name:'Khôi phục Streak',     desc:'Phục hồi streak về giá trị gần nhất bị mất',  price:350, type:'consumable', effect:'streak_restore', weekly:true },
   ],
-  special: [
+  spin: [
     { id:'lucky_draw',    ico:'🎰', name:'Vòng quay may mắn',    desc:'Ngẫu nhiên: xu, XP, tim hoặc jackpot 500xu',  price:50,  type:'consumable', effect:'lucky',    weekly:false },
     { id:'lucky_draw_ex', ico:'🌟', name:'Vòng quay VIP',        desc:'Phần thưởng gấp đôi, tỉ lệ jackpot cao hơn', price:120, type:'consumable', effect:'lucky_ex', weekly:true },
+  ],
+  special: [
     { id:'name_color',    ico:'✨', name:'Tên màu vàng',          desc:'Username gradient vàng trong bảng xếp hạng',  price:300, type:'permanent',  effect:'name_gold' },
     { id:'name_purple',   ico:'💜', name:'Tên màu tím',           desc:'Username gradient tím trong bảng xếp hạng',   price:280, type:'permanent',  effect:'name_purple' },
     { id:'name_red',      ico:'❤️', name:'Tên màu đỏ',            desc:'Username gradient đỏ trong bảng xếp hạng',    price:280, type:'permanent',  effect:'name_red' },
@@ -6380,7 +6394,7 @@ function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'd
 function isOwned(id){ return getOwned().includes(id); }
 
 function buyItem(id){
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   // Permanent: can't rebuy
@@ -6411,7 +6425,7 @@ function closeShopModal(){
 
 function confirmBuy(){
   const id = document.getElementById('shopModalBuyBtn').dataset.itemId;
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
   if(!item) return;
   if(!spendCoins(item.price)){ showToast('❌ Không đủ xu!'); closeShopModal(); return; }
@@ -6628,6 +6642,8 @@ function renderShop(){
   if(gs) gs.innerHTML = SHOP_ITEMS.special.map(makeCard).join('');
   const ga = document.getElementById('shopGridAvatar');
   if(ga) ga.innerHTML = SHOP_ITEMS.avatar.map(makeCard).join('');
+  const gsp = document.getElementById('shopGridSpin');
+  if(gsp) gsp.innerHTML = SHOP_ITEMS.spin.map(makeCard).join('');
 
   // Add reset banner to boost panel
   const boostPanel = document.getElementById('shopPanelBoost');
@@ -6641,7 +6657,7 @@ function renderShop(){
   }
 
   // Owned panel
-  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.avatar];
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const ownedItems = allItems.filter(i => owned.includes(i.id));
   const go = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
