@@ -6910,19 +6910,48 @@ function equipAvatar(id){
   if(!item || !isOwned(id)) return;
   localStorage.setItem(uk(COIN_EQUIPPED_KEY), id);
   applyEquippedAvatar();
+  syncShopToServer();
   renderShop();
-  showToast('🐸 Trang phục đã được mặc!');
+  showToast('🐸 Trang phục đã được mặc! Đã đồng bộ.');
 }
 
 function applyEquippedAvatar(){
   const equipped = getEquipped();
   const item = SHOP_ITEMS.avatar.find(i => i.id === equipped);
+  const avatarContent = item && item.svg ? item.svg : '🐸';
+  const isEmoji = !item || !item.svg;
+
+  // ── Profile "Tôi" ──
   const pf = document.querySelector('.pf2-avatar');
-  if(pf) pf.innerHTML = item && item.svg ? item.svg : '🐸';
+  if(pf) pf.innerHTML = avatarContent;
+
+  // ── Shop preview ──
   const preview = document.getElementById('shopAvatarPreview');
-  if(preview){ preview.innerHTML = item && item.svg ? item.svg : '🐸'; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
+  if(preview){ preview.innerHTML = avatarContent; preview.classList.add('pop'); setTimeout(()=>preview.classList.remove('pop'),400); }
   const lbl = document.getElementById('shopAvatarLabel');
   if(lbl) lbl.textContent = item ? item.name : 'Mặc định';
+
+  // ── Leaderboard: banner "Bạn" (XP + Streak) ──
+  document.querySelectorAll('.lb2-me-avatar').forEach(el => {
+    el.innerHTML = isEmoji
+      ? `<span style="font-size:1.6rem">${avatarContent}</span>`
+      : `<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;overflow:hidden">${avatarContent}</div>`;
+  });
+
+  // ── Leaderboard: list row "bạn" ──
+  document.querySelectorAll('.lb-row.me .lb-avatar').forEach(el => {
+    el.innerHTML = isEmoji
+      ? avatarContent
+      : `<div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">${avatarContent}</div>`;
+  });
+
+  // ── Leaderboard: podium nếu đang top 3 ──
+  document.querySelectorAll('.podium-avatar').forEach(el => {
+    if(el.closest('.podium-item') && el.textContent.includes('🐸')){
+      el.innerHTML = (el.querySelector('.podium-crown') ? '<span class="podium-crown">👑</span>' : '') +
+        (isEmoji ? avatarContent : `<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">${avatarContent}</div>`);
+    }
+  });
 }
 
 function applyNameColorBadge(){
@@ -7077,7 +7106,31 @@ function renderShop(){
           <span style="background:#059669;color:#fff;padding:2px 8px;border-radius:999px;font-size:.62rem">SỞ HỮU</span>
           <span>${permanentOwned.length} vật phẩm</span>
         </div>`;
-        html += `<div class="shop-grid">${permanentOwned.map(makeCard).join('')}</div>`;
+        permanentOwned.forEach(item => {
+          const isEquippedNow = equipped === item.id;
+          const icoDisplay = item.svg
+            ? `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center">${item.svg}</div>`
+            : `<div style="font-size:1.8rem;line-height:1">${item.ico}</div>`;
+          const actionBtn = item.type === 'avatar'
+            ? (isEquippedNow
+                ? `<button disabled style="flex-shrink:0;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;font-family:inherit;white-space:nowrap;opacity:.8">✓ Đang mặc</button>`
+                : `<button onclick="equipAvatar('${item.id}')" style="flex-shrink:0;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(124,58,237,.35)">Mặc vào</button>`)
+            : (isEquippedNow
+                ? `<button disabled style="flex-shrink:0;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;font-family:inherit;white-space:nowrap;opacity:.8">✓ Đang dùng</button>`
+                : `<button onclick="applyItemEffect(${JSON.stringify(item)});syncShopToServer();renderShop()" style="flex-shrink:0;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(234,88,12,.3)">Sử dụng</button>`);
+          const bg = isEquippedNow
+            ? 'background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #6EE7B7'
+            : 'background:var(--white);border:1.5px solid var(--gray-100)';
+          html += `<div style="${bg};border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+            <div style="flex-shrink:0;width:56px;height:56px;background:#F8FAFC;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">${icoDisplay}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'Baloo 2',cursive;font-size:.9rem;font-weight:700;color:var(--gray-800)">${item.name}</div>
+              <div style="font-size:.7rem;color:var(--gray-400);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.desc}</div>
+              ${isEquippedNow ? '<div style="font-size:.65rem;color:#059669;font-weight:800;margin-top:4px">● Đang được kích hoạt</div>' : ''}
+            </div>
+            ${actionBtn}
+          </div>`;
+        });
       }
 
       go.innerHTML = html;
@@ -8044,9 +8097,9 @@ function _renderBoard(type){
       ? 'style="color:#F59E0B;font-weight:900"' : '';
     row.innerHTML = `
       <div class="lb-rank-num">${rank}</div>
-      <div class="lb-avatar">${p.emo}</div>
+      <div class="lb-avatar">${(()=>{if(!p.isMe)return p.emo;const eq=getEquipped();const av=SHOP_ITEMS.avatar.find(i=>i.id===eq);return av&&av.svg?`<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">${av.svg}</div>`:'🐸';})()}</div>
       <div class="lb-name" ${nameStyle}>${p.name}</div>
-      <div class="lb-val ${type==='streak'?'lb-streak-val':''}">${fmt(p.val)}</div>`;
+      <div class="lb-val ${type==='streak'?'lb-streak-val':''}">${fmt(p.val)}</div>\`;
     listEl.appendChild(row);
   });
 }
