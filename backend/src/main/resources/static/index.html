@@ -1508,7 +1508,7 @@
     <!-- Giao diện -->
     <div class="cfg-section-label">🎨 Giao diện</div>
     <div class="cfg-card">
-      <div class="cfg-row">
+      <div class="cfg-row cfg-row-last">
         <div class="cfg-row-left">
           <div class="cfg-icon" style="background:#FFFBEB;color:#D97706"><svg width="20" height="20" viewBox="0 0 24 24"><text x="2" y="18" font-family="Georgia,serif" font-size="17" font-weight="900" fill="currentColor">A</text><text x="13" y="20" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="currentColor" opacity=".7">a</text></svg></div>
           <div class="cfg-row-text">
@@ -1523,19 +1523,7 @@
           <option value="xlarge">Rất lớn</option>
         </select>
       </div>
-      <div class="cfg-row cfg-row-last">
-        <div class="cfg-row-left">
-          <div class="cfg-icon" style="background:#F0FDF4;color:#15803D"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"><rect x="8" y="4" width="8" height="16" rx="2" fill="currentColor" fill-opacity=".12"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/><line x1="4" y1="8" x2="4" y2="16" stroke-opacity=".7"/><line x1="2" y1="9.5" x2="2" y2="14.5" stroke-opacity=".4"/><line x1="20" y1="8" x2="20" y2="16" stroke-opacity=".7"/><line x1="22" y1="9.5" x2="22" y2="14.5" stroke-opacity=".4"/></svg></div>
-          <div class="cfg-row-text">
-            <div class="cfg-row-name">Rung phản hồi</div>
-            <div class="cfg-row-sub">Rung nhẹ khi trả lời</div>
-          </div>
-        </div>
-        <label class="cfg-toggle">
-          <input type="checkbox" id="cfgHaptic" checked onchange="cfgSetHaptic(this.checked)">
-          <span class="cfg-toggle-track"></span>
-        </label>
-      </div>
+
     </div>
 
     <!-- Tài khoản -->
@@ -8008,8 +7996,8 @@ function mgTap(side, slotIdx){
 
 function mgDrawLine(leftEl, rightEl){
   const svg = document.getElementById('mgLineSVG');
-  const arena = document.getElementById('matchingScreen');
-  const arenaRect = arena.getBoundingClientRect();
+  // Dùng mg-arena (parent của SVG) làm gốc tọa độ — không phải matchingScreen
+  const arenaRect = svg.parentElement.getBoundingClientRect();
   const lRect = leftEl.getBoundingClientRect();
   const rRect = rightEl.getBoundingClientRect();
 
@@ -8018,16 +8006,15 @@ function mgDrawLine(leftEl, rightEl){
   const x2 = rRect.left   - arenaRect.left;
   const y2 = rRect.top    - arenaRect.top  + rRect.height / 2;
 
-  // Bezier curve through midpoint
   const mx = (x1 + x2) / 2;
+  const dist = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
   const line = document.createElementNS('http://www.w3.org/2000/svg','path');
   line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
   line.setAttribute('class','mg-line');
-  line.setAttribute('stroke-dasharray','200');
-  line.setAttribute('stroke-dashoffset','200');
+  line.setAttribute('stroke-dasharray', dist + 50);
+  line.setAttribute('stroke-dashoffset', dist + 50);
   svg.appendChild(line);
 
-  // Animate dashoffset
   requestAnimationFrame(() => {
     line.style.transition = 'stroke-dashoffset .35s ease';
     line.setAttribute('stroke-dashoffset','0');
@@ -9071,10 +9058,8 @@ window.addXP = function(amount){
    🎨 UI/UX: Haptic feedback on mobile
 ════════════════════════════════════════════════ */
 function haptic(type='light'){
-  if(!navigator.vibrate) return;
-  if(cfgGet().haptic === false) return;
-  var patterns={light:10, medium:25, heavy:50, error:[50,30,50]};
-  navigator.vibrate(patterns[type]||10);
+  // Đã tắt rung phản hồi
+  return;
 }
 
 /* haptic merged into answerQuiz directly */
