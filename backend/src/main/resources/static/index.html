@@ -2420,7 +2420,7 @@
     </div>
     <div id="skMistakeRow" style="display:flex;gap:6px;align-items:center;min-height:24px"></div>
     <div class="sk-canvas-wrap" style="display:flex;align-items:center;justify-content:center">
-      <div id="skHanziTarget" style="width:100%;aspect-ratio:1/1"></div>
+      <div id="skHanziTarget"></div>
     </div>
     <div class="sk-score-ring" id="skScoreRing" style="display:none">
       <svg viewBox="0 0 120 120" width="120" height="120">
@@ -8483,10 +8483,13 @@ function loadStrokeChar(){
         .then(onOK)
         .catch(function(){ _tryLoadChar(urls.slice(1), onOK, onFail); });
     }
+    const _skWrap = document.querySelector('.sk-canvas-wrap');
+    const _skSize = Math.round(_skWrap ? _skWrap.offsetWidth - 4 : 340) || 340;
     const _skEl = document.getElementById('skHanziTarget');
-    const _skSize = Math.round(_skEl.getBoundingClientRect().width) || 380;
+    _skEl.style.width = _skSize + 'px';
+    _skEl.style.height = _skSize + 'px';
     _hwWriter = HanziWriter.create('skHanziTarget', singleChar,{
-      width:_skSize,height:_skSize,padding:Math.round(_skSize*0.07),
+      width:_skSize,height:_skSize,padding:Math.round(_skSize*0.06),
       charDataLoader: function(ch, onDone, onErr){ _tryLoadChar(_cdnList, onDone, onErr); },
       showOutline:true,outlineColor:'#DDD6FE',strokeColor:'#6D28D9',
       highlightColor:'#A78BFA',drawingColor:'#4C1D95',drawingWidth:8,
