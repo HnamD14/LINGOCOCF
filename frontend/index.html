@@ -1345,61 +1345,98 @@
     <!-- Panel: Vòng quay -->
     <div id="shopPanelSpin" class="shop-panel">
 
-      <!-- Hero banner -->
-      <div style="background:linear-gradient(135deg,#7C3AED,#DB2777,#F59E0B);border-radius:18px;padding:20px 16px;margin-bottom:18px;text-align:center;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-10px;left:-10px;font-size:3rem;opacity:.15;transform:rotate(-20deg)">🎡</div>
-        <div style="position:absolute;top:-5px;right:-5px;font-size:2.5rem;opacity:.15;transform:rotate(15deg)">⭐</div>
-        <div style="font-size:2.2rem;margin-bottom:6px">🎡</div>
-        <div style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.04em;margin-bottom:4px">VÒNG QUAY MAY MẮN</div>
-        <div style="font-size:.75rem;color:rgba(255,255,255,.85);font-weight:600">Quay để nhận xu · XP · tim và phần thưởng siêu hấp dẫn!</div>
-        <div style="display:flex;justify-content:center;gap:10px;margin-top:12px">
-          <div style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:800;color:#fff">🪙 Tối đa 2000xu</div>
-          <div style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:800;color:#fff">⭐ Tối đa 500 XP</div>
-        </div>
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#7C3AED,#DB2777,#F59E0B);border-radius:18px;padding:18px 16px 14px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><circle cx=%2230%22 cy=%2230%22 r=%2225%22 fill=%22none%22 stroke=%22rgba(255,255,255,.08)%22 stroke-width=%221%22/></svg>') repeat"></div>
+        <div style="font-size:2.4rem;margin-bottom:4px">🎡</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;letter-spacing:.04em">VÒNG QUAY MAY MẮN</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.8);margin-top:3px">Quay ngay — nhận thưởng ngay!</div>
       </div>
 
-      <!-- Prize preview -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎁 Bảng phần thưởng</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #F59E0B;border-radius:12px;padding:10px 6px;text-align:center">
-            <div style="font-size:1.4rem">🪙</div>
-            <div style="font-size:.68rem;font-weight:800;color:#92400E;margin-top:3px">+30 ~ 500 xu</div>
+      <!-- Spin tiers -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+
+        <!-- Free spin -->
+        <div id="spinTierFree" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #34D399;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden" onclick="doSpinDirect('free')">
+          <div style="font-size:2rem;flex-shrink:0">🎁</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:900;color:#065F46">Quay Miễn Phí</div>
+            <div style="font-size:.72rem;color:#059669;font-weight:600;margin-top:2px">1 lượt / ngày · Reset lúc 00:00</div>
+            <div id="freeSpinStatus" style="font-size:.7rem;color:#6B7280;margin-top:3px"></div>
           </div>
-          <div style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border:1.5px solid #7C3AED;border-radius:12px;padding:10px 6px;text-align:center">
-            <div style="font-size:1.4rem">⭐</div>
-            <div style="font-size:.68rem;font-weight:800;color:#5B21B6;margin-top:3px">+50 ~ 500 XP</div>
+          <div style="background:#059669;color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap">MIỄN PHÍ</div>
+        </div>
+
+        <!-- Normal spin -->
+        <div style="background:linear-gradient(135deg,#FEF9C3,#FDE68A);border:2px solid #F59E0B;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden" onclick="doSpinDirect('normal')">
+          <div style="font-size:2rem;flex-shrink:0">🎰</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:900;color:#92400E">Quay Thường</div>
+            <div style="font-size:.72rem;color:#B45309;font-weight:600;margin-top:2px">Xu · XP · Tim · Jackpot 500xu</div>
           </div>
-          <div style="background:linear-gradient(135deg,#FCE7F3,#FBCFE8);border:1.5px solid #DB2777;border-radius:12px;padding:10px 6px;text-align:center">
-            <div style="font-size:1.4rem">💎</div>
-            <div style="font-size:.68rem;font-weight:800;color:#9D174D;margin-top:3px">Tim đầy!</div>
-          </div>
-          <div style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:1.5px solid #059669;border-radius:12px;padding:10px 6px;text-align:center">
-            <div style="font-size:1.4rem">💣</div>
-            <div style="font-size:.68rem;font-weight:800;color:#065F46;margin-top:3px">+200 XP Bomb</div>
-          </div>
-          <div style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE);border:1.5px solid #2563EB;border-radius:12px;padding:10px 6px;text-align:center">
-            <div style="font-size:1.4rem">⚡</div>
-            <div style="font-size:.68rem;font-weight:800;color:#1E40AF;margin-top:3px">XP x2 (30p)</div>
-          </div>
-          <div style="background:linear-gradient(135deg,#FEF9C3,#FEF08A);border:1.5px solid #CA8A04;border-radius:12px;padding:10px 6px;text-align:center;position:relative">
-            <div style="position:absolute;top:-6px;right:-4px;background:#EF4444;color:#fff;font-size:.55rem;font-weight:900;padding:2px 5px;border-radius:6px">HIẾM</div>
-            <div style="font-size:1.4rem">🌟</div>
-            <div style="font-size:.68rem;font-weight:800;color:#92400E;margin-top:3px">JACKPOT 2000xu</div>
+          <div style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg1" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg1)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
+            50 xu
           </div>
         </div>
+
+        <!-- VIP spin -->
+        <div style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border:2px solid #7C3AED;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden" onclick="doSpinDirect('vip')">
+          <div style="position:absolute;top:-2px;right:10px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:0 0 8px 8px">VIP</div>
+          <div style="font-size:2rem;flex-shrink:0">💎</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:900;color:#5B21B6">Quay VIP</div>
+            <div style="font-size:.72rem;color:#7C3AED;font-weight:600;margin-top:2px">Phần thưởng gấp đôi · Jackpot 1000xu</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg2" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg2)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
+            120 xu
+          </div>
+        </div>
+
+        <!-- MEGA spin -->
+        <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);border:2px solid #F59E0B;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden" onclick="doSpinDirect('mega')">
+          <div style="position:absolute;top:-2px;right:10px;background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:0 0 8px 8px">HOT 🔥</div>
+          <div style="font-size:2rem;flex-shrink:0">🌟</div>
+          <div style="flex:1">
+            <div style="font-size:.88rem;font-weight:900;color:#FDE68A">Quay MEGA</div>
+            <div style="font-size:.72rem;color:#FCA5A5;font-weight:600;margin-top:2px">Siêu phần thưởng · JACKPOT 2000xu</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:.78rem;font-weight:900;padding:8px 14px;border-radius:50px;white-space:nowrap;display:flex;align-items:center;gap:4px">
+            <svg width="13" height="13" viewBox="0 0 40 40"><defs><radialGradient id="cg3" cx="38%" cy="32%" r="68%"><stop offset="0%" stop-color="#FEF9C3"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#92400E"/></radialGradient></defs><circle cx="20" cy="21" r="17" fill="#B45309" opacity=".3"/><circle cx="20" cy="19.5" r="17" fill="url(#cg3)" stroke="#D97706" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="900" fill="#7C2D12" opacity=".9">元</text></svg>
+            300 xu
+          </div>
+        </div>
+
       </div>
 
-      <!-- Spin items -->
-      <div style="font-size:.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎟 Mua lượt quay</div>
-      <div class="shop-grid" id="shopGridSpin"></div>
-
-      <!-- How to use tip -->
-      <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:12px;padding:12px 14px;margin-top:4px;display:flex;align-items:flex-start;gap:10px">
-        <span style="font-size:1.3rem;flex-shrink:0">💡</span>
-        <div>
-          <div style="font-size:.78rem;font-weight:800;color:#14532D;margin-bottom:2px">Cách sử dụng</div>
-          <div style="font-size:.73rem;color:#166534;line-height:1.5">Sau khi mua lượt quay, vào tab <strong>Đã mua</strong> → chọn vật phẩm → nhấn <strong>Dùng ngay</strong> để quay và nhận thưởng!</div>
+      <!-- Prize board -->
+      <div style="font-size:.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎁 Phần thưởng có thể nhận</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px">
+        <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1.5px solid #F59E0B;border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:1.4rem">🪙</div>
+          <div style="font-size:.65rem;font-weight:800;color:#92400E;margin-top:2px">+30 ~ 500 xu</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border:1.5px solid #7C3AED;border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:1.4rem">⭐</div>
+          <div style="font-size:.65rem;font-weight:800;color:#5B21B6;margin-top:2px">+50 ~ 500 XP</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#FCE7F3,#FBCFE8);border:1.5px solid #DB2777;border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:1.4rem">💎</div>
+          <div style="font-size:.65rem;font-weight:800;color:#9D174D;margin-top:2px">Tim đầy!</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border:1.5px solid #059669;border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:1.4rem">💣</div>
+          <div style="font-size:.65rem;font-weight:800;color:#065F46;margin-top:2px">XP Bomb +200</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE);border:1.5px solid #2563EB;border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:1.4rem">⚡</div>
+          <div style="font-size:.65rem;font-weight:800;color:#1E40AF;margin-top:2px">XP x2 (30p)</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);border:1.5px solid #F59E0B;border-radius:12px;padding:10px 6px;text-align:center;position:relative">
+          <div style="position:absolute;top:-5px;right:-3px;background:#EF4444;color:#fff;font-size:.5rem;font-weight:900;padding:1px 5px;border-radius:5px">HIẾM</div>
+          <div style="font-size:1.4rem">🌟</div>
+          <div style="font-size:.65rem;font-weight:800;color:#FDE68A;margin-top:2px">JACKPOT!</div>
         </div>
       </div>
 
@@ -6685,6 +6722,89 @@ function _showSpinResult(prize, label){
   modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
 }
 
+function doSpinDirect(mode){
+  const coins = getCoins();
+  const costs = { free:0, normal:50, vip:120, mega:300 };
+  const cost = costs[mode] || 0;
+
+  // Check free spin
+  if(mode === 'free'){
+    const today = new Date().toDateString();
+    const lastFree = localStorage.getItem(uk('lingococ_free_spin_date'));
+    if(lastFree === today){
+      showToast('🎁 Hôm nay đã dùng lượt miễn phí rồi! Reset lúc 00:00');
+      return;
+    }
+    localStorage.setItem(uk('lingococ_free_spin_date'), today);
+    updateFreeSpinStatus();
+  } else {
+    // Check coins
+    if(coins < cost){
+      showToast('🪙 Không đủ xu! Cần ' + cost + ' xu để quay.');
+      return;
+    }
+    addCoins(-cost);
+  }
+
+  // Show spinning animation then result
+  _showSpinAnimation(mode);
+}
+
+function _showSpinAnimation(mode){
+  const existing = document.getElementById('spinAnimModal');
+  if(existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'spinAnimModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease';
+
+  const segments = ['🪙','⭐','💎','🪙','⚡','🪙','💣','🌟'];
+  let deg = 0;
+  let spinning = true;
+
+  modal.innerHTML = `
+    <div style="text-align:center">
+      <div id="spinWheelWrap" style="width:220px;height:220px;border-radius:50%;border:6px solid #F59E0B;box-shadow:0 0 30px rgba(245,158,11,.5);background:conic-gradient(#7C3AED 0 12.5%,#DB2777 12.5% 25%,#F59E0B 25% 37.5%,#059669 37.5% 50%,#2563EB 50% 62.5%,#DC2626 62.5% 75%,#7C3AED 75% 87.5%,#F59E0B 87.5% 100%);display:flex;align-items:center;justify-content:center;transition:transform 3s cubic-bezier(.17,.67,.12,.99);position:relative;margin:0 auto 20px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;z-index:2">🐸</div>
+      </div>
+      <div style="position:relative;margin-top:-12px;margin-bottom:16px">
+        <div style="font-size:1.8rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">▼</div>
+      </div>
+      <div style="font-size:.85rem;color:#fff;font-weight:700;opacity:.8">Đang quay...</div>
+    </div>`;
+
+  document.body.appendChild(modal);
+
+  // Animate wheel
+  const wheel = modal.querySelector('#spinWheelWrap');
+  const totalDeg = 1440 + Math.floor(Math.random() * 360);
+  setTimeout(() => {
+    wheel.style.transform = 'rotate(' + totalDeg + 'deg)';
+  }, 50);
+
+  // Show result after animation
+  setTimeout(() => {
+    modal.remove();
+    _runLuckyDraw(mode);
+  }, 3200);
+}
+
+function updateFreeSpinStatus(){
+  const el = document.getElementById('freeSpinStatus');
+  if(!el) return;
+  const today = new Date().toDateString();
+  const lastFree = localStorage.getItem(uk('lingococ_free_spin_date'));
+  if(lastFree === today){
+    el.textContent = '✓ Đã dùng hôm nay · Reset ngày mai';
+    el.style.color = '#9CA3AF';
+    const tier = document.getElementById('spinTierFree');
+    if(tier){ tier.style.opacity = '.6'; tier.style.cursor = 'not-allowed'; }
+  } else {
+    el.textContent = '✨ Có thể quay ngay!';
+    el.style.color = '#059669';
+  }
+}
+
 function equipAvatar(id){
   const item = SHOP_ITEMS.avatar.find(i => i.id === id);
   if(!item || !isOwned(id)) return;
@@ -6793,8 +6913,8 @@ function renderShop(){
   if(gs) gs.innerHTML = SHOP_ITEMS.special.map(makeCard).join('');
   const ga = document.getElementById('shopGridAvatar');
   if(ga) ga.innerHTML = SHOP_ITEMS.avatar.map(makeCard).join('');
-  const gsp = document.getElementById('shopGridSpin');
-  if(gsp) gsp.innerHTML = SHOP_ITEMS.spin.map(makeCard).join('');
+  // Spin panel now handles directly via doSpinDirect — no grid needed
+  if(typeof updateFreeSpinStatus === 'function') updateFreeSpinStatus();
 
   // Add reset banner to boost panel
   const boostPanel = document.getElementById('shopPanelBoost');
@@ -6828,6 +6948,7 @@ function switchShopTab(tab, btn){
   const panel = document.getElementById('shopPanel' + tab.charAt(0).toUpperCase() + tab.slice(1));
   if(panel) panel.classList.add('active');
   if(tab === 'avatar') applyEquippedAvatar();
+  if(tab === 'spin') updateFreeSpinStatus();
 }
 
 function goShop(){
