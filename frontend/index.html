@@ -8095,11 +8095,20 @@ function _renderBoard(type){
     row.className = 'lb-row' + (p.isMe ? ' me' : '');
     const nameStyle = p.isMe && localStorage.getItem(uk('lingococ_name_gold'))==='1'
       ? 'style="color:#F59E0B;font-weight:900"' : '';
-    row.innerHTML = `
-      <div class="lb-rank-num">${rank}</div>
-      <div class="lb-avatar">${(()=>{if(!p.isMe)return p.emo;const eq=getEquipped();const av=SHOP_ITEMS.avatar.find(i=>i.id===eq);return av&&av.svg?`<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">${av.svg}</div>`:'🐸';})()}</div>
-      <div class="lb-name" ${nameStyle}>${p.name}</div>
-      <div class="lb-val ${type==='streak'?'lb-streak-val':''}">${fmt(p.val)}</div>\`;
+    // Tính avatar trước để tránh nested backtick
+    const meAvaHtml = (() => {
+      if(!p.isMe) return p.emo;
+      const eq = getEquipped();
+      const av = SHOP_ITEMS.avatar.find(i => i.id === eq);
+      return av && av.svg
+        ? '<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%">' + av.svg + '</div>'
+        : '🐸';
+    })();
+    row.innerHTML =
+      '<div class="lb-rank-num">' + rank + '</div>' +
+      '<div class="lb-avatar">' + meAvaHtml + '</div>' +
+      '<div class="lb-name" ' + nameStyle + '>' + p.name + '</div>' +
+      '<div class="lb-val ' + (type==='streak'?'lb-streak-val':'') + '">' + fmt(p.val) + '</div>';
     listEl.appendChild(row);
   });
 }
