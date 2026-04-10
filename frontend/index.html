@@ -223,7 +223,11 @@
     </div>
   </div>
 
-  <div id="xp2xPill" style="display:none;align-items:center;justify-content:center;gap:6px;background:linear-gradient(90deg,#FFF7ED,#FFF1EB);color:var(--orange);border-bottom:1.5px solid #FED7AA;padding:5px 16px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;flex-shrink:0"></div>
+  <div id="xp2xPill" style="display:none;align-items:center;justify-content:center;gap:8px;background:linear-gradient(90deg,#EA580C,#F97316,#FB923C);color:#fff;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;flex-shrink:0;letter-spacing:.01em;box-shadow:0 2px 8px rgba(234,88,12,.25);position:relative;overflow:hidden">
+    <span style="font-size:1rem;line-height:1;filter:drop-shadow(0 0 4px #fff8)">⚡</span>
+    <span id="xp2xPillText">XP x2 đang hoạt động</span>
+    <span style="background:rgba(255,255,255,.22);border-radius:999px;padding:1px 8px;font-size:.7rem;font-weight:900;letter-spacing:.02em" id="xp2xPillTimer"></span>
+  </div>
   <div class="scroll-area h-body">
 
     <!-- HERO + XP -->
@@ -7019,7 +7023,8 @@ function showXP2xIndicator(){
   if(!pill) return;
   if(until > Date.now()){
     const mins = Math.ceil((until - Date.now()) / 60000);
-    pill.textContent = '⚡ x2 còn ' + mins + 'p';
+    const timerEl = document.getElementById('xp2xPillTimer');
+    if(timerEl) timerEl.textContent = 'còn ' + mins + 'p';
     pill.style.display = 'flex';
     clearTimeout(pill._timer);
     pill._timer = setTimeout(() => { pill.style.display = 'none'; }, until - Date.now());

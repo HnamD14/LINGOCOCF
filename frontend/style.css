@@ -2999,9 +2999,8 @@ body{
 .rm-map-goto-btn:hover{opacity:.88;}
 
 /* ── FIX: Roadmap screen - nav luôn ở dưới, không cần scroll ── */
-#roadmapScreen{
-  height:100vh;min-height:unset;
-  display:flex;flex-direction:column;overflow:hidden;
+#roadmapScreen.active{
+  height:100vh;min-height:unset;overflow:hidden;
 }
 #roadmapScreen .lm-body{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -3011,9 +3010,8 @@ body{
 }
 
 /* ── FIX: Leaderboard screen - ngăn scroll vô tận ── */
-#leaderboardScreen{
-  height:100vh;min-height:unset;
-  display:flex;flex-direction:column;overflow:hidden;
+#leaderboardScreen.active{
+  height:100vh;min-height:unset;overflow:hidden;
 }
 #leaderboardScreen .lb2-header{flex-shrink:0}
 #leaderboardScreen .lb2-body{
@@ -3025,7 +3023,6 @@ body{
 
 /* ── FIX: xp2xPill - banner full-width thay vì ép vào topbar ── */
 #xp2xPill{
-  display:none;
   width:100%;box-sizing:border-box;
   align-items:center;justify-content:center;
 }
