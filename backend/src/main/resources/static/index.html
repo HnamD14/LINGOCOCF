@@ -5264,6 +5264,10 @@ function onAuthSuccess(user, token, isNew = false){
     state.hearts = Infinity;
   }
   if(user.coins != null){ const lc=getCoins(); if(user.coins>lc) saveCoins(user.coins); }
+  // ── Load shop data từ server ──
+  if(user.shopOwned)     localStorage.setItem(uk(COIN_OWNED_KEY),     user.shopOwned);
+  if(user.shopEquipped)  localStorage.setItem(uk(COIN_EQUIPPED_KEY),  user.shopEquipped);
+  if(user.shopInventory) localStorage.setItem(uk('lingococ_shop_inventory'), user.shopInventory);
   if(user.wordsLearned != null && user.wordsLearned > 0){ localStorage.setItem(uk(WORDS_KEY),   user.wordsLearned); localStorage.setItem('lc_words',   user.wordsLearned); }
   if(user.correctAnswers != null && user.correctAnswers > 0){ localStorage.setItem(uk(CORRECT_KEY), user.correctAnswers); localStorage.setItem('lc_correct', user.correctAnswers); }
   if(user.totalAnswers   != null && user.totalAnswers   > 0){ localStorage.setItem(uk(TOTAL_KEY),   user.totalAnswers);   localStorage.setItem('lc_total',   user.totalAnswers); }
@@ -6365,6 +6369,8 @@ function saveCoins(n){ localStorage.setItem(uk(COIN_KEY), Math.max(0,n)); update
 function addCoins(amount, x, y){
   if(amount <= 0) return;
   saveCoins(getCoins() + amount);
+  clearTimeout(window._coinSyncTimer);
+  window._coinSyncTimer = setTimeout(syncShopToServer, 2000);
   // Hiệu ứng xu bay lên
   if(x && y){
     const el = document.createElement('div');
@@ -6381,6 +6387,8 @@ function spendCoins(amount){
   const cur = getCoins();
   if(cur < amount) return false;
   saveCoins(cur - amount);
+  clearTimeout(window._coinSyncTimer);
+  window._coinSyncTimer = setTimeout(syncShopToServer, 2000);
   return true;
 }
 
@@ -6494,6 +6502,38 @@ function getOwned(){ try{ return JSON.parse(localStorage.getItem(uk(COIN_OWNED_K
 function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; }
 function isOwned(id){ return getOwned().includes(id); }
 
+/* ── Inventory (consumables chưa dùng) ── */
+const SHOP_INV_KEY = 'lingococ_shop_inventory';
+function getInventory(){ try{ return JSON.parse(localStorage.getItem(uk(SHOP_INV_KEY))||'[]'); }catch{ return []; } }
+function saveInventory(inv){ localStorage.setItem(uk(SHOP_INV_KEY), JSON.stringify(inv)); }
+function addToInventory(id){
+  const inv = getInventory();
+  const ex  = inv.find(i => i.id === id);
+  if(ex) ex.count++;
+  else   inv.push({id, count:1});
+  saveInventory(inv);
+}
+function removeFromInventory(id){
+  const inv = getInventory();
+  const ex  = inv.find(i => i.id === id);
+  if(!ex) return;
+  ex.count--;
+  saveInventory(inv.filter(i => i.count > 0));
+}
+function getInventoryCount(id){ const e = getInventory().find(i => i.id === id); return e ? e.count : 0; }
+
+/* ── Sync shop data lên server ── */
+async function syncShopToServer(){
+  try {
+    await api('/api/user/shop','POST',{
+      coins:         getCoins(),
+      shopOwned:     JSON.stringify(getOwned()),
+      shopEquipped:  localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default',
+      shopInventory: JSON.stringify(getInventory()),
+    }, true);
+  } catch(e){}
+}
+
 function buyItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
@@ -6533,13 +6573,20 @@ function confirmBuy(){
   if(item.type === 'permanent'){
     const owned = getOwned();
     if(!owned.includes(id)){ owned.push(id); localStorage.setItem(uk(COIN_OWNED_KEY), JSON.stringify(owned)); }
+    applyItemEffect(item); // permanent/avatar → dùng luôn
+  } else if(item.type === 'avatar'){
+    applyItemEffect(item);
+  } else {
+    // consumable → vào inventory, không dùng ngay
+    addToInventory(id);
+    showToast(`📦 Đã thêm vào Kho đồ: ${item.name}! Vào mục "Đã mua" để dùng.`);
   }
   if(item.weekly) markWeeklyBought(id);
-  applyItemEffect(item);
   closeShopModal();
+  syncShopToServer();
   renderShop();
   fireConfetti();
-  showToast(`🪙 Mua thành công: ${item.name}!`);
+  if(item.type === 'permanent' || item.type === 'avatar') showToast(`✅ Mua thành công: ${item.name}!`);
 }
 
 function applyItemEffect(item){
@@ -6749,85 +6796,85 @@ function _showSpinAnimation(mode){
   const existing = document.getElementById('spinAnimModal');
   if(existing) existing.remove();
 
-  // Wheel segments với label + màu
-  const segs = [
-    { label:'🪙 +100xu',  color:'#F59E0B', dark:'#92400E' },
-    { label:'⭐ +50 XP',  color:'#7C3AED', dark:'#5B21B6' },
-    { label:'💎 Tim đầy', color:'#DB2777', dark:'#9D174D' },
-    { label:'🪙 +30xu',   color:'#059669', dark:'#065F46' },
-    { label:'⚡ XP x2',   color:'#2563EB', dark:'#1E40AF' },
-    { label:'🪙 +200xu',  color:'#DC2626', dark:'#991B1B' },
-    { label:'💣 XP+200',  color:'#0891B2', dark:'#155E75' },
-    { label:'🌟 JACKPOT', color:'#D97706', dark:'#92400E' },
-  ];
+  const modeLabel = {free:'🎁 Free',normal:'🎰 Thường',vip:'💎 VIP',mega:'🌟 MEGA'}[mode]||'🎡';
+  const modeColor = {free:'#059669',normal:'#D97706',vip:'#7C3AED',mega:'#EF4444'}[mode]||'#F59E0B';
+
+  // Segments theo mode
+  const segsMap = {
+    free:   [{l:'🪙+10xu',c:'#F59E0B'},{l:'⭐+30XP',c:'#7C3AED'},{l:'🪙+25xu',c:'#059669'},{l:'💎+1Tim',c:'#DB2777'}],
+    normal: [{l:'🪙+50xu',c:'#F59E0B'},{l:'⭐+50XP',c:'#7C3AED'},{l:'💎Tim đầy',c:'#DB2777'},{l:'🪙+15xu',c:'#059669'},{l:'⚡XPx2',c:'#2563EB'},{l:'🪙+100xu',c:'#DC2626'},{l:'💣+200XP',c:'#0891B2'},{l:'🌟+250xu',c:'#D97706'}],
+    vip:    [{l:'🪙+200xu',c:'#F59E0B'},{l:'⭐+150XP',c:'#7C3AED'},{l:'💎Tim đầy',c:'#DB2777'},{l:'🪙+40xu',c:'#059669'},{l:'⚡XPx2',c:'#2563EB'},{l:'🪙+100xu',c:'#DC2626'},{l:'🌟+500xu',c:'#D97706'},{l:'🚀JACKPOT',c:'#6D28D9'}],
+    mega:   [{l:'🪙+400xu',c:'#F59E0B'},{l:'⭐+300XP',c:'#7C3AED'},{l:'💎Tim đầy',c:'#DB2777'},{l:'🪙+75xu',c:'#059669'},{l:'⚡XPx2',c:'#2563EB'},{l:'💣XPBomb',c:'#DC2626'},{l:'🌟+1000xu',c:'#D97706'},{l:'👑MEGA',c:'#6D28D9'}],
+  };
+  const segs = segsMap[mode] || segsMap.normal;
   const n = segs.length;
   const sliceDeg = 360 / n;
 
-  // Build SVG wheel
-  function polarToXY(cx, cy, r, angleDeg){
-    const rad = (angleDeg - 90) * Math.PI / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  }
-  function makeSlice(cx, cy, r, startDeg, endDeg, color){
-    const s = polarToXY(cx,cy,r,startDeg);
-    const e = polarToXY(cx,cy,r,endDeg);
-    const large = endDeg - startDeg > 180 ? 1 : 0;
-    return `<path d="M${cx},${cy} L${s.x},${s.y} A${r},${r} 0 ${large},1 ${e.x},${e.y} Z" fill="${color}"/>`;
-  }
-  function makeLabel(cx, cy, r, midDeg, text, darkColor){
-    const pos = polarToXY(cx, cy, r*0.65, midDeg);
-    const lines = text.split(' ');
-    return lines.map((ln, i) =>
-      `<text x="${pos.x}" y="${pos.y + (i - (lines.length-1)/2)*13}" text-anchor="middle" dominant-baseline="middle"
-        font-size="11" font-weight="800" fill="#fff" font-family="system-ui,sans-serif"
-        style="text-shadow:0 1px 3px rgba(0,0,0,.5)">${ln}</text>`
-    ).join('');
-  }
+  function polarToXY(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)}; }
 
-  const sz = 240, cx = sz/2, cy = sz/2, r = sz/2 - 4;
-  let svgParts = [`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">`];
-  // outer ring
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+2}" fill="#1a1a2e"/>`);
-  segs.forEach((seg, i) => {
-    const start = i * sliceDeg;
-    const end   = start + sliceDeg;
-    const mid   = start + sliceDeg / 2;
-    svgParts.push(makeSlice(cx,cy,r, start, end, seg.color));
-    // divider line
-    const dEnd = polarToXY(cx,cy,r,end);
-    svgParts.push(`<line x1="${cx}" y1="${cy}" x2="${dEnd.x}" y2="${dEnd.y}" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>`);
-    svgParts.push(makeLabel(cx,cy,r, mid, seg.label, seg.dark));
+  const sz=290, cx=sz/2, cy=sz/2, r=sz/2-6;
+  let parts=[`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">`];
+  // Shadow ring
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${r+8}" fill="rgba(0,0,0,.3)"/>`);
+  // Gold outer ring
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${r+4}" fill="${modeColor}" opacity=".9"/>`);
+  // Slices
+  segs.forEach((seg,i)=>{
+    const s=i*sliceDeg, e=s+sliceDeg, mid=s+sliceDeg/2;
+    const p1=polarToXY(cx,cy,r,s), p2=polarToXY(cx,cy,r,e);
+    const large=e-s>180?1:0;
+    // Alternate shade
+    const fillColor = i%2===0 ? seg.c : seg.c+'CC';
+    parts.push(`<path d="M${cx},${cy} L${p1.x},${p1.y} A${r},${r} 0 ${large},1 ${p2.x},${p2.y} Z" fill="${fillColor}"/>`);
+    // Divider
+    parts.push(`<line x1="${cx}" y1="${cy}" x2="${p2.x}" y2="${p2.y}" stroke="rgba(255,255,255,.35)" stroke-width="2"/>`);
+    // Label
+    const lp=polarToXY(cx,cy,r*0.67,mid);
+    const lines=seg.l.split(/(?=[🪙⭐💎⚡💣🌟🚀👑🎁])|(?<=xu|XP|Tim|x2)/);
+    const linesClean = seg.l.length > 8 ? [seg.l.slice(0,Math.ceil(seg.l.length/2)), seg.l.slice(Math.ceil(seg.l.length/2))] : [seg.l];
+    linesClean.forEach((ln,li)=>{
+      const yo = (li-(linesClean.length-1)/2)*12;
+      parts.push(`<text x="${lp.x}" y="${lp.y+yo}" text-anchor="middle" dominant-baseline="middle" font-size="10.5" font-weight="900" fill="#fff" font-family="system-ui,sans-serif" paint-order="stroke" stroke="rgba(0,0,0,.4)" stroke-width="2">${ln}</text>`);
+    });
   });
-  // center circle
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="22" fill="#fff" stroke="#E5E7EB" stroke-width="2"/>`);
-  svgParts.push(`<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="18">🐸</text>`);
-  // outer border
-  svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${r+2}" fill="none" stroke="#F59E0B" stroke-width="4"/>`);
-  svgParts.push('</svg>');
-  const wheelSVG = svgParts.join('');
+  // Inner decorative ring
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="30" fill="#1a1a2e" stroke="${modeColor}" stroke-width="3"/>`);
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="24" fill="#fff" opacity=".08"/>`);
+  parts.push(`<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="22">🐸</text>`);
+  // Sparkle dots on outer ring
+  for(let i=0;i<n;i++){
+    const dp=polarToXY(cx,cy,r+2,i*sliceDeg);
+    parts.push(`<circle cx="${dp.x}" cy="${dp.y}" r="4" fill="#fff" stroke="${modeColor}" stroke-width="1.5"/>`);
+  }
+  parts.push('</svg>');
+  const wheelSVG = parts.join('');
 
   const modal = document.createElement('div');
   modal.id = 'spinAnimModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .2s ease';
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(10,5,25,.88);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .2s ease`;
 
   modal.innerHTML = `
-    <div style="text-align:center;padding:20px">
-      <div style="font-size:.85rem;font-weight:900;color:#F59E0B;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">🎡 Đang quay...</div>
+    <div style="text-align:center;padding:16px;width:100%;max-width:360px">
+      <div style="font-size:.9rem;font-weight:900;color:${modeColor};letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;text-shadow:0 0 20px ${modeColor}88">${modeLabel} — Đang quay...</div>
 
-      <!-- Pointer -->
-      <div style="font-size:2rem;line-height:1;margin-bottom:-4px;filter:drop-shadow(0 2px 4px rgba(245,158,11,.8))">▼</div>
-
-      <!-- Wheel -->
-      <div id="spinWheelWrap" style="display:inline-block;transition:transform 3.5s cubic-bezier(.17,.67,.12,.99);transform-origin:center center">
-        ${wheelSVG}
+      <!-- Pointer cố định -->
+      <div style="position:relative;display:inline-block">
+        <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:2">
+          <svg width="28" height="24" viewBox="0 0 28 24"><polygon points="14,24 0,0 28,0" fill="${modeColor}" filter="drop-shadow(0 2px 6px ${modeColor}88)"/></svg>
+        </div>
+        <!-- Glow ring -->
+        <div style="position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,${modeColor}22 0%,transparent 70%);animation:pulse 1s ease-in-out infinite;pointer-events:none"></div>
+        <!-- Wheel -->
+        <div id="spinWheelWrap" style="display:block;transition:transform 3.8s cubic-bezier(.08,.82,.17,1);transform-origin:center center;border-radius:50%;overflow:hidden;box-shadow:0 0 40px ${modeColor}55,0 8px 32px rgba(0,0,0,.5)">
+          ${wheelSVG}
+        </div>
       </div>
 
-      <div style="margin-top:12px;font-size:.78rem;color:rgba(255,255,255,.6);font-weight:600">Chờ xíu nhé...</div>
+      <div style="margin-top:20px;font-size:.78rem;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.05em">Vận may đang chờ bạn...</div>
     </div>`;
 
   document.body.appendChild(modal);
 
-  // Start spin after short delay (render frame)
   const totalDeg = 1440 + Math.floor(Math.random() * 360);
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -6836,11 +6883,10 @@ function _showSpinAnimation(mode){
     });
   });
 
-  // Show result after animation completes
   setTimeout(() => {
     modal.remove();
     _runLuckyDraw(mode);
-  }, 3800);
+  }, 4000);
 }
 
 function updateFreeSpinStatus(){
@@ -6981,14 +7027,61 @@ function renderShop(){
     boostPanel.prepend(banner);
   }
 
-  // Owned panel
+  // ── Owned + Inventory panel ──────────────────────────────
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
-  const ownedItems = allItems.filter(i => owned.includes(i.id));
-  const go = document.getElementById('shopGridOwned');
+  const inv = getInventory();
+  const go  = document.getElementById('shopGridOwned');
   const empty = document.getElementById('shopOwnedEmpty');
+
   if(go && empty){
-    if(ownedItems.length === 0){ empty.style.display='block'; go.innerHTML=''; }
-    else{ empty.style.display='none'; go.innerHTML = ownedItems.map(makeCard).join(''); }
+    const permanentOwned = allItems.filter(i => owned.includes(i.id));
+    const hasAnything = permanentOwned.length > 0 || inv.length > 0;
+
+    if(!hasAnything){
+      empty.style.display = 'block';
+      go.innerHTML = '';
+    } else {
+      empty.style.display = 'none';
+      let html = '';
+
+      // Phần 1: Kho đồ (consumables chưa dùng)
+      if(inv.length > 0){
+        html += `<div style="font-size:.7rem;font-weight:900;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px;display:flex;align-items:center;gap:6px">
+          <span style="background:#F59E0B;color:#fff;padding:2px 8px;border-radius:999px;font-size:.62rem">KHO ĐỒ</span>
+          <span>${inv.reduce((s,i)=>s+i.count,0)} vật phẩm</span>
+        </div>`;
+        inv.forEach(entry => {
+          const item = allItems.find(i => i.id === entry.id);
+          if(!item) return;
+          const icoHtml = item.svg
+            ? `<div style="font-size:1rem;line-height:1;margin-bottom:4px">${item.svg}</div>`
+            : `<div style="font-size:1.8rem;line-height:1;margin-bottom:4px">${item.ico}</div>`;
+          html += `<div style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FED7AA;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div style="flex-shrink:0;width:48px;height:48px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 2px 8px rgba(0,0,0,.08)">${item.ico}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;color:#92400E">${item.name}</div>
+              <div style="font-size:.7rem;color:#B45309;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.desc}</div>
+              <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+                <span style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;border-radius:999px;font-size:.65rem;font-weight:800;padding:2px 8px">x${entry.count}</span>
+              </div>
+            </div>
+            <button onclick="useInventoryItem('${item.id}')" style="flex-shrink:0;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(234,88,12,.3)">Dùng ngay</button>
+          </div>`;
+        });
+      }
+
+      // Phần 2: Vật phẩm vĩnh viễn đã sở hữu
+      if(permanentOwned.length > 0){
+        if(inv.length > 0) html += `<div style="height:1px;background:var(--gray-100);margin:6px 0 14px"></div>`;
+        html += `<div style="font-size:.7rem;font-weight:900;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <span style="background:#059669;color:#fff;padding:2px 8px;border-radius:999px;font-size:.62rem">SỞ HỮU</span>
+          <span>${permanentOwned.length} vật phẩm</span>
+        </div>`;
+        html += `<div class="shop-grid">${permanentOwned.map(makeCard).join('')}</div>`;
+      }
+
+      go.innerHTML = html;
+    }
   }
   applyEquippedAvatar();
 }
@@ -7051,6 +7144,18 @@ function useHint(){
     showToast('💡 Không thể gợi ý ở bài này. Còn ' + (n-1) + ' lượt.');
   }
 }
+function useInventoryItem(id){
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
+  const item = allItems.find(i => i.id === id);
+  if(!item) return;
+  if(getInventoryCount(id) <= 0){ showToast('❌ Hết vật phẩm này!'); return; }
+  removeFromInventory(id);
+  applyItemEffect(item);
+  syncShopToServer();
+  renderShop();
+  showToast(`✅ Đã dùng: ${item.name}!`);
+}
+
 function updateHintBtn(){
   const btn = document.getElementById('quizHintBtn');
   const n = getHintCount();

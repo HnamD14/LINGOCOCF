@@ -390,6 +390,11 @@ public class UserController {
                 .hearts(u.getHearts()        != null ? u.getHearts()           : 5)
                 .heartsRegenAt(u.getHeartsRegenAt() != null ? u.getHeartsRegenAt().toString() + "Z" : null)
                 .coins(u.getCoins()          != null ? u.getCoins()            : 0)
+                .shopOwned(u.getShopOwned()          != null ? u.getShopOwned()     : "[]")
+                .shopEquipped(u.getShopEquipped()    != null ? u.getShopEquipped()  : "default")
+                .shopInventory(u.getShopInventory()  != null ? u.getShopInventory() : "[]")
+                .spinCount(u.getSpinCount()          != null ? u.getSpinCount()     : 0)
+                .spinDate(u.getSpinDate()            != null ? u.getSpinDate()      : "")
                 .build();
     }
 }
