@@ -3026,3 +3026,33 @@ body{
   width:100%;box-sizing:border-box;
   align-items:center;justify-content:center;
 }
+
+/* ══ Đã mua — owned cards & buttons ══════════════════════ */
+.owned-card{
+  -webkit-tap-highlight-color:transparent;
+}
+.owned-card:active{
+  transform:scale(.985);
+}
+.owned-action-btn{
+  position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+.owned-action-btn::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,.0);
+  transition:background .15s;
+  border-radius:inherit;
+}
+.owned-action-btn:active::after{
+  background:rgba(255,255,255,.22);
+}
+.owned-action-btn:active{
+  transform:scale(.93);
+  box-shadow:none !important;
+}
+/* ripple on click */
+@keyframes owned-ripple{
+  from{transform:scale(0);opacity:.5}
+  to{transform:scale(3);opacity:0}
+}
