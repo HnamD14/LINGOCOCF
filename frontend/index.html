@@ -7117,7 +7117,7 @@ function renderShop(){
                 : `<button onclick="equipAvatar('${item.id}')" style="flex-shrink:0;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(124,58,237,.35)">Mặc vào</button>`)
             : (isEquippedNow
                 ? `<button disabled style="flex-shrink:0;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;font-family:inherit;white-space:nowrap;opacity:.8">✓ Đang dùng</button>`
-                : `<button onclick="applyItemEffect(${JSON.stringify(item)});syncShopToServer();renderShop()" style="flex-shrink:0;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(234,88,12,.3)">Sử dụng</button>`);
+                : `<button onclick="usePermanentItem('${item.id}')" style="flex-shrink:0;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;border-radius:50px;padding:9px 14px;font-size:.75rem;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 8px rgba(234,88,12,.3)">Sử dụng</button>`);
           const bg = isEquippedNow
             ? 'background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #6EE7B7'
             : 'background:var(--white);border:1.5px solid var(--gray-100)';
@@ -7197,6 +7197,16 @@ function useHint(){
     showToast('💡 Không thể gợi ý ở bài này. Còn ' + (n-1) + ' lượt.');
   }
 }
+function usePermanentItem(id){
+  const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
+  const item = allItems.find(i => i.id === id);
+  if(!item) return;
+  applyItemEffect(item);
+  syncShopToServer();
+  renderShop();
+  showToast('✅ Đã kích hoạt: ' + item.name + '!');
+}
+
 function useInventoryItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
