@@ -5134,6 +5134,19 @@ function onAuthSuccess(user, token, isNew = false){
   }
 
   state.userId = newUserId;
+
+  // ── Migration: nếu có achievements lưu ở key _guest → chuyển sang key user thật ──
+  try {
+    const guestKey = ACH_KEY + '_guest';
+    const userKey  = uk(ACH_KEY);
+    const guestData = localStorage.getItem(guestKey);
+    const userData  = localStorage.getItem(userKey);
+    if(guestData && !userData){
+      localStorage.setItem(userKey, guestData);
+      localStorage.removeItem(guestKey);
+    }
+  } catch(e) {}
+
   // Reset state sạch cho user này
   state.xp = 0;
   state.streak = 0;
@@ -5203,6 +5216,8 @@ function onAuthSuccess(user, token, isNew = false){
   setTimeout(syncStatsFromServer, 500);
   setTimeout(_preloadHanziIdMap, 1200);
   setTimeout(miLoadFromServer, 2000);
+  // ── Achievements: chạy SAU khi userId đã set và stats đã seed ──
+  setTimeout(checkAchievements, 2500);
 
   // ── Progress sync mỗi 5 phút ──
   startProgressSync();
@@ -11236,7 +11251,7 @@ function miClearAll(){
 /* ── Init on load ── */
 window.addEventListener('load',()=>{
   setTimeout(renderQuests,800);
-  setTimeout(checkAchievements,1500);
+  // checkAchievements chỉ chạy sau khi userId đã set — xem onAuthSuccess
   if(localStorage.getItem(CFG.TOKEN_KEY)){
     setTimeout(_fetchSetsIndex,1000);
     setTimeout(_checkSrsReviewDue, 2000);
