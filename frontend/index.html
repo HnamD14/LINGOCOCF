@@ -6981,6 +6981,19 @@ function applyNameGoldBadge(){ applyNameColorBadge(); }
 
 
 /* ── Render shop ── */
+/* Kiểm tra trạng thái "đang dùng" chính xác cho từng loại vật phẩm */
+function isItemActive(item, equipped){
+  if(item.id.startsWith('av_'))   return equipped === item.id;
+  if(item.effect === 'name_gold')   return localStorage.getItem(uk('lingococ_name_color')) === 'gold';
+  if(item.effect === 'name_purple') return localStorage.getItem(uk('lingococ_name_color')) === 'purple';
+  if(item.effect === 'name_red')    return localStorage.getItem(uk('lingococ_name_color')) === 'red';
+  if(item.effect === 'heart_shield')return parseInt(localStorage.getItem(uk('lingococ_heart_shield_until'))||'0') > Date.now();
+  if(item.effect === 'league_shield')return localStorage.getItem(uk('lingococ_league_shield')) === getWeekKey();
+  if(item.effect === 'coin2x')      return parseInt(localStorage.getItem(uk('lingococ_coin2x_until'))||'0') > Date.now();
+  if(item.effect === 'daily2x')     return parseInt(localStorage.getItem(uk('lingococ_daily2x_until'))||'0') > Date.now();
+  return false;
+}
+
 function renderShop(){
   updateCoinUI();
   const owned    = getOwned();
@@ -7164,13 +7177,12 @@ function renderShop(){
           </div>`
         );
         permanentOwned.forEach(item => {
-          const isActive = equipped === item.id;
-          const isAvatar = item.type === 'avatar';
-          const hasTrigger = !isAvatar; // name_color, etc.
+          const isActive = isItemActive(item, equipped);
+          const isAvatar = item.id.startsWith('av_'); // avatar: id bắt đầu av_
 
           let btnText, btnColor, btnGlow, btnClick;
           if(isActive){
-            btnText = null; // show "ĐANG DÙNG" badge instead
+            btnText = null; // hiện badge "ĐANG DÙNG"
           } else if(isAvatar){
             btnText = '🐸 Mặc vào';
             btnColor = 'linear-gradient(135deg,#7C3AED,#A855F7)';
@@ -7188,7 +7200,7 @@ function renderShop(){
             name: item.name, desc: item.desc,
             active: isActive,
             activeText: isAvatar ? 'Đang mặc' : 'Đang kích hoạt',
-            activeColor: '#059669',
+            activeColor: isAvatar ? '#059669' : '#7C3AED',
             btnText: isActive ? null : btnText,
             btnColor, btnGlow, btnClick,
           }));
@@ -7261,6 +7273,11 @@ function usePermanentItem(id){
   const allItems = [...SHOP_ITEMS.boost, ...SHOP_ITEMS.special, ...SHOP_ITEMS.spin, ...SHOP_ITEMS.avatar];
   const item = allItems.find(i => i.id === id);
   if(!item) return;
+  // Avatar: id bắt đầu av_ → dùng equipAvatar để set COIN_EQUIPPED_KEY đúng
+  if(id.startsWith('av_')){
+    equipAvatar(id);
+    return;
+  }
   applyItemEffect(item);
   syncShopToServer();
   renderShop();
