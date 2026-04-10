@@ -2997,3 +2997,35 @@ body{
 .rm-map-unit-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
 .rm-map-goto-btn{width:100%;margin-top:4px;padding:11px;background:linear-gradient(135deg,#1F2937,#374151);color:#fff;border:none;border-radius:10px;font-family:'Baloo 2',cursive;font-size:.85rem;font-weight:800;cursor:pointer;transition:opacity .15s;}
 .rm-map-goto-btn:hover{opacity:.88;}
+
+/* ── FIX: Roadmap screen - nav luôn ở dưới, không cần scroll ── */
+#roadmapScreen{
+  height:100vh;min-height:unset;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#roadmapScreen .lm-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#roadmapScreen .bottom-nav{
+  flex-shrink:0;position:relative;bottom:auto;
+}
+
+/* ── FIX: Leaderboard screen - ngăn scroll vô tận ── */
+#leaderboardScreen{
+  height:100vh;min-height:unset;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#leaderboardScreen .lb2-header{flex-shrink:0}
+#leaderboardScreen .lb2-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#leaderboardScreen .bottom-nav{
+  flex-shrink:0;position:relative;bottom:auto;
+}
+
+/* ── FIX: xp2xPill - banner full-width thay vì ép vào topbar ── */
+#xp2xPill{
+  display:none;
+  width:100%;box-sizing:border-box;
+  align-items:center;justify-content:center;
+}
