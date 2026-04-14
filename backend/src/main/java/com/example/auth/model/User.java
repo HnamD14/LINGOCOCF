@@ -103,7 +103,7 @@ public class User {
     private String spinDate;            // "Mon Apr 07 2026"
 
     // ── Custom Decks (myDecks tự tạo từ frontend) ──
-    @Column(name = "custom_decks_json", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "custom_decks_json", columnDefinition = "TEXT")
     private String customDecksJson;     // JSON: [{id,name,emoji,cards:[...]}]
 
     // ── AI Saved Cards (sc_session_saved) ──
