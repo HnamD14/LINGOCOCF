@@ -33,5 +33,7 @@ public class AuthResponse {
         private String  shopInventory;
         private Integer spinCount;
         private String  spinDate;
+        private String  customDecksJson;
+        private String  savedCardsJson;
     }
 }

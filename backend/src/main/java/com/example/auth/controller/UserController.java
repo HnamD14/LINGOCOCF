@@ -118,6 +118,12 @@ public class UserController {
         // Coins sync — take max to prevent client spoofing going below server value
         if (req.getCoins() != null && req.getCoins() >= 0) user.setCoins(req.getCoins());
 
+        // Custom decks & saved cards sync
+        if (req.getCustomDecksJson() != null && req.getCustomDecksJson().length() <= 500000)
+            user.setCustomDecksJson(req.getCustomDecksJson());
+        if (req.getSavedCardsJson() != null && req.getSavedCardsJson().length() <= 100000)
+            user.setSavedCardsJson(req.getSavedCardsJson());
+
         userRepo.save(user);
         return ResponseEntity.ok(ApiResponse.success("Progress saved", toInfo(user)));
     }
@@ -395,6 +401,8 @@ public class UserController {
                 .shopInventory(u.getShopInventory()  != null ? u.getShopInventory() : "[]")
                 .spinCount(u.getSpinCount()          != null ? u.getSpinCount()     : 0)
                 .spinDate(u.getSpinDate()            != null ? u.getSpinDate()      : "")
+                .customDecksJson(u.getCustomDecksJson())
+                .savedCardsJson(u.getSavedCardsJson())
                 .build();
     }
 }

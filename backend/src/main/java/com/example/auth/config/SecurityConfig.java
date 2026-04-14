@@ -112,7 +112,8 @@ public class SecurityConfig {
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         cfg.setAllowedHeaders(List.of(
             "Authorization", "Content-Type", "Accept",
-            "X-Requested-With", "Cache-Control"
+            "X-Requested-With", "Cache-Control",
+            "text/plain"
         ));
         cfg.setExposedHeaders(List.of(
             "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After"

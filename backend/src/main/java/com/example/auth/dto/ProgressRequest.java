@@ -51,4 +51,12 @@ public class ProgressRequest {
     @Min(value = 0, message = "coins không được âm")
     @Schema(example = "150", description = "Số xu hiện tại")
     private Integer coins;
+
+    @Size(max = 500000, message = "customDecksJson quá lớn")
+    @Schema(description = "JSON các bộ thẻ tự tạo của user")
+    private String customDecksJson;
+
+    @Size(max = 100000, message = "savedCardsJson quá lớn")
+    @Schema(description = "JSON các card AI đã lưu")
+    private String savedCardsJson;
 }

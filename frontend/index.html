@@ -2832,6 +2832,9 @@ async function syncStatsFromServer(){
         // Gọi loadHearts để catch-up đúng số tim đã hồi và khởi động lại timer
         loadHearts();
       } else { state.hearts=Infinity; }
+      // Sync decks từ server (nếu server có dữ liệu mới hơn local)
+      _mdRestoreFromServer(u);
+
       // Refresh dashboard nếu đang mở hoặc luôn cập nhật
       loadDashboardCharts();
   initTopicSections();
@@ -5376,6 +5379,9 @@ function onAuthSuccess(user, token, isNew = false){
   setTimeout(syncStatsFromServer, 500);
   setTimeout(_preloadHanziIdMap, 1200);
   setTimeout(miLoadFromServer, 2000);
+
+  // ── Restore custom decks & saved cards từ server ──
+  _mdRestoreFromServer(user);
 
   // ── Progress sync mỗi 5 phút ──
   startProgressSync();
@@ -8117,7 +8123,10 @@ function copyInviteCode(){
   navigator.clipboard?.writeText(code).then(()=>showToast('📋 Đã copy mã mời: '+code));
 }
 
-function doLogout(){
+async function doLogout(){
+  // Sync progress + decks lên server TRƯỚC khi xóa (quan trọng!)
+  try { await syncProgressToServer(); } catch(e) {}
+
   // Thu hồi refresh token trên server (fire-and-forget)
   const rt = localStorage.getItem(REFRESH_TOKEN_KEY);
   if(rt && localStorage.getItem(CFG.TOKEN_KEY)){
@@ -8128,6 +8137,8 @@ function doLogout(){
   localStorage.removeItem(CFG.USER_KEY);
 
   // Xóa TOÀN BỘ data của user hiện tại (có suffix _userId)
+  // GHI CHÚ: myDecks và savedCards đã được sync lên server ở trên,
+  //           nên xóa local là an toàn — sẽ restore từ server khi login lại.
   if(state.userId){
     const suffix = '_' + state.userId;
     Object.keys(localStorage)
@@ -9949,6 +9960,45 @@ function startProgressSync(){
   _syncTimer = setInterval(syncProgressToServer, 5 * 60 * 1000);
 }
 
+// Sync khi user đóng tab / rời trang
+// Dùng fetch({ keepalive: true }) — gửi được JWT header, browser đảm bảo gửi xong kể cả khi tab đóng
+window.addEventListener('beforeunload', () => {
+  if(!localStorage.getItem(CFG.TOKEN_KEY)) return;
+  try {
+    const token = localStorage.getItem(CFG.TOKEN_KEY);
+    if(!token) return;
+    const brokenData = (() => { try { return JSON.parse(localStorage.getItem(uk(STREAK_BROKEN_KEY)) || 'null'); } catch { return null; } })();
+    fetch(CFG.BE_URL + '/api/user/progress', {
+      method:  'POST',
+      keepalive: true, // key: browser gửi xong kể cả khi tab bị đóng
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({
+        xp:              state.xp,
+        streak:          state.streak,
+        wordsLearned:    Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem('lc_words')||'0')),
+        correct:         Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0')),
+        total:           Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem('lc_total')||'0')),
+        lastStudyDate:   localStorage.getItem(uk(LASTDAY_KEY)) || null,
+        coins:           getCoins(),
+        brokenStreakValue: brokenData ? brokenData.previousStreak : null,
+        brokenStreakDate:  brokenData ? brokenData.brokenDate     : null,
+        customDecksJson: JSON.stringify(mdGetDecks()),
+        savedCardsJson:  JSON.stringify(mdGetAllSavedCards()),
+      }),
+    }).catch(() => {}); // silent fail
+  } catch(e) {}
+});
+
+// Sync khi tab bị ẩn (chuyển tab khác, phone lock màn hình, ...)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && localStorage.getItem(CFG.TOKEN_KEY)) {
+    syncProgressToServer().catch(() => {});
+  }
+});
+
 async function syncProgressToServer(){
   if(!localStorage.getItem(CFG.TOKEN_KEY)) return;
   const brokenData = (() => {
@@ -9965,6 +10015,9 @@ async function syncProgressToServer(){
     // Gửi recovery data để BE có thể validate khi client gọi /streak/recover
     brokenStreakValue: brokenData ? brokenData.previousStreak : null,
     brokenStreakDate:  brokenData ? brokenData.brokenDate     : null,
+    // Sync custom decks & saved AI cards
+    customDecksJson: JSON.stringify(mdGetDecks()),
+    savedCardsJson:  JSON.stringify(mdGetAllSavedCards()),
   };
   try {
     await api('/api/user/progress', 'POST', payload, true);
@@ -12260,6 +12313,7 @@ function scSaveScanCard(i, btn) {
   existing.unshift(card);
   localStorage.setItem(uk(SC_SAVED_KEY), JSON.stringify(existing.slice(0, 200)));
   btn.textContent = '✅ Đã lưu'; btn.classList.add('saved'); btn.disabled = true;
+  _mdSyncToServer(); // sync saved cards lên server
   scRenderSaved();
   showToast('💾 Đã lưu ' + card.hanzi + ' — ' + card.meaning);
 }
@@ -12331,6 +12385,7 @@ function scSaveToMyDeck() {
   const existing = JSON.parse(localStorage.getItem(uk(SC_SAVED_KEY)) || '[]');
   existing.unshift(card);
   localStorage.setItem(uk(SC_SAVED_KEY), JSON.stringify(existing.slice(0, 200)));
+  _mdSyncToServer(); // sync saved cards lên server
 
   const msg = document.getElementById('scSaveMsg');
   window._scLastSavedCard = card;
@@ -12380,10 +12435,67 @@ function mdGetDecks() {
 
 function mdSaveDecks(decks) {
   localStorage.setItem(_mdUserKey(MD_KEY), JSON.stringify(decks));
+  // Auto-sync lên server sau mỗi thay đổi (fire-and-forget, debounce 2s)
+  _mdSyncToServer();
+}
+
+// Debounced sync: custom decks + saved cards → server
+let _mdSyncTimer = null;
+async function _mdSyncToServer() {
+  if (_mdSyncTimer) clearTimeout(_mdSyncTimer);
+  _mdSyncTimer = setTimeout(async () => {
+    if (!localStorage.getItem(CFG.TOKEN_KEY)) return;
+    try {
+      await api('/api/user/progress', 'POST', {
+        customDecksJson: JSON.stringify(mdGetDecks()),
+        savedCardsJson:  JSON.stringify(mdGetAllSavedCards()),
+      }, true);
+    } catch(e) { /* silent — localStorage vẫn là backup */ }
+  }, 2000);
 }
 
 function mdGetAllSavedCards() {
   return JSON.parse(localStorage.getItem(_mdUserKey(SC_SAVED_KEY)) || '[]');
+}
+
+/* ── Restore decks từ server data sau khi login ── */
+function _mdRestoreFromServer(user) {
+  if (!user) return;
+
+  // Restore saved AI cards
+  if (user.savedCardsJson) {
+    try {
+      const serverCards = JSON.parse(user.savedCardsJson);
+      if (Array.isArray(serverCards) && serverCards.length > 0) {
+        const localCards = mdGetAllSavedCards();
+        // Merge: dùng server nếu nhiều hơn, không xóa dữ liệu local
+        if (serverCards.length >= localCards.length) {
+          localStorage.setItem(_mdUserKey(SC_SAVED_KEY), JSON.stringify(serverCards));
+        }
+      }
+    } catch(e) { /* ignore parse error */ }
+  }
+
+  // Restore custom decks
+  if (user.customDecksJson) {
+    try {
+      const serverDecks = JSON.parse(user.customDecksJson);
+      if (Array.isArray(serverDecks) && serverDecks.length > 0) {
+        const localDecks = mdGetDecks();
+        if (serverDecks.length >= localDecks.length) {
+          // Server có nhiều deck hơn → dùng server (tránh mất dữ liệu từ thiết bị khác)
+          localStorage.setItem(_mdUserKey(MD_KEY), JSON.stringify(serverDecks));
+        } else {
+          // Local có nhiều hơn → merge: giữ local + thêm deck từ server nếu thiếu
+          const localIds = new Set(localDecks.map(d => d.id));
+          const extraFromServer = serverDecks.filter(d => !localIds.has(d.id));
+          if (extraFromServer.length > 0) {
+            localStorage.setItem(_mdUserKey(MD_KEY), JSON.stringify([...localDecks, ...extraFromServer]));
+          }
+        }
+      }
+    } catch(e) { /* ignore parse error */ }
+  }
 }
 
 /* ── Render danh sách bộ thẻ ── */
@@ -12641,7 +12753,6 @@ function mdCreateDeck() {
   const decks = mdGetDecks();
   const newDeck = { id: 'deck_'+Date.now(), name, emoji, cards, createdAt: new Date().toISOString() };
   decks.unshift(newDeck);
-  mdSaveDecks(newDeck.id === undefined ? decks : decks);  // always valid
   mdSaveDecks(decks);
   closeMdNewModal();
   renderMyDecks();
