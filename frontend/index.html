@@ -8139,10 +8139,15 @@ async function doLogout(){
   // Xóa TOÀN BỘ data của user hiện tại (có suffix _userId)
   // GHI CHÚ: myDecks và savedCards đã được sync lên server ở trên,
   //           nên xóa local là an toàn — sẽ restore từ server khi login lại.
+  // NGOẠI LỆ: Giữ lại achievement data — per-user key, không nhạy cảm,
+  //            tránh bắn lại thông báo thành tựu cũ khi login lại cùng thiết bị.
   if(state.userId){
     const suffix = '_' + state.userId;
+    const keepKeys = new Set([
+      'lingococ_achievements_' + state.userId,  // giữ lại để tránh re-notify
+    ]);
     Object.keys(localStorage)
-      .filter(k => k.endsWith(suffix))
+      .filter(k => k.endsWith(suffix) && !keepKeys.has(k))
       .forEach(k => localStorage.removeItem(k));
   }
 
