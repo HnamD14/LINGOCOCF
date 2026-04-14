@@ -1207,37 +1207,97 @@
   </div>
 </div>
 
-<!-- Community: Publish modal -->
-<div id="cmPublishModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9100;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeCmPublish()">
-  <div style="background:var(--white);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:480px;padding:24px 20px 36px;display:flex;flex-direction:column;gap:12px">
-    <div style="font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:var(--gray-800)">🌐 Đăng lên cộng đồng</div>
-    <input id="cmPubName" type="text" placeholder="Tên bộ thẻ..." class="f-input" style="padding:11px 14px">
-    <input id="cmPubDesc" type="text" placeholder="Mô tả ngắn (tuỳ chọn)..." class="f-input" style="padding:11px 14px">
-    <div style="display:flex;gap:8px">
-      <select id="cmPubHsk" class="cfg-select" style="flex:1">
-        <option value="">HSK level...</option>
-        <option value="1">HSK1</option><option value="2">HSK2</option><option value="3">HSK3</option>
-      </select>
-      <select id="cmPubDeck" class="cfg-select" style="flex:2">
-        <option value="">Chọn bộ thẻ của bạn...</option>
-      </select>
+<!-- Community: Publish modal — ENHANCED -->
+<div id="cmPublishModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeCmPublish()">
+  <div style="background:var(--white);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden">
+
+    <!-- Header -->
+    <div style="padding:18px 18px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#1a1a2e,#2D1B69);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🌐</div>
+      <div>
+        <div style="font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;color:var(--gray-800)">Đăng lên cộng đồng</div>
+        <div style="font-size:.72rem;color:var(--gray-400);font-weight:600">Chia sẻ bộ thẻ của bạn với mọi người</div>
+      </div>
+      <button onclick="closeCmPublish()" style="margin-left:auto;background:var(--gray-100);border:none;border-radius:50%;width:30px;height:30px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-500)">×</button>
     </div>
-    <button onclick="submitPublish()" style="padding:14px;background:linear-gradient(135deg,#1a1a2e,#2D1B69);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer">🚀 Đăng lên</button>
-    <button onclick="closeCmPublish()" style="padding:11px;background:none;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--gray-400);cursor:pointer">Hủy</button>
+
+    <!-- Body — scrollable -->
+    <div style="flex:1;overflow-y:auto;padding:16px 18px 0">
+
+      <!-- Step 1: Chọn bộ thẻ -->
+      <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:8px">① Chọn bộ thẻ của bạn</div>
+      <div id="cmPubDeckList" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:14px">
+        <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:.82rem">Không có bộ thẻ nào</div>
+      </div>
+
+      <!-- Preview từ khi chọn deck -->
+      <div id="cmPubPreview" style="display:none;margin-bottom:14px">
+        <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:6px">Xem trước từ vựng</div>
+        <div id="cmPubPreviewWords" style="background:var(--gray-50);border-radius:var(--r-sm);padding:10px 12px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:5px"></div>
+      </div>
+
+      <!-- Step 2: Thông tin bài đăng -->
+      <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:8px">② Thông tin bài đăng</div>
+      <input id="cmPubName" type="text" placeholder="Tên bộ thẻ (bắt buộc)..." class="f-input" style="padding:11px 14px;margin-bottom:8px">
+      <input id="cmPubDesc" type="text" placeholder="Mô tả ngắn (tuỳ chọn)..." class="f-input" style="padding:11px 14px;margin-bottom:8px">
+      <input id="cmPubTopic" type="text" placeholder="Chủ đề / Tag (vd: Du lịch, Giao tiếp)..." class="f-input" style="padding:11px 14px;margin-bottom:8px">
+
+      <!-- Quick topic chips -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+        <span style="font-size:.68rem;font-weight:700;color:var(--gray-400);align-self:center">Gợi ý:</span>
+        <button onclick="document.getElementById('cmPubTopic').value='Giao tiếp'" class="cm-topic-chip">Giao tiếp</button>
+        <button onclick="document.getElementById('cmPubTopic').value='Du lịch'" class="cm-topic-chip">Du lịch</button>
+        <button onclick="document.getElementById('cmPubTopic').value='Kinh doanh'" class="cm-topic-chip">Kinh doanh</button>
+        <button onclick="document.getElementById('cmPubTopic').value='Học thuật'" class="cm-topic-chip">Học thuật</button>
+        <button onclick="document.getElementById('cmPubTopic').value='Ẩm thực'" class="cm-topic-chip">Ẩm thực</button>
+        <button onclick="document.getElementById('cmPubTopic').value='Thành ngữ'" class="cm-topic-chip">Thành ngữ</button>
+      </div>
+
+      <!-- HSK level -->
+      <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:8px">③ Cấp độ HSK (tuỳ chọn)</div>
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button class="cm-hsk-pick active" id="cmHskPick_" onclick="cmPickHsk('',this)">Không rõ</button>
+        <button class="cm-hsk-pick" id="cmHskPick_1" onclick="cmPickHsk('1',this)">HSK 1</button>
+        <button class="cm-hsk-pick" id="cmHskPick_2" onclick="cmPickHsk('2',this)">HSK 2</button>
+        <button class="cm-hsk-pick" id="cmHskPick_3" onclick="cmPickHsk('3',this)">HSK 3</button>
+      </div>
+
+    </div><!-- end body -->
+
+    <!-- Footer actions — fixed -->
+    <div style="padding:14px 18px 28px;border-top:1px solid var(--gray-100);display:flex;gap:8px;flex-shrink:0">
+      <button onclick="closeCmPublish()" style="flex:1;padding:13px;background:none;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--gray-400);cursor:pointer">Hủy</button>
+      <button onclick="submitPublish()" style="flex:2;padding:13px;background:linear-gradient(135deg,#1a1a2e,#2D1B69);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer">🚀 Đăng lên cộng đồng</button>
+    </div>
   </div>
 </div>
 
-<!-- Community: Detail modal -->
+<!-- Community: Detail modal — ENHANCED with reactions -->
 <div id="cmDetailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9100;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeCmDetail()">
-  <div style="background:var(--white);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column">
-    <div style="padding:18px 18px 14px;border-bottom:1px solid var(--gray-100)">
-      <div id="cmDetailName" style="font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:var(--gray-800)">Tên bộ thẻ</div>
-      <div id="cmDetailMeta" style="font-size:.75rem;color:var(--gray-400);margin-top:3px"></div>
+  <div style="background:var(--white);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column">
+
+    <!-- Header -->
+    <div style="padding:16px 18px 12px;border-bottom:1px solid var(--gray-100);flex-shrink:0">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1">
+          <div id="cmDetailName" style="font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;color:var(--gray-800)">Tên bộ thẻ</div>
+          <div id="cmDetailMeta" style="font-size:.72rem;color:var(--gray-400);margin-top:3px;font-weight:600"></div>
+        </div>
+        <button onclick="closeCmDetail()" style="background:var(--gray-100);border:none;border-radius:50%;width:30px;height:30px;font-size:1.1rem;cursor:pointer;color:var(--gray-500);flex-shrink:0">×</button>
+      </div>
+      <!-- Reaction bar in header -->
+      <div id="cmDetailReactions" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"></div>
     </div>
-    <div id="cmDetailWords" style="flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:6px"></div>
-    <div style="padding:14px 18px 24px;border-top:1px solid var(--gray-100);display:flex;gap:8px">
-      <button id="cmDetailLikeBtn" onclick="cmToggleLike()" style="flex:1;padding:12px;background:var(--gray-50);border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;color:var(--gray-600);cursor:pointer">💎 Thích</button>
-      <button onclick="cmClone()" style="flex:2;padding:12px;background:linear-gradient(135deg,#1a1a2e,#2D1B69);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;cursor:pointer">📥 Lưu về "Của tôi"</button>
+
+    <!-- Word list -->
+    <div id="cmDetailWords" style="flex:1;overflow-y:auto;padding:10px 18px;display:flex;flex-direction:column;gap:5px"></div>
+
+    <!-- Footer actions -->
+    <div style="padding:12px 18px 26px;border-top:1px solid var(--gray-100);flex-shrink:0">
+      <div style="display:flex;gap:8px">
+        <button id="cmDetailLikeBtn" onclick="cmToggleLike()" style="flex:1;padding:11px;background:var(--gray-50);border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:800;color:var(--gray-600);cursor:pointer">💎 Thích</button>
+        <button onclick="cmClone()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1a1a2e,#2D1B69);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Baloo 2',cursive;font-size:.92rem;font-weight:700;cursor:pointer">📥 Lưu về "Của tôi"</button>
+      </div>
     </div>
   </div>
 </div>
@@ -7438,9 +7498,19 @@ async function cmLoadMore(){
   }catch(e){}
 }
 
+// ── Card HTML builder (with reaction strip) ──────────────────────
 function cmCardHTML(s){
   const hskBadge = s.hskLevel ? `<span class="cm-badge hsk${s.hskLevel}">HSK${s.hskLevel}</span>` : '';
   const likedStyle = s.liked ? 'color:#E11D48' : '';
+  // Build mini reaction strip from reactions.counts
+  let reactStrip = '';
+  const rxCounts = (s.reactions && s.reactions.counts) ? s.reactions.counts : {};
+  const rxEntries = Object.entries(rxCounts).filter(([,v])=>v>0);
+  if(rxEntries.length > 0){
+    reactStrip = `<div class="cm-card-reactions">${
+      rxEntries.map(([emoji, cnt])=>`<span class="cm-mini-react">${emoji} ${cnt}</span>`).join('')
+    }</div>`;
+  }
   return `<div class="cm-card" onclick="cmOpenDetail(${s.id})">
     <div class="cm-card-head">
       <div class="cm-card-ico"><svg width="22" height="22" viewBox="0 0 40 40"><rect x="5" y="9" width="9" height="22" rx="2" fill="#F97316"/><rect x="5" y="9" width="3" height="22" rx="2" fill="#C2410C"/><rect x="15" y="5" width="10" height="26" rx="2" fill="#7C3AED"/><rect x="15" y="5" width="3.5" height="26" rx="2" fill="#4C1D95"/><rect x="26" y="12" width="9" height="19" rx="2" fill="#0891B2"/><rect x="26" y="12" width="3" height="19" rx="2" fill="#0E7490"/><rect x="3" y="31" width="34" height="3" rx="1.5" fill="#D97706"/></svg></div>
@@ -7458,9 +7528,11 @@ function cmCardHTML(s){
       <span class="cm-stat" style="${likedStyle}">💎 ${s.likeCount}</span>
       <span class="cm-stat">📥 ${s.cloneCount}</span>
     </div>
+    ${reactStrip}
   </div>`;
 }
 
+// ── Detail modal ─────────────────────────────────────────────────
 async function cmOpenDetail(id){
   _cmCurrentSetId = id;
   try{
@@ -7468,29 +7540,71 @@ async function cmOpenDetail(id){
     if(status!==200||!data.success){ showToast('Không tải được bộ thẻ'); return; }
     const s = data.data;
     document.getElementById('cmDetailName').textContent = s.name;
-    document.getElementById('cmDetailMeta').textContent =
-      `bởi ${s.creatorFullName||s.creatorUsername} · ${s.wordCount} từ · 💎 ${s.likeCount} · 📥 ${s.cloneCount}`;
-    // Parse vocab
+
+    // Meta line with topic badge
+    let metaHTML = `bởi <b>${s.creatorFullName||s.creatorUsername}</b> · 📖 ${s.wordCount} từ · 💎 ${s.likeCount} · 📥 ${s.cloneCount}`;
+    if(s.hskLevel) metaHTML += ` · <span class="cm-badge hsk${s.hskLevel}" style="display:inline">HSK${s.hskLevel}</span>`;
+    if(s.topic)    metaHTML += ` · <span class="cm-badge" style="display:inline">${s.topic}</span>`;
+    document.getElementById('cmDetailMeta').innerHTML = metaHTML;
+
+    // Render reactions bar
+    cmRenderDetailReactions(s.reactions || {counts:{}, myReactions:[], allowed:['❤️','🔥','😍','👏','💡']});
+
+    // Parse vocab words
     let words = [];
     try{ words = JSON.parse(s.vocabJson||'[]'); }catch(e){}
     const wordsEl = document.getElementById('cmDetailWords');
     wordsEl.innerHTML = words.length===0
       ? '<div style="color:var(--gray-400);text-align:center;padding:20px">Bộ thẻ trống</div>'
       : words.map(w=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-          <span style="font-size:1.3rem;font-family:serif;color:var(--gray-800);min-width:50px">${w.h}</span>
-          <span style="font-size:.78rem;color:var(--gray-400);min-width:70px">${w.p||''}</span>
-          <span style="font-size:.82rem;font-weight:700;color:var(--gray-700)">${w.m||''}</span>
+          <span style="font-size:1.25rem;font-family:serif;color:var(--gray-800);min-width:52px">${w.h||''}</span>
+          <span style="font-size:.75rem;color:var(--gray-400);min-width:72px;font-family:'JetBrains Mono',monospace">${w.p||''}</span>
+          <span style="font-size:.82rem;font-weight:700;color:var(--gray-700);flex:1">${w.m||''}</span>
         </div>`).join('');
+
+    // Like button state
     const likeBtn = document.getElementById('cmDetailLikeBtn');
     likeBtn.textContent = s.liked ? '💎 Đã thích' : '🤍 Thích';
-    likeBtn.style.background = s.liked ? '#FEE2E8' : 'var(--gray-50)';
-    likeBtn.style.borderColor = s.liked ? '#FCA5A5' : 'var(--gray-200)';
-    likeBtn.style.color = s.liked ? '#DC2626' : 'var(--gray-600)';
+    likeBtn.style.background   = s.liked ? '#FEE2E8' : 'var(--gray-50)';
+    likeBtn.style.borderColor  = s.liked ? '#FCA5A5' : 'var(--gray-200)';
+    likeBtn.style.color        = s.liked ? '#DC2626' : 'var(--gray-600)';
+
     document.getElementById('cmDetailModal').style.display='flex';
   }catch(e){ showToast('Lỗi kết nối'); }
 }
+
+function cmRenderDetailReactions(rxData){
+  const el = document.getElementById('cmDetailReactions');
+  if(!el) return;
+  const allowed   = rxData.allowed   || ['❤️','🔥','😍','👏','💡'];
+  const counts    = rxData.counts    || {};
+  const myRx      = new Set(rxData.myReactions || []);
+  el.innerHTML = allowed.map(emoji => {
+    const cnt     = counts[emoji] || 0;
+    const reacted = myRx.has(emoji);
+    return `<button class="cm-react-btn${reacted?' reacted':''}"
+      onclick="event.stopPropagation();cmReact('${emoji}')"
+      title="${emoji}">
+      <span>${emoji}</span>
+      ${cnt>0 ? `<span class="react-count">${cnt}</span>` : ''}
+    </button>`;
+  }).join('');
+}
+
 function closeCmDetail(){ document.getElementById('cmDetailModal').style.display='none'; }
 
+// ── Reactions ────────────────────────────────────────────────────
+async function cmReact(emoji){
+  if(!_cmCurrentSetId) return;
+  try{
+    const {status,data} = await api('/api/community/sets/'+_cmCurrentSetId+'/react','POST',{emoji},true);
+    if(status===200&&data.success){
+      cmRenderDetailReactions(data.data);
+    }
+  }catch(e){}
+}
+
+// ── Like ─────────────────────────────────────────────────────────
 async function cmToggleLike(){
   if(!_cmCurrentSetId) return;
   try{
@@ -7498,26 +7612,32 @@ async function cmToggleLike(){
     if(status===200&&data.success){
       const r = data.data;
       const btn = document.getElementById('cmDetailLikeBtn');
-      btn.textContent = r.liked ? '💎 Đã thích' : '🤍 Thích';
-      btn.style.background = r.liked ? '#FEE2E8' : 'var(--gray-50)';
+      btn.textContent    = r.liked ? '💎 Đã thích' : '🤍 Thích';
+      btn.style.background  = r.liked ? '#FEE2E8' : 'var(--gray-50)';
       btn.style.borderColor = r.liked ? '#FCA5A5' : 'var(--gray-200)';
-      btn.style.color = r.liked ? '#DC2626' : 'var(--gray-600)';
+      btn.style.color       = r.liked ? '#DC2626' : 'var(--gray-600)';
     }
   }catch(e){}
 }
 
+// ── Clone ────────────────────────────────────────────────────────
 async function cmClone(){
   if(!_cmCurrentSetId) return;
   try{
-    const {status,data} = await api('/api/community/sets/'+_cmCurrentSetId+'/clone','POST',null,true);
-    // Fetch vocab detail rồi lưu vào my decks localStorage
+    await api('/api/community/sets/'+_cmCurrentSetId+'/clone','POST',null,true);
     const detailRes = await api('/api/community/sets/'+_cmCurrentSetId,'GET',null,true);
     if(detailRes.status===200&&detailRes.data.success){
       const s = detailRes.data.data;
       let words=[]; try{ words=JSON.parse(s.vocabJson||'[]'); }catch(e){}
-      // Dùng MD system để lưu
-      if(typeof mdCreateDeck === 'function' && words.length>0){
-        mdCreateDeck(s.name, words);
+      if(typeof mdGetDecks==='function' && words.length>0){
+        const decks = mdGetDecks();
+        const newDeck = {
+          id:'deck_'+Date.now(), name:s.name, emoji:'📥',
+          cards: words.map(w=>({...w, savedAt:new Date().toISOString()})),
+          createdAt: new Date().toISOString()
+        };
+        decks.unshift(newDeck);
+        mdSaveDecks(decks);
       }
     }
     closeCmDetail();
@@ -7526,6 +7646,7 @@ async function cmClone(){
   }catch(e){ showToast('Lỗi khi sao chép'); }
 }
 
+// ── Delete ───────────────────────────────────────────────────────
 async function cmDelete(id){
   if(!confirm('Xóa bộ thẻ này khỏi cộng đồng?')) return;
   try{
@@ -7534,34 +7655,126 @@ async function cmDelete(id){
   }catch(e){}
 }
 
-// Publish modal
+// ── Publish modal ────────────────────────────────────────────────
+let _cmPubSelectedDeck = null; // {name, emoji, cards:[]}
+let _cmPubHskVal = '';
+
 function openPublishModal(){
-  // Điền danh sách bộ thẻ của user
-  const sel = document.getElementById('cmPubDeck');
-  sel.innerHTML = '<option value="">Chọn bộ thẻ của bạn...</option>';
-  try{
-    const decks = JSON.parse(localStorage.getItem(uk('lingococ_my_decks'))||'[]');
-    decks.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = JSON.stringify(d.items||[]);
-      opt.textContent = d.name;
-      sel.appendChild(opt);
-    });
-  }catch(e){}
+  _cmPubSelectedDeck = null;
+  _cmPubHskVal = '';
+
+  // Reset form
+  document.getElementById('cmPubName').value = '';
+  document.getElementById('cmPubDesc').value = '';
+  document.getElementById('cmPubTopic').value = '';
+  document.getElementById('cmPubPreview').style.display = 'none';
+  // Reset HSK picks
+  document.querySelectorAll('.cm-hsk-pick').forEach(b=>b.classList.remove('active'));
+  const defPick = document.getElementById('cmHskPick_');
+  if(defPick) defPick.classList.add('active');
+
+  // Build deck list
+  const listEl = document.getElementById('cmPubDeckList');
+  let decks = [];
+  try{ decks = mdGetDecks(); }catch(e){}
+
+  if(!decks || decks.length===0){
+    listEl.innerHTML = `<div style="text-align:center;padding:24px;color:var(--gray-400)">
+      <div style="font-size:2rem">📭</div>
+      <div style="font-weight:700;margin-top:6px;font-size:.85rem">Bạn chưa có bộ thẻ nào</div>
+      <div style="font-size:.75rem;margin-top:4px">Hãy tạo bộ thẻ trong mục Thư viện trước</div>
+    </div>`;
+  } else {
+    listEl.innerHTML = decks.map((d,i)=>{
+      const cardCount = (d.cards||d.items||[]).length;
+      return `<div class="cm-deck-pick" id="cmDeckPick_${i}" onclick="cmSelectDeck(${i})">
+        <div class="dk-emoji">${d.emoji||'📚'}</div>
+        <div class="dk-info">
+          <div class="dk-name">${d.name}</div>
+          <div class="dk-count">${cardCount} từ vựng</div>
+        </div>
+        <div class="dk-check" id="cmDeckCheck_${i}"></div>
+      </div>`;
+    }).join('');
+  }
+
   document.getElementById('cmPublishModal').style.display='flex';
 }
-function closeCmPublish(){ document.getElementById('cmPublishModal').style.display='none'; }
+
+function cmSelectDeck(idx){
+  // Deselect all
+  document.querySelectorAll('.cm-deck-pick').forEach((el,i)=>{
+    el.classList.remove('selected');
+    const ch = document.getElementById('cmDeckCheck_'+i);
+    if(ch){ ch.textContent=''; ch.style.background=''; ch.style.borderColor='var(--gray-200)'; }
+  });
+  // Select this
+  const el = document.getElementById('cmDeckPick_'+idx);
+  const ch = document.getElementById('cmDeckCheck_'+idx);
+  if(el) el.classList.add('selected');
+  if(ch){ ch.textContent='✓'; ch.style.background='#7C3AED'; ch.style.borderColor='#7C3AED'; ch.style.color='#fff'; }
+
+  // Store selected deck
+  let decks = [];
+  try{ decks = mdGetDecks(); }catch(e){}
+  _cmPubSelectedDeck = decks[idx];
+
+  // Auto-fill name if empty
+  const nameEl = document.getElementById('cmPubName');
+  if(nameEl && !nameEl.value.trim() && _cmPubSelectedDeck){
+    nameEl.value = _cmPubSelectedDeck.name || '';
+  }
+
+  // Show preview
+  const cards = (_cmPubSelectedDeck.cards || _cmPubSelectedDeck.items || []).slice(0,8);
+  const previewEl = document.getElementById('cmPubPreview');
+  const previewWords = document.getElementById('cmPubPreviewWords');
+  if(cards.length > 0){
+    previewWords.innerHTML = cards.map(w=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-200)">
+        <span style="font-size:1.1rem;font-family:serif;min-width:44px;color:var(--gray-800)">${w.h||w.hanzi||''}</span>
+        <span style="font-size:.72rem;color:var(--gray-400);min-width:64px;font-family:'JetBrains Mono',monospace">${w.p||w.pinyin||''}</span>
+        <span style="font-size:.78rem;font-weight:700;color:var(--gray-700);flex:1">${w.m||w.meaning||''}</span>
+      </div>`).join('') +
+      ((_cmPubSelectedDeck.cards||_cmPubSelectedDeck.items||[]).length > 8
+        ? `<div style="text-align:center;padding:6px;font-size:.72rem;color:var(--gray-400);font-weight:700">...và ${(_cmPubSelectedDeck.cards||_cmPubSelectedDeck.items||[]).length - 8} từ khác</div>`
+        : '');
+    previewEl.style.display='block';
+  } else {
+    previewEl.style.display='none';
+  }
+}
+
+function cmPickHsk(val, btn){
+  _cmPubHskVal = val;
+  document.querySelectorAll('.cm-hsk-pick').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function closeCmPublish(){
+  document.getElementById('cmPublishModal').style.display='none';
+  _cmPubSelectedDeck = null;
+}
 
 async function submitPublish(){
   const name = document.getElementById('cmPubName').value.trim();
   const desc = document.getElementById('cmPubDesc').value.trim();
-  const hsk  = document.getElementById('cmPubHsk').value;
-  const vocabRaw = document.getElementById('cmPubDeck').value;
-  if(!name){ showToast('Vui lòng nhập tên bộ thẻ'); return; }
-  if(!vocabRaw){ showToast('Vui lòng chọn bộ thẻ'); return; }
+  const topic = document.getElementById('cmPubTopic').value.trim();
+  if(!name){ showToast('⚠️ Vui lòng nhập tên bộ thẻ'); return; }
+  if(!_cmPubSelectedDeck){ showToast('⚠️ Vui lòng chọn một bộ thẻ'); return; }
+
+  const cards = _cmPubSelectedDeck.cards || _cmPubSelectedDeck.items || [];
+  if(cards.length===0){ showToast('⚠️ Bộ thẻ đang trống, không thể đăng'); return; }
+
+  // Normalize cards to {h,p,m} format
+  const vocabJson = JSON.stringify(cards.map(c=>({
+    h: c.h||c.hanzi||'', p: c.p||c.pinyin||'', m: c.m||c.meaning||''
+  })));
+
   try{
     const {status,data} = await api('/api/community/sets/publish','POST',{
-      name, description:desc, hskLevel:hsk||null, vocabJson:vocabRaw
+      name, description:desc, hskLevel:_cmPubHskVal||null,
+      topic, vocabJson
     }, true);
     if(status===200&&data.success){
       closeCmPublish();
@@ -7571,13 +7784,15 @@ async function submitPublish(){
   }catch(e){ showToast('Không thể kết nối server'); }
 }
 
+// ── My published sets ────────────────────────────────────────────
 async function openMyPublished(){
+  const list = document.getElementById('cmList');
+  list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);font-weight:700">⏳ Đang tải...</div>';
   try{
     const {status,data} = await api('/api/community/my-sets','GET',null,true);
     if(status===200&&data.success){
-      const list = document.getElementById('cmList');
       if(data.data.length===0){
-        list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray-400)"><div style="font-size:2.5rem">📭</div><div style="font-weight:700;margin-top:8px">Chưa đăng bộ thẻ nào</div></div>';
+        list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray-400)"><div style="font-size:2.5rem">📭</div><div style="font-weight:700;margin-top:8px">Chưa đăng bộ thẻ nào</div><div style="font-size:.78rem;margin-top:4px">Nhấn "+ Đăng" để chia sẻ bộ thẻ đầu tiên!</div></div>';
       } else {
         list.innerHTML = data.data.map(s=>cmCardHTML(s)).join('');
       }

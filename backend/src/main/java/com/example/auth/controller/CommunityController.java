@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/community")
@@ -19,9 +20,12 @@ public class CommunityController {
 
     private final CommunitySetRepository communityRepo;
     private final CommunitySetLikeRepository likeRepo;
+    private final CommunitySetReactionRepository reactionRepo;
     private final UserRepository userRepo;
 
-    // ── GET /api/community/sets?q=&hskLevel=&sort=hot&page=0 ──────
+    private static final List<String> ALLOWED_REACTIONS = List.of("❤️", "🔥", "😍", "👏", "💡");
+
+    // ── GET /api/community/sets ───────────────────────────────────
     @GetMapping("/sets")
     public ResponseEntity<ApiResponse<Map<String,Object>>> getSets(
             @AuthenticationPrincipal UserDetails ud,
@@ -72,8 +76,8 @@ public class CommunityController {
             @AuthenticationPrincipal UserDetails ud,
             @RequestBody Map<String,Object> body) {
         User me = resolveUser(ud);
-        String name = (String) body.getOrDefault("name", "Bộ thẻ của " + me.getUsername());
-        String desc = (String) body.getOrDefault("description", "");
+        String name  = (String) body.getOrDefault("name", "Bộ thẻ của " + me.getUsername());
+        String desc  = (String) body.getOrDefault("description", "");
         String vocab = (String) body.getOrDefault("vocabJson", "[]");
         Integer hsk  = body.get("hskLevel") != null ? Integer.parseInt(body.get("hskLevel").toString()) : null;
         String topic = (String) body.getOrDefault("topic", "");
@@ -105,6 +109,41 @@ public class CommunityController {
             communityRepo.save(set);
             return ResponseEntity.ok(ApiResponse.success(Map.of("liked", true, "likeCount", set.getLikeCount())));
         }
+    }
+
+    // ── POST /api/community/sets/{id}/react ──────────────────────
+    @PostMapping("/sets/{id}/react")
+    public ResponseEntity<ApiResponse<Map<String,Object>>> react(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails ud,
+            @RequestBody Map<String,Object> body) {
+        User me = resolveUser(ud);
+        String emoji = (String) body.get("emoji");
+        if (emoji == null || !ALLOWED_REACTIONS.contains(emoji)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Emoji không hợp lệ"));
+        }
+        CommunitySet set = communityRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bộ thẻ"));
+
+        boolean alreadyReacted = reactionRepo.existsByUserIdAndSetIdAndEmoji(me.getId(), id, emoji);
+        if (alreadyReacted) {
+            reactionRepo.findByUserIdAndSetIdAndEmoji(me.getId(), id, emoji)
+                    .ifPresent(reactionRepo::delete);
+        } else {
+            reactionRepo.save(CommunitySetReaction.builder().user(me).set(set).emoji(emoji).build());
+        }
+
+        Map<String,Object> counts = buildReactionCounts(id, me);
+        return ResponseEntity.ok(ApiResponse.success(counts));
+    }
+
+    // ── GET /api/community/sets/{id}/reactions ───────────────────
+    @GetMapping("/sets/{id}/reactions")
+    public ResponseEntity<ApiResponse<Map<String,Object>>> getReactions(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails ud) {
+        User me = resolveUser(ud);
+        return ResponseEntity.ok(ApiResponse.success(buildReactionCounts(id, me)));
     }
 
     // ── POST /api/community/sets/{id}/clone ──────────────────────
@@ -144,6 +183,24 @@ public class CommunityController {
     }
 
     // ── Helpers ──────────────────────────────────────────────────
+    private Map<String,Object> buildReactionCounts(Long setId, User me) {
+        List<Object[]> rows = reactionRepo.countByEmojiForSet(setId);
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (Object[] row : rows) {
+            counts.put((String) row[0], (Long) row[1]);
+        }
+        Set<String> myReactions = new HashSet<>();
+        if (me != null) {
+            reactionRepo.findByUserIdAndSetId(me.getId(), setId)
+                    .forEach(r -> myReactions.add(r.getEmoji()));
+        }
+        Map<String,Object> result = new LinkedHashMap<>();
+        result.put("counts", counts);
+        result.put("myReactions", myReactions);
+        result.put("allowed", ALLOWED_REACTIONS);
+        return result;
+    }
+
     private Map<String,Object> toMap(CommunitySet s, User me) {
         boolean liked = me != null && likeRepo.existsByUserIdAndSetId(me.getId(), s.getId());
         Map<String,Object> m = new LinkedHashMap<>();
@@ -158,11 +215,11 @@ public class CommunityController {
         m.put("cloneCount", s.getCloneCount());
         m.put("liked", liked);
         m.put("isOwner", me != null && s.getCreator().getId().equals(me.getId()));
-        // Count vocab items từ JSON (rough)
         String vocab = s.getVocabJson();
         int count = vocab == null ? 0 : (int) vocab.chars().filter(c -> c == '{').count();
         m.put("wordCount", count);
         m.put("createdAt", s.getCreatedAt());
+        m.put("reactions", buildReactionCounts(s.getId(), me));
         return m;
     }
 
