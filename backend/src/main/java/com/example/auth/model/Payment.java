@@ -31,7 +31,7 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Status status = Status.PENDING;
+    private Status status = Status.DRAFT;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -39,5 +39,5 @@ public class Payment {
     private LocalDateTime confirmedAt;
     private String note;
 
-    public enum Status { PENDING, CONFIRMED, REJECTED }
+    public enum Status { DRAFT, PENDING, CONFIRMED, REJECTED }
 }

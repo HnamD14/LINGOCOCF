@@ -2817,14 +2817,14 @@ async function syncStatsFromServer(){
         localStorage.setItem('lc_words', serverWords);
       }
       if(serverCorrect > 0){
-        const localCorrect = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+        const localCorrect = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
         if(serverCorrect > localCorrect){
           localStorage.setItem(uk(CORRECT_KEY), serverCorrect);
           localStorage.setItem('lc_correct', serverCorrect);
         }
       }
       if(serverTotal > 0){
-        const localTotal = Math.max(parseInt(localStorage.getItem('lc_total')||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+        const localTotal = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
         if(serverTotal > localTotal){
           localStorage.setItem(uk(TOTAL_KEY), serverTotal);
           localStorage.setItem('lc_total', serverTotal);
@@ -2975,9 +2975,9 @@ function getLevelUpMsg(lv){
 ════════════════════════════════════════════════ */
 
 function loadStats(){
-  const words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   parseInt(localStorage.getItem('lc_words')||'0'),   state.wordsLearned||0);
-  const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0'), state.correctAnswers||0);
-  const total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem('lc_total')||'0'),   state.totalAnswers||0);
+  const words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   state.wordsLearned||0);
+  const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), state.correctAnswers||0);
+  const total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   state.totalAnswers||0);
   updateStatsUI(words, correct, total);
   return { words, correct, total };
 }
@@ -2994,11 +2994,11 @@ function saveWordLearned_OLD(newWords){
 function saveQuizResult(isCorrect){
   // uk() key là nguồn chính (per-user); lc_ là shadow key
   const cBase = Math.max(
-    parseInt(localStorage.getItem('lc_correct')||'0'),
+    parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'),
     parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')
   );
   const tBase = Math.max(
-    parseInt(localStorage.getItem('lc_total')||'0'),
+    parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),
     parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')
   );
   const correct = cBase + (isCorrect ? 1 : 0);
@@ -3015,8 +3015,7 @@ function saveQuizResult(isCorrect){
 function saveWordLearned(newWords){
   // uk() key là nguồn chính (per-user), lc_ là shadow để đọc nhanh
   const cur = Math.max(
-    parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_words')||'0')
+    parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')
   );
   const updated = cur + newWords;
   localStorage.setItem(uk(WORDS_KEY), updated); // per-user key (nguồn chính)
@@ -3045,14 +3044,14 @@ function recordStats(wordsCount, correctCount, totalCount){
   // words
   if(wordsCount > 0) saveWordLearned(wordsCount);
   // correct / total
-  const cBase = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
-  const tBase = Math.max(parseInt(localStorage.getItem('lc_total')||'0'),   parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const cBase = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const tBase = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
   const newC = cBase + correctCount;
   const newT = tBase + totalCount;
   localStorage.setItem('lc_correct', newC);  localStorage.setItem(uk(CORRECT_KEY), newC);
   localStorage.setItem('lc_total',   newT);  localStorage.setItem(uk(TOTAL_KEY),   newT);
   // live-update profile dashboard
-  const _dw = document.getElementById('dashWords');    if(_dw) _dw.textContent = Math.max(parseInt(localStorage.getItem('lc_words')||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')).toLocaleString('vi-VN');
+  const _dw = document.getElementById('dashWords');    if(_dw) _dw.textContent = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')).toLocaleString('vi-VN');
   const _da = document.getElementById('dashAccuracy'); if(_da) _da.textContent = newT > 0 ? Math.round(newC/newT*100)+'%' : '—';
   // also push to server (non-blocking)
   try{ syncProgressToServer(); }catch(e){}
@@ -4603,10 +4602,10 @@ function syncHomeStats(){
   updateLevelUI(false);
   // ── Đồng thời cập nhật 4 stat cards ở tab Tôi ───────────────
   // uk() key = per-user (nguồn chính), lc_ = shadow fallback
-  const _words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   parseInt(localStorage.getItem('lc_words')||'0'));
-  const _correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0'));
-  const _total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem('lc_total')||'0'));
-  const _xp      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'), parseInt(localStorage.getItem('lc_xp')||'0'));
+  const _words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
+  const _correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const _total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const _xp      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'));
   const _g = id => document.getElementById(id);
   if(_g('dashTotalXP'))  _g('dashTotalXP').textContent  = _xp.toLocaleString('vi-VN');
   if(_g('dashWords'))    _g('dashWords').textContent    = _words.toLocaleString('vi-VN');
@@ -4822,9 +4821,9 @@ function showComplete(){
   document.getElementById('cs_xp').textContent       = '+' + xpEarned + ' XP';
 
   // Điền thống kê tích lũy
-  const totalWords   = Math.max(parseInt(localStorage.getItem('lc_words')||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
-  const totalCorrect = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
-  const totalTotal   = Math.max(parseInt(localStorage.getItem('lc_total')||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const totalWords   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
+  const totalCorrect = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const totalTotal   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
   const totalXP      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'));
 
   const el = id => document.getElementById(id);
@@ -5249,6 +5248,8 @@ async function doLogin(){
       _autoLoginDone = true;
       // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
       localStorage.removeItem(CFG.USER_KEY);
+      // Xóa shadow keys lc_* không có prefix user để tránh lẫn data
+      ['lc_words','lc_correct','lc_total','lc_xp'].forEach(k => localStorage.removeItem(k));
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
@@ -5283,6 +5284,8 @@ async function doRegister(){
       _autoLoginDone = true;
       // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
       localStorage.removeItem(CFG.USER_KEY);
+      // Xóa shadow keys lc_* không có prefix user để tránh lẫn data
+      ['lc_words','lc_correct','lc_total','lc_xp'].forEach(k => localStorage.removeItem(k));
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
@@ -5327,30 +5330,50 @@ function onAuthSuccess(user, token, isNew = false){
   const newUserId = (user.username || user.email || String(user.id) || 'default').toLowerCase().trim();
   const prevUserId = state.userId;
 
-  // Nếu đổi user (login user khác hoặc user mới) → xóa lc_ shared keys
+  // Hàm xóa toàn bộ data local của 1 userId
+  function _clearUserData(uid){
+    if(!uid) return;
+    const prefix = '_' + uid;
+    const toRemove = [];
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.endsWith(prefix)) toRemove.push(k);
+    }
+    toRemove.forEach(k => localStorage.removeItem(k));
+  }
+
+  // Nếu đổi user → xóa lc_ shared keys + KHÔNG xóa data của user mới (chỉ xóa user cũ nếu cần)
   if(prevUserId && prevUserId !== newUserId){
     ['lc_xp','lc_words','lc_correct','lc_total'].forEach(k => localStorage.removeItem(k));
-    // Xoá keys cũ không có per-user suffix (legacy cleanup)
     const oldKeys = [];
     for(let i=0; i<localStorage.length; i++){
       const k = localStorage.key(i);
       if(!k) continue;
-      // Lesson progress cũ không suffix
       if(k.startsWith(LM_PROGRESS_KEY+'_') && !k.includes('@') && !/[a-z_]+\d+$/.test(k)) oldKeys.push(k);
-      // Deck key bare (không suffix) — tránh lấy deck của user khác
       if(k === 'lingococ_mydecks' || k === 'sc_session_saved') oldKeys.push(k);
     }
     oldKeys.forEach(k => localStorage.removeItem(k));
   }
-  // User mới đăng ký → xóa hết lc_ shadow keys
+
+  // User mới đăng ký → xóa TOÀN BỘ data local của userId này (phòng trùng username)
   if(isNew){
     ['lc_xp','lc_words','lc_correct','lc_total'].forEach(k => localStorage.removeItem(k));
-    // Đảm bảo deck list trống hoàn toàn cho account mới
+    _clearUserData(newUserId);
     localStorage.removeItem('lingococ_mydecks');
     localStorage.removeItem('sc_session_saved');
   }
 
+  // ② Set userId TRƯỚC để uk() dùng đúng suffix từ đây trở đi
   state.userId = newUserId;
+
+  // Nếu server nói wordsLearned = 0 → xóa thành tựu local (tránh hiện nhầm data cũ)
+  if(!isNew && (user.wordsLearned == null || user.wordsLearned === 0)){
+    localStorage.removeItem(uk('lingococ_achievements'));
+    localStorage.removeItem(uk('lingococ_words'));
+    localStorage.removeItem(uk('lingococ_correct'));
+    localStorage.removeItem(uk('lingococ_total'));
+  }
+
   // Reset state sạch cho user này
   state.xp = 0;
   state.streak = 0;
@@ -8732,11 +8755,14 @@ async function submitTxn(){
   setBusy('btnSubmitTxn',true);
   try {
     const {status,data} = await api('/api/payment/submit-transaction','POST',{orderCode:state.orderCode,transactionCode:txn,note:'app'},true);
-    if(status===200 && data.success) goToStep3(txn);
-    else showToast('❌ '+(data.message||'Gửi thất bại'));
-  } catch {
-    goToStep3(txn); // Demo: cho qua
-    showToast('⚠️ Demo mode');
+    if(status===200 && data.success){
+      goToStep3(txn);
+      showToast('✅ Đã gửi xác nhận! Đang chờ admin duyệt...');
+    } else {
+      showToast('❌ '+(data.message||'Gửi thất bại'));
+    }
+  } catch(e) {
+    showToast('❌ Không kết nối được server');
   } finally { setBusy('btnSubmitTxn',false); }
 }
 
@@ -8749,7 +8775,11 @@ function goToStep3(txn){
   document.getElementById('payS2').style.display = 'none';
   document.getElementById('payS3').style.display = 'block';
   setPayStep(3);
-  state.pollTimer = setInterval(checkStatus, 30000);
+  // Poll mỗi 10s để phát hiện admin duyệt/từ chối nhanh hơn
+  if(state.pollTimer) clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(checkStatus, 10000);
+  // Check ngay lập tức
+  setTimeout(checkStatus, 2000);
 }
 
 async function checkStatus(){
@@ -8758,7 +8788,7 @@ async function checkStatus(){
   try {
     const {status,data} = await api('/api/payment/status/'+state.orderCode,'GET',null,true);
     if(status===200 && data.success) updateStatusUI(data.data.status, data.data);
-  } catch { showToast('Không kết nối được BE'); }
+  } catch { /* bỏ qua lỗi mạng, tiếp tục poll */ }
   finally { setBusy('btnCheckStatus',false); }
 }
 
@@ -8767,28 +8797,51 @@ function updateStatusUI(status, data){
   const ico  = document.getElementById('payStatusIco');
   const ttl  = document.getElementById('payStatusTitle');
   const msg  = document.getElementById('payStatusMsg');
+
   if(status==='CONFIRMED'){
-    const isPlus = selPlan.startsWith('PLUS');
+    const isPlus   = selPlan.startsWith('PLUS');
     const tierName = isPlus ? '🥈 Cóc Bạc PLUS' : '👑 Cóc Vàng PRO';
     const newRole  = isPlus ? 'PLUS' : 'PRO';
-    card.className='pay-status-card confirmed';
-    ico.textContent='🎉';
-    ttl.textContent='Nâng cấp thành công!'; ttl.style.color='var(--green)';
-    msg.innerHTML=`<strong>Tài khoản đã được nâng lên ${tierName}! 🚀</strong>`; msg.style.color='#166534';
+    card.className = 'pay-status-card confirmed';
+    ico.textContent = '🎉';
+    ttl.textContent = 'Nâng cấp thành công!'; ttl.style.color = 'var(--green)';
+    msg.innerHTML   = `<strong>Tài khoản đã được nâng lên ${tierName}! 🚀</strong>`;
+    msg.style.color = '#166534';
     clearInterval(state.pollTimer);
-    fireConfetti(); showToast(tierName + ' — Chúc mừng Cóc!');
-    // Cập nhật cache + unlock đúng tier
+    fireConfetti();
+    showToast(tierName + ' — Chúc mừng Cóc! 🎊', 5000);
+    // Cập nhật role + unlock
     const cachedUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
     if(cachedUser){ cachedUser.role = newRole; localStorage.setItem(CFG.USER_KEY, JSON.stringify(cachedUser)); }
     setProExpiry(selPlan);
     if(isPlus){ unlockPlus(); _applyPlusBadge(); showUpgradeOrRenew('PLUS'); }
     else { unlockPro(cachedUser||{}); showUpgradeOrRenew('PRO'); }
+    // Tự động đóng trang thanh toán sau 3 giây
+    setTimeout(() => {
+      goBackToOrigin();
+    }, 3000);
+
   } else if(status==='REJECTED'){
-    card.className='pay-status-card rejected';
-    ico.textContent='❌'; ttl.textContent='Thanh toán bị từ chối'; ttl.style.color='var(--red)';
-    msg.innerHTML='Vui lòng liên hệ Admin. Ghi chú: '+(data.note||'—'); msg.style.color='#991B1B';
+    card.className  = 'pay-status-card rejected';
+    ico.textContent = '❌';
+    ttl.textContent = 'Thanh toán bị từ chối';
+    ttl.style.color = 'var(--red)';
+    const reason = data.note || 'Không có lý do cụ thể';
+    msg.innerHTML   = `
+      <div style="background:#FEE2E2;border:1.5px solid #FECACA;border-radius:10px;padding:12px 14px;margin-top:6px;text-align:left">
+        <div style="font-size:.75rem;font-weight:800;color:#991B1B;margin-bottom:4px">📋 LÝ DO TỪ CHỐI:</div>
+        <div style="font-size:.85rem;color:#7F1D1D;font-weight:600">${reason}</div>
+      </div>
+      <div style="margin-top:10px;font-size:.8rem;color:#6B7280">Vui lòng liên hệ admin hoặc thử lại.</div>`;
+    msg.style.color = '#991B1B';
     clearInterval(state.pollTimer);
-  } else { showToast('⏳ Vẫn đang chờ xác nhận...'); }
+    showToast('❌ Đơn hàng bị từ chối: ' + reason, 6000);
+
+  } else if(status==='PENDING'){
+    // Đang chờ admin duyệt — cập nhật UI cho biết
+    if(ico) ico.textContent = '⏳';
+    if(ttl){ ttl.textContent = 'Đang chờ admin xác nhận...'; ttl.style.color = 'var(--orange)'; }
+  }
 }
 
 
@@ -10076,9 +10129,9 @@ window.addEventListener('beforeunload', () => {
       body: JSON.stringify({
         xp:              state.xp,
         streak:          state.streak,
-        wordsLearned:    Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem('lc_words')||'0')),
-        correct:         Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0')),
-        total:           Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem('lc_total')||'0')),
+        wordsLearned:    Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')),
+        correct:         Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')),
+        total:           Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')),
         lastStudyDate:   localStorage.getItem(uk(LASTDAY_KEY)) || null,
         coins:           getCoins(),
         brokenStreakValue: brokenData ? brokenData.previousStreak : null,
@@ -10105,9 +10158,9 @@ async function syncProgressToServer(){
   const payload = {
     xp:           state.xp,
     streak:       state.streak,
-    wordsLearned: Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem('lc_words')||'0')),
-    correct:      Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0')),
-    total:        Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem('lc_total')||'0')),
+    wordsLearned: Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')),
+    correct:      Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')),
+    total:        Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')),
     lastStudyDate: localStorage.getItem(uk(LASTDAY_KEY)) || null,
     coins: getCoins(),
     // Gửi recovery data để BE có thể validate khi client gọi /streak/recover
@@ -10918,12 +10971,10 @@ function loadFullDashboard(){
   // ── Stat cards ──────────────────────────────────
   const xp = Math.max(
     parseInt(localStorage.getItem(uk(XP_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_xp')||'0'),
     state.xp||0
   );
   const words = Math.max(
     parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_words')||'0'),
     state.wordsLearned||0
   );
   const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), state.correctAnswers||0);
@@ -11306,10 +11357,10 @@ function getAchTier(id){ const d=_loadAch(); return d[id]!==undefined?d[id]:-1; 
 
 function checkAchievements(){
   if(!state.userId) return; // Fix: tránh re-show thành tựu khi chưa login xong
-  const words  =Math.max(parseInt(localStorage.getItem('lc_words')||'0'),parseInt(localStorage.getItem(uk('lingococ_words'))||'0'),state.wordsLearned||0);
-  const correct=Math.max(parseInt(localStorage.getItem('lc_correct')||'0'),parseInt(localStorage.getItem(uk('lingococ_correct'))||'0'),state.correctAnswers||0);
-  const total  =Math.max(parseInt(localStorage.getItem('lc_total')||'0'),parseInt(localStorage.getItem(uk('lingococ_total'))||'0'),state.totalAnswers||0);
-  const xp     =Math.max(state.xp||0,parseInt(localStorage.getItem('lc_xp')||'0'));
+  const words  = Math.max(parseInt(localStorage.getItem(uk('lingococ_words'))  ||'0'), state.wordsLearned  ||0);
+  const correct= Math.max(parseInt(localStorage.getItem(uk('lingococ_correct'))||'0'), state.correctAnswers||0);
+  const total  = Math.max(parseInt(localStorage.getItem(uk('lingococ_total'))  ||'0'), state.totalAnswers  ||0);
+  const xp     = Math.max(state.xp||0, parseInt(localStorage.getItem(uk('lingococ_xp'))||'0'));
   const streak =state.streak||0;
   const dailyCount=parseInt(localStorage.getItem(uk(DAILY_COUNT_KEY))||'0');
   const strokes   =parseInt(localStorage.getItem(uk(STROKE_COUNT_KEY))||'0');

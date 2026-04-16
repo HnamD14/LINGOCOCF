@@ -97,19 +97,25 @@ public class PaymentService {
         Payment p = paymentRepo.findByOrderCode(orderCode)
                 .orElseThrow(() -> new IllegalArgumentException("Mã đơn hàng không tồn tại"));
 
-        if (p.getStatus() != Payment.Status.PENDING)
-            throw new IllegalStateException("Đơn hàng này đã được xử lý rồi");
+        if (p.getStatus() == Payment.Status.CONFIRMED)
+            throw new IllegalStateException("Đơn hàng này đã được xác nhận rồi");
 
-        if (paymentRepo.findByTransactionCode(txnCode).isPresent())
+        if (p.getStatus() == Payment.Status.REJECTED)
+            throw new IllegalStateException("Đơn hàng này đã bị từ chối");
+
+        if (txnCode != null && !txnCode.isBlank() &&
+            paymentRepo.findByTransactionCode(txnCode).isPresent())
             throw new IllegalArgumentException("Mã giao dịch này đã được dùng trước đó");
 
         p.setTransactionCode(txnCode);
         p.setNote(note);
+        // Chuyển từ DRAFT → PENDING để admin thấy và duyệt
+        p.setStatus(Payment.Status.PENDING);
         paymentRepo.save(p);
 
-        log.info("📝 Transaction submitted: {} for order: {}", txnCode, orderCode);
+        log.info("📝 Transaction submitted (DRAFT→PENDING): {} for order: {}", txnCode, orderCode);
         return Map.of(
-            "message",   "Đã nhận! Admin sẽ xác nhận trong 5–30 phút.",
+            "message",   "Đã gửi! Đơn hàng đang chờ admin xác nhận.",
             "orderCode", orderCode,
             "status",    "PENDING"
         );
@@ -135,13 +141,23 @@ public class PaymentService {
             return Map.of("success", false, "message", "Bỏ qua: không phải tiền vào");
         }
 
-        // Tìm đơn hàng PENDING khớp nội dung chuyển khoản
+        // Tìm đơn hàng PENDING hoặc DRAFT khớp nội dung chuyển khoản
         Optional<Payment> found = paymentRepo
             .findByStatusOrderByCreatedAtDesc(Payment.Status.PENDING)
             .stream()
             .filter(p -> content.contains(p.getOrderCode().toUpperCase()))
-            .filter(p -> transferAmount >= p.getAmount()) // số CK >= giá gói
+            .filter(p -> transferAmount >= p.getAmount())
             .findFirst();
+
+        // Nếu không thấy PENDING, thử tìm trong DRAFT (user chưa xác nhận nhưng đã CK)
+        if (found.isEmpty()) {
+            found = paymentRepo
+                .findByStatusOrderByCreatedAtDesc(Payment.Status.DRAFT)
+                .stream()
+                .filter(p -> content.contains(p.getOrderCode().toUpperCase()))
+                .filter(p -> transferAmount >= p.getAmount())
+                .findFirst();
+        }
 
         if (found.isEmpty()) {
             log.warn("⚠️ SePay webhook: không tìm thấy đơn PENDING khớp nội dung [{}] amount={}", content, transferAmount);

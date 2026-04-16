@@ -8755,11 +8755,14 @@ async function submitTxn(){
   setBusy('btnSubmitTxn',true);
   try {
     const {status,data} = await api('/api/payment/submit-transaction','POST',{orderCode:state.orderCode,transactionCode:txn,note:'app'},true);
-    if(status===200 && data.success) goToStep3(txn);
-    else showToast('❌ '+(data.message||'Gửi thất bại'));
-  } catch {
-    goToStep3(txn); // Demo: cho qua
-    showToast('⚠️ Demo mode');
+    if(status===200 && data.success){
+      goToStep3(txn);
+      showToast('✅ Đã gửi xác nhận! Đang chờ admin duyệt...');
+    } else {
+      showToast('❌ '+(data.message||'Gửi thất bại'));
+    }
+  } catch(e) {
+    showToast('❌ Không kết nối được server');
   } finally { setBusy('btnSubmitTxn',false); }
 }
 
@@ -8772,7 +8775,11 @@ function goToStep3(txn){
   document.getElementById('payS2').style.display = 'none';
   document.getElementById('payS3').style.display = 'block';
   setPayStep(3);
-  state.pollTimer = setInterval(checkStatus, 30000);
+  // Poll mỗi 10s để phát hiện admin duyệt/từ chối nhanh hơn
+  if(state.pollTimer) clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(checkStatus, 10000);
+  // Check ngay lập tức
+  setTimeout(checkStatus, 2000);
 }
 
 async function checkStatus(){
@@ -8781,7 +8788,7 @@ async function checkStatus(){
   try {
     const {status,data} = await api('/api/payment/status/'+state.orderCode,'GET',null,true);
     if(status===200 && data.success) updateStatusUI(data.data.status, data.data);
-  } catch { showToast('Không kết nối được BE'); }
+  } catch { /* bỏ qua lỗi mạng, tiếp tục poll */ }
   finally { setBusy('btnCheckStatus',false); }
 }
 
@@ -8790,28 +8797,51 @@ function updateStatusUI(status, data){
   const ico  = document.getElementById('payStatusIco');
   const ttl  = document.getElementById('payStatusTitle');
   const msg  = document.getElementById('payStatusMsg');
+
   if(status==='CONFIRMED'){
-    const isPlus = selPlan.startsWith('PLUS');
+    const isPlus   = selPlan.startsWith('PLUS');
     const tierName = isPlus ? '🥈 Cóc Bạc PLUS' : '👑 Cóc Vàng PRO';
     const newRole  = isPlus ? 'PLUS' : 'PRO';
-    card.className='pay-status-card confirmed';
-    ico.textContent='🎉';
-    ttl.textContent='Nâng cấp thành công!'; ttl.style.color='var(--green)';
-    msg.innerHTML=`<strong>Tài khoản đã được nâng lên ${tierName}! 🚀</strong>`; msg.style.color='#166534';
+    card.className = 'pay-status-card confirmed';
+    ico.textContent = '🎉';
+    ttl.textContent = 'Nâng cấp thành công!'; ttl.style.color = 'var(--green)';
+    msg.innerHTML   = `<strong>Tài khoản đã được nâng lên ${tierName}! 🚀</strong>`;
+    msg.style.color = '#166534';
     clearInterval(state.pollTimer);
-    fireConfetti(); showToast(tierName + ' — Chúc mừng Cóc!');
-    // Cập nhật cache + unlock đúng tier
+    fireConfetti();
+    showToast(tierName + ' — Chúc mừng Cóc! 🎊', 5000);
+    // Cập nhật role + unlock
     const cachedUser = (() => { try{ return JSON.parse(localStorage.getItem(CFG.USER_KEY)); }catch{ return null; } })();
     if(cachedUser){ cachedUser.role = newRole; localStorage.setItem(CFG.USER_KEY, JSON.stringify(cachedUser)); }
     setProExpiry(selPlan);
     if(isPlus){ unlockPlus(); _applyPlusBadge(); showUpgradeOrRenew('PLUS'); }
     else { unlockPro(cachedUser||{}); showUpgradeOrRenew('PRO'); }
+    // Tự động đóng trang thanh toán sau 3 giây
+    setTimeout(() => {
+      goBackToOrigin();
+    }, 3000);
+
   } else if(status==='REJECTED'){
-    card.className='pay-status-card rejected';
-    ico.textContent='❌'; ttl.textContent='Thanh toán bị từ chối'; ttl.style.color='var(--red)';
-    msg.innerHTML='Vui lòng liên hệ Admin. Ghi chú: '+(data.note||'—'); msg.style.color='#991B1B';
+    card.className  = 'pay-status-card rejected';
+    ico.textContent = '❌';
+    ttl.textContent = 'Thanh toán bị từ chối';
+    ttl.style.color = 'var(--red)';
+    const reason = data.note || 'Không có lý do cụ thể';
+    msg.innerHTML   = `
+      <div style="background:#FEE2E2;border:1.5px solid #FECACA;border-radius:10px;padding:12px 14px;margin-top:6px;text-align:left">
+        <div style="font-size:.75rem;font-weight:800;color:#991B1B;margin-bottom:4px">📋 LÝ DO TỪ CHỐI:</div>
+        <div style="font-size:.85rem;color:#7F1D1D;font-weight:600">${reason}</div>
+      </div>
+      <div style="margin-top:10px;font-size:.8rem;color:#6B7280">Vui lòng liên hệ admin hoặc thử lại.</div>`;
+    msg.style.color = '#991B1B';
     clearInterval(state.pollTimer);
-  } else { showToast('⏳ Vẫn đang chờ xác nhận...'); }
+    showToast('❌ Đơn hàng bị từ chối: ' + reason, 6000);
+
+  } else if(status==='PENDING'){
+    // Đang chờ admin duyệt — cập nhật UI cho biết
+    if(ico) ico.textContent = '⏳';
+    if(ttl){ ttl.textContent = 'Đang chờ admin xác nhận...'; ttl.style.color = 'var(--orange)'; }
+  }
 }
 
 
