@@ -343,7 +343,6 @@ public class UserController {
             result.put("total", items.size());
             return ResponseEntity.ok(ApiResponse.success("OK", result));
         } catch (Exception e) {
-            log.error("adminList error: {}", e.getMessage());
             return ResponseEntity.status(500).body(ApiResponse.error("Lỗi tải danh sách user: " + e.getMessage()));
         }
     }
