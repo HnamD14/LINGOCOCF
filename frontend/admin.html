@@ -17,22 +17,12 @@
   --bg:#FFF8F3;--white:#fff;
   --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;
   --gray-400:#9CA3AF;--gray-600:#4B5563;--gray-800:#1F2937;
-  --text:#1A1A1A;
   --sh-sm:0 1px 3px #00000012;--sh:0 4px 16px #00000014;--sh-lg:0 12px 40px #0000001A;
   --r-sm:10px;--r:16px;--r-lg:24px;
 }
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-
-/* ── LOGIN ── */
-#loginScreen{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(155deg,var(--orange) 0%,var(--orange2) 100%);
-  padding:20px;
-}
-.login-card{
-  background:var(--white);border-radius:var(--r-lg);padding:36px 32px;
-  width:100%;max-width:380px;box-shadow:var(--sh-lg);
-}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text,#1A1A1A);min-height:100vh}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,var(--orange) 0%,var(--orange2) 100%);padding:20px}
+.login-card{background:var(--white);border-radius:var(--r-lg);padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--sh-lg)}
 .login-logo{text-align:center;margin-bottom:24px}
 .login-logo .frog{font-size:3rem;display:block;margin-bottom:6px}
 .login-logo h1{font-size:1.6rem;font-weight:900;color:var(--gray-800);letter-spacing:-.03em}
@@ -41,117 +31,64 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .field-label{font-size:.75rem;font-weight:800;color:var(--gray-600);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;display:block}
 .f-wrap{position:relative;margin-bottom:16px}
 .f-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
-.f-input{
-  width:100%;padding:12px 14px 12px 38px;
-  background:var(--white);border:2.5px solid var(--gray-200);
-  border-radius:var(--r-sm);font-family:'Nunito',sans-serif;
-  font-size:.92rem;font-weight:600;color:var(--text);outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
+.f-input{width:100%;padding:12px 14px 12px 38px;background:var(--white);border:2.5px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;color:#1A1A1A;outline:none;transition:border-color .2s,box-shadow .2s}
 .f-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px #FF6B0015}
-.login-alert{
-  border-radius:var(--r-sm);padding:11px 14px;font-size:.84rem;font-weight:700;
-  align-items:center;gap:8px;margin-bottom:16px;display:none;
-}
+.login-alert{border-radius:var(--r-sm);padding:11px 14px;font-size:.84rem;font-weight:700;align-items:center;gap:8px;margin-bottom:16px;display:none}
 .login-alert.show{display:flex}
 .login-alert.err{background:var(--red-light);border:2px solid #FECACA;color:var(--red)}
-.a-btn{
-  width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));
-  color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;
-  border:none;border-radius:var(--r-sm);cursor:pointer;
-  box-shadow:0 6px 20px #FF6B0030;transition:transform .15s,opacity .15s;
-}
+.a-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;border:none;border-radius:var(--r-sm);cursor:pointer;box-shadow:0 6px 20px #FF6B0030;transition:transform .15s,opacity .15s}
 .a-btn:hover{transform:translateY(-1px)}
 .a-btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
-
-/* ── APP ── */
 #appScreen{display:none}
-.topbar{
-  position:sticky;top:0;z-index:100;padding:14px 20px;background:var(--white);
-  border-bottom:2px solid var(--gray-100);display:flex;align-items:center;
-  justify-content:space-between;box-shadow:var(--sh-sm);
-}
+.topbar{position:sticky;top:0;z-index:100;padding:14px 20px;background:var(--white);border-bottom:2px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh-sm)}
 .topbar-logo{display:flex;align-items:center;gap:10px}
 .topbar-logo .frog{font-size:1.5rem}
-.topbar-logo h2{font-size:1.2rem;font-weight:900;letter-spacing:-.03em;color:var(--gray-800)}
+.topbar-logo h2{font-size:1.15rem;font-weight:900;letter-spacing:-.03em;color:var(--gray-800)}
 .topbar-logo h2 span{color:var(--orange)}
-.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.admin-badge{
-  background:linear-gradient(135deg,var(--orange),var(--orange2));
-  color:#fff;font-size:.72rem;font-weight:900;padding:4px 10px;
-  border-radius:999px;letter-spacing:.05em;
-}
-.auto-badge{
-  background:var(--green-light);border:1.5px solid #BBF7D0;
-  color:var(--green-dark);font-size:.72rem;font-weight:900;padding:4px 10px;
-  border-radius:999px;display:flex;align-items:center;gap:4px;
-}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.admin-badge{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;font-size:.72rem;font-weight:900;padding:4px 10px;border-radius:999px}
+.auto-badge{background:var(--green-light);border:1.5px solid #BBF7D0;color:var(--green-dark);font-size:.72rem;font-weight:900;padding:4px 10px;border-radius:999px;display:flex;align-items:center;gap:4px}
 .auto-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.4)}}
-.logout-btn{
-  background:var(--gray-100);border:none;border-radius:var(--r-sm);padding:8px 14px;
-  font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
-  color:var(--gray-600);cursor:pointer;transition:background .15s;
-}
-.logout-btn:hover{background:var(--gray-200)}
-
+.topbar-btn{background:var(--gray-100);border:none;border-radius:var(--r-sm);padding:8px 14px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;color:var(--gray-600);cursor:pointer;transition:background .15s}
+.topbar-btn:hover{background:var(--gray-200)}
+.topbar-btn.purple{background:var(--purple-light);color:var(--purple)}
+.topbar-btn.purple:hover{background:#DDD6FE}
 .main{max-width:960px;margin:0 auto;padding:24px 16px}
-
-/* ── STATS ── */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
-.stat-card{
-  background:var(--white);border-radius:var(--r);padding:18px;
-  box-shadow:var(--sh-sm);border:2px solid var(--gray-100);
-}
-.stat-card .emoji{font-size:1.5rem;margin-bottom:8px}
-.stat-card .lbl{font-size:.72rem;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em}
-.stat-card .val{font-size:2rem;font-weight:900;line-height:1.1;margin-top:4px}
+.tabs{display:flex;gap:4px;background:var(--gray-100);border-radius:var(--r-sm);padding:4px;margin-bottom:24px}
+.tab-btn{flex:1;padding:9px;background:none;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;color:var(--gray-400);cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--white);color:var(--gray-800);box-shadow:var(--sh-sm)}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:var(--r);padding:16px;box-shadow:var(--sh-sm);border:2px solid var(--gray-100)}
+.stat-card .emoji{font-size:1.4rem;margin-bottom:6px}
+.stat-card .lbl{font-size:.68rem;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em}
+.stat-card .val{font-size:1.8rem;font-weight:900;line-height:1.1;margin-top:3px}
 .s-pending .val{color:var(--orange)}
 .s-confirmed .val{color:var(--green-dark)}
-.s-revenue .val{color:var(--blue);font-size:1.4rem}
-.s-total .val{color:var(--gray-800)}
-
-/* ── SECTION ── */
-.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.section-title{font-size:1.1rem;font-weight:900;color:var(--gray-800);display:flex;align-items:center;gap:8px}
-.badge-count{background:var(--orange);color:#fff;font-size:.72rem;font-weight:900;padding:2px 8px;border-radius:999px;min-width:22px;text-align:center}
-.refresh-btn{
-  background:var(--green-light);border:2px solid #BBF7D0;border-radius:var(--r-sm);
-  padding:8px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
-  color:var(--green-dark);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:6px;
-}
-.refresh-btn:hover{background:#BBF7D0}
+.s-revenue .val{color:var(--blue);font-size:1.2rem}
+.s-total .val,.s-users .val{color:var(--gray-800)}
+.s-pro .val{color:var(--purple)}
+.s-plus .val{color:var(--gold)}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.section-title{font-size:1rem;font-weight:900;color:var(--gray-800);display:flex;align-items:center;gap:8px}
+.badge-count{background:var(--orange);color:#fff;font-size:.72rem;font-weight:900;padding:2px 8px;border-radius:999px}
+.refresh-btn{background:var(--green-light);border:2px solid #BBF7D0;border-radius:var(--r-sm);padding:8px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;color:var(--green-dark);cursor:pointer;display:flex;align-items:center;gap:6px}
 .spin-icon{display:inline-block}
 .spinning .spin-icon{animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── EMPTY ── */
 .empty-state{text-align:center;padding:48px 20px;background:var(--white);border-radius:var(--r);border:2px dashed var(--gray-200)}
 .empty-state .ico{font-size:3rem;margin-bottom:12px}
 .empty-state p{font-size:.95rem;font-weight:700;color:var(--gray-400)}
-
-/* ── CARD ── */
 .pay-list{display:flex;flex-direction:column;gap:14px}
-.pay-card{
-  background:var(--white);border-radius:var(--r);padding:18px 20px;
-  box-shadow:var(--sh-sm);border:2px solid var(--gray-100);
-  animation:slideIn .3s ease;
-}
+.pay-card{background:var(--white);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh-sm);border:2px solid var(--gray-100);animation:slideIn .3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .pay-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
 .user-info{display:flex;align-items:center;gap:10px}
-.avatar{
-  width:42px;height:42px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--orange-light),var(--orange-mid));
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;font-weight:900;color:var(--orange);
-}
+.avatar{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--orange-light),var(--orange-mid));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:var(--orange)}
 .u-name{font-size:.95rem;font-weight:900;color:var(--gray-800)}
 .u-email{font-size:.77rem;color:var(--gray-400);font-weight:600}
-.plan-chip{
-  background:var(--gold-light);color:var(--gold);font-size:.74rem;font-weight:900;
-  padding:4px 10px;border-radius:999px;white-space:nowrap;border:1.5px solid #F6D86B;
-}
+.plan-chip{background:var(--gold-light);color:var(--gold);font-size:.74rem;font-weight:900;padding:4px 10px;border-radius:999px;white-space:nowrap;border:1.5px solid #F6D86B}
+.plan-chip.plus{background:var(--blue-light);color:var(--blue);border-color:#BFDBFE}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 @media(max-width:500px){.info-grid{grid-template-columns:1fr}}
 .info-item .lbl{font-size:.7rem;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
@@ -161,82 +98,56 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .info-item .val.code{font-family:'JetBrains Mono',monospace;font-size:.82rem}
 .info-item .val.no-txn{color:var(--gray-400);font-style:italic}
 .card-actions{display:flex;gap:10px}
-.btn-ok{
-  flex:1;padding:11px;background:linear-gradient(135deg,var(--green),var(--green-dark));
-  color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;
-  border:none;border-radius:var(--r-sm);cursor:pointer;
-  box-shadow:0 4px 12px #22C55E30;transition:transform .15s,opacity .15s;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
+.btn-ok{flex:1;padding:11px;background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;border:none;border-radius:var(--r-sm);cursor:pointer;box-shadow:0 4px 12px #22C55E30;transition:transform .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-ok:hover{transform:translateY(-1px)}
 .btn-ok:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn-no{
-  flex:1;padding:11px;background:var(--red-light);color:var(--red);
-  font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;
-  border:2px solid #FECACA;border-radius:var(--r-sm);cursor:pointer;
-  transition:background .15s,transform .15s;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.btn-no:hover{background:#FECACA;transform:translateY(-1px)}
-.btn-no:disabled{opacity:.6;cursor:not-allowed;transform:none}
-
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
-  background:var(--gray-800);color:#fff;padding:12px 22px;border-radius:var(--r-sm);
-  font-size:.88rem;font-weight:800;box-shadow:var(--sh-lg);z-index:9999;
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
-  display:flex;align-items:center;gap:8px;
-}
+.btn-no{flex:1;padding:11px;background:var(--red-light);color:var(--red);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;border:2px solid #FECACA;border-radius:var(--r-sm);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-no:hover{background:#FECACA}
+.btn-no:disabled{opacity:.6;cursor:not-allowed}
+.user-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm)}
+.user-table th{background:var(--gray-50);font-size:.72rem;font-weight:900;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:2px solid var(--gray-100)}
+.user-table td{padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:.84rem;font-weight:600;color:var(--gray-800);vertical-align:middle}
+.user-table tr:last-child td{border-bottom:none}
+.user-table tr:hover td{background:var(--gray-50)}
+.role-badge{font-size:.68rem;font-weight:900;padding:2px 8px;border-radius:999px;display:inline-block}
+.role-badge.PRO{background:var(--purple-light);color:var(--purple)}
+.role-badge.PLUS{background:var(--gold-light);color:var(--gold)}
+.role-badge.ADMIN{background:var(--orange-light);color:var(--orange)}
+.role-badge.USER{background:var(--gray-100);color:var(--gray-400)}
+.expiry-ok{color:var(--green-dark);font-size:.78rem;font-weight:700}
+.expiry-warn{color:#D97706;font-size:.78rem;font-weight:700}
+.expiry-expired{color:var(--red);font-size:.78rem;font-weight:700}
+.expiry-none{color:var(--gray-400);font-size:.78rem}
+.search-bar{display:flex;gap:10px;margin-bottom:14px}
+.search-input{flex:1;padding:9px 14px;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--purple)}
+.filter-select{padding:9px 12px;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:700;outline:none;cursor:pointer;color:var(--gray-600)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--gray-800);color:#fff;padding:12px 22px;border-radius:var(--r-sm);font-size:.88rem;font-weight:800;box-shadow:var(--sh-lg);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;display:flex;align-items:center;gap:8px}
 #toast.show{transform:translateX(-50%) translateY(0)}
 #toast.ok{background:#166534}
 #toast.err{background:var(--red)}
-
-/* ── MODAL ── */
-.modal-bg{
-  position:fixed;inset:0;background:#00000060;z-index:9000;
-  display:none;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(4px);
-}
+.modal-bg{position:fixed;inset:0;background:#00000060;z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-bg.open{display:flex}
-.modal{
-  background:var(--white);border-radius:var(--r-lg);padding:28px;
-  width:100%;max-width:400px;box-shadow:var(--sh-lg);animation:mIn .25s ease;
-}
+.modal{background:var(--white);border-radius:var(--r-lg);padding:28px;width:100%;max-width:420px;box-shadow:var(--sh-lg);animation:mIn .25s ease}
 @keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .modal h3{font-size:1.1rem;font-weight:900;margin-bottom:8px}
-.modal p{font-size:.87rem;color:var(--gray-600);font-weight:600;margin-bottom:18px;line-height:1.5}
-.modal textarea{
-  width:100%;min-height:80px;padding:12px;resize:vertical;margin-bottom:16px;
-  border:2.5px solid var(--gray-200);border-radius:var(--r-sm);
-  font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;outline:none;
-  transition:border-color .2s;
-}
-.modal textarea:focus{border-color:var(--red)}
-.modal-acts{display:flex;gap:10px}
+.modal p{font-size:.87rem;color:var(--gray-600);font-weight:600;margin-bottom:16px;line-height:1.5}
+.modal textarea{width:100%;min-height:80px;padding:12px;resize:vertical;margin-bottom:16px;border:2.5px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;outline:none}
+.modal-field{margin-bottom:12px}
+.modal-field label{font-size:.74rem;font-weight:800;color:var(--gray-600);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.modal-field input,.modal-field select{width:100%;padding:9px 12px;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;outline:none;color:#1A1A1A}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--purple)}
+.modal-acts{display:flex;gap:10px;margin-top:4px}
 .m-cancel{flex:1;padding:11px;background:var(--gray-100);border:2px solid var(--gray-200);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:800;color:var(--gray-600);cursor:pointer}
 .m-reject{flex:1;padding:11px;background:var(--red);border:none;border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;color:#fff;cursor:pointer}
-
-/* ── SETUP GUIDE ── */
-.setup-card{
-  background:var(--white);border-radius:var(--r);padding:20px 22px;
-  border:2px solid var(--green-light);margin-bottom:24px;
-}
-.setup-card h3{font-size:.95rem;font-weight:900;color:var(--green-dark);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.setup-steps{display:flex;flex-direction:column;gap:8px}
-.setup-step{display:flex;align-items:flex-start;gap:10px;font-size:.84rem;font-weight:700;color:var(--gray-600)}
-.step-num{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.step-code{font-family:'JetBrains Mono',monospace;background:var(--gray-100);padding:2px 8px;border-radius:6px;font-size:.8rem;color:var(--blue)}
-.setup-close{float:right;background:none;border:none;cursor:pointer;font-size:.85rem;color:var(--gray-400);font-weight:700}
-
-/* ── SKELETON ── */
+.m-purple{flex:1;padding:11px;background:var(--purple);border:none;border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;color:#fff;cursor:pointer}
+.m-purple:disabled{opacity:.6;cursor:not-allowed}
 .skeleton{background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-200) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:var(--r);height:120px;margin-bottom:14px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -259,107 +170,60 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
 </div>
 
-<!-- ══ APP ══ -->
 <div id="appScreen">
   <div class="topbar">
     <div class="topbar-logo">
       <span class="frog">🐸</span>
-      <h2>Lingo<span>Cóc</span> <span style="font-size:.9rem;color:var(--gray-400)">Admin</span></h2>
+      <h2>Lingo<span>Cóc</span> <span style="font-size:.85rem;color:var(--gray-400)">Admin</span></h2>
     </div>
     <div class="topbar-right">
       <span class="admin-badge">👑 ADMIN</span>
       <span class="auto-badge"><span class="auto-dot"></span> SePay AUTO</span>
-      <button class="logout-btn" onclick="doLogout()">Đăng xuất</button>
+      <button class="topbar-btn purple" onclick="openSetRole()">🔑 Cấp Role</button>
+      <button class="topbar-btn" onclick="doLogout()">Đăng xuất</button>
     </div>
   </div>
-
   <div class="main">
-
-    <!-- Setup guide - ẩn sau khi đọc -->
-    <div class="setup-card" id="setupGuide">
-      <button class="setup-close" onclick="document.getElementById('setupGuide').style.display='none'">✕ Ẩn</button>
-      <h3>🤖 Hướng dẫn kích hoạt tự động duyệt (SePay)</h3>
-      <div class="setup-steps">
-        <div class="setup-step"><span class="step-num">1</span><span>Đăng ký miễn phí tại <strong>sepay.vn</strong> → Kết nối tài khoản ngân hàng</span></div>
-        <div class="setup-step"><span class="step-num">2</span><span>Cài ngrok: <span class="step-code">ngrok http 8080</span> → Copy URL dạng <span class="step-code">https://abc.ngrok.io</span></span></div>
-        <div class="setup-step"><span class="step-num">3</span><span>SePay Dashboard → Webhook → URL: <span class="step-code">https://abc.ngrok.io/api/payment/webhook/sepay</span></span></div>
-        <div class="setup-step"><span class="step-num">4</span><span>Copy API Key của SePay → dán vào <strong>application.yml</strong>: <span class="step-code">sepay.webhook-secret: YOUR_KEY</span></span></div>
-        <div class="setup-step"><span class="step-num">5</span><span>User chuyển khoản đúng nội dung mã đơn hàng → hệ thống tự duyệt trong vài giây! ✅</span></div>
-      </div>
-    </div>
-
-    <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card s-pending">
-        <div class="emoji">⏳</div>
-        <div class="lbl">Chờ duyệt</div>
-        <div class="val" id="sPending">—</div>
-      </div>
-      <div class="stat-card s-confirmed">
-        <div class="emoji">✅</div>
-        <div class="lbl">Đã xác nhận</div>
-        <div class="val" id="sConfirmed">—</div>
-      </div>
-      <div class="stat-card s-revenue">
-        <div class="emoji">💰</div>
-        <div class="lbl">Doanh thu</div>
-        <div class="val" id="sRevenue">—</div>
-      </div>
-      <div class="stat-card s-total">
-        <div class="emoji">📋</div>
-        <div class="lbl">Tổng đơn</div>
-        <div class="val" id="sTotal">—</div>
-      </div>
-      <div class="stat-card" style="border-left:4px solid #7C3AED">
-        <div class="emoji">👥</div>
-        <div class="lbl">Tổng user</div>
-        <div class="val" id="sTotalUsers" style="color:#7C3AED">—</div>
-      </div>
-      <div class="stat-card" style="border-left:4px solid #059669">
-        <div class="emoji">📅</div>
-        <div class="lbl">Học hôm nay</div>
-        <div class="val" id="sActiveToday" style="color:#059669">—</div>
-      </div>
-      <div class="stat-card" style="border-left:4px solid #D97706">
-        <div class="emoji">📖</div>
-        <div class="lbl">Tổng từ đã học</div>
-        <div class="val" id="sTotalWords" style="color:#D97706">—</div>
-      </div>
+      <div class="stat-card s-pending"><div class="emoji">⏳</div><div class="lbl">Chờ duyệt</div><div class="val" id="sPending">—</div></div>
+      <div class="stat-card s-confirmed"><div class="emoji">✅</div><div class="lbl">Đã xác nhận</div><div class="val" id="sConfirmed">—</div></div>
+      <div class="stat-card s-revenue"><div class="emoji">💰</div><div class="lbl">Doanh thu</div><div class="val" id="sRevenue">—</div></div>
+      <div class="stat-card s-total"><div class="emoji">📋</div><div class="lbl">Tổng đơn</div><div class="val" id="sTotal">—</div></div>
+      <div class="stat-card s-users"><div class="emoji">👥</div><div class="lbl">Tổng users</div><div class="val" id="sTotalUsers">—</div></div>
+      <div class="stat-card s-pro"><div class="emoji">👑</div><div class="lbl">PRO</div><div class="val" id="sProUsers">—</div></div>
+      <div class="stat-card s-plus"><div class="emoji">🥈</div><div class="lbl">PLUS</div><div class="val" id="sPlusUsers">—</div></div>
     </div>
-
-    <!-- Top learners + League distribution -->
-    <div id="adminExtStats" style="display:none;margin-bottom:24px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e5e7eb">
-          <div style="font-weight:800;font-size:.9rem;color:#374151;margin-bottom:12px">🏆 Top 5 học nhiều nhất</div>
-          <div id="topLearnersTable"></div>
-        </div>
-        <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e5e7eb">
-          <div style="font-weight:800;font-size:.9rem;color:#374151;margin-bottom:12px">🏅 Phân bổ League</div>
-          <div id="leagueDistTable"></div>
-          <div style="margin-top:12px;font-size:.78rem;color:#6B7280">
-            👑 PRO: <span id="sProUsers">—</span> · ⭐ PLUS: <span id="sPlusUsers">—</span> · 🆓 Free: <span id="sFreeUsers">—</span>
-          </div>
-        </div>
-      </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabPayments" onclick="switchTab('Payments')">⏳ Đơn chờ duyệt</button>
+      <button class="tab-btn" id="tabUsers" onclick="switchTab('Users')">👥 Quản lý Users</button>
     </div>
-
-    <!-- Pending list -->
-    <div class="section-hd">
-      <div class="section-title">
-        ⏳ Đơn hàng chờ duyệt thủ công
-        <span class="badge-count" id="pendingCnt">0</span>
+    <div id="tabContentPayments">
+      <div class="section-hd">
+        <div class="section-title">Đơn hàng chờ duyệt thủ công <span class="badge-count" id="pendingCnt">0</span></div>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadData()"><span class="spin-icon">🔄</span> Làm mới</button>
       </div>
-      <button class="refresh-btn" id="refreshBtn" onclick="loadData()">
-        <span class="spin-icon">🔄</span> Làm mới
-      </button>
+      <div id="pendingList"><div class="skeleton"></div><div class="skeleton"></div></div>
     </div>
-    <div id="pendingList"><div class="skeleton"></div><div class="skeleton"></div></div>
-
+    <div id="tabContentUsers" style="display:none">
+      <div class="section-hd">
+        <div class="section-title">Danh sách Users</div>
+        <button class="refresh-btn" id="refreshUsersBtn" onclick="loadUsers()"><span class="spin-icon">🔄</span> Làm mới</button>
+      </div>
+      <div class="search-bar">
+        <input class="search-input" id="userSearch" placeholder="🔍 Tìm username, email, tên..." oninput="filterUsers()">
+        <select class="filter-select" id="userRoleFilter" onchange="filterUsers()">
+          <option value="">Tất cả role</option>
+          <option value="PRO">👑 PRO</option>
+          <option value="PLUS">🥈 PLUS</option>
+          <option value="USER">👤 USER</option>
+          <option value="ADMIN">🔧 ADMIN</option>
+        </select>
+      </div>
+      <div id="userTableWrap"><div class="skeleton" style="height:200px"></div></div>
+    </div>
   </div>
 </div>
 
-<!-- ══ REJECT MODAL ══ -->
 <div class="modal-bg" id="rejectModal" onclick="if(event.target===this)closeReject()">
   <div class="modal">
     <h3>❌ Từ chối đơn hàng</h3>
@@ -367,7 +231,40 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <textarea id="rejectReason" placeholder="VD: Mã giao dịch không hợp lệ, số tiền không khớp..."></textarea>
     <div class="modal-acts">
       <button class="m-cancel" onclick="closeReject()">Huỷ</button>
-      <button class="m-reject" id="rejectConfirmBtn" onclick="confirmReject()">Xác nhận từ chối</button>
+      <button class="m-reject" id="rejectConfirmBtn" onclick="doReject()">Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="setRoleModal" onclick="if(event.target===this)closeSetRole()">
+  <div class="modal">
+    <h3>🔑 Cấp / Đổi Role</h3>
+    <p>Cập nhật role và ngày hết hạn cho user.</p>
+    <div class="modal-field">
+      <label>Username</label>
+      <input id="srUsername" placeholder="Nhập username">
+    </div>
+    <div class="modal-field">
+      <label>Role</label>
+      <select id="srRole">
+        <option value="PLUS">🥈 PLUS</option>
+        <option value="PRO" selected>👑 PRO</option>
+        <option value="USER">👤 USER (hủy gói)</option>
+        <option value="ADMIN">🔧 ADMIN</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Thời hạn</label>
+      <select id="srMonths">
+        <option value="3">3 tháng</option>
+        <option value="12">12 tháng (1 năm)</option>
+        <option value="1">1 tháng</option>
+        <option value="0">Không đặt hạn (Vĩnh viễn)</option>
+      </select>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeSetRole()">Huỷ</button>
+      <button class="m-purple" id="setRoleBtn" onclick="doSetRole()">✅ Xác nhận</button>
     </div>
   </div>
 </div>
@@ -379,62 +276,67 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 const BE = '';
 let token = localStorage.getItem('adminToken') || '';
 let rejectId = null;
+let allUsers = [];
 
-/* ── Helpers ── */
-function toast(msg, type='', dur=3000){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'show ' + type;
-  clearTimeout(t._t); t._t = setTimeout(() => t.className = '', dur);
+function toast(msg, type, dur){
+  dur = dur || 3500;
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + (type||'');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className = ''; }, dur);
 }
 function fmt(n){ return Number(n).toLocaleString('vi-VN') + 'đ'; }
 function fmtDate(s){
   if(!s) return '—';
-  const d = new Date(s);
+  var d = new Date(s);
   return d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
+function fmtExpiry(s){
+  if(!s) return '<span class="expiry-none">Vĩnh viễn</span>';
+  var d = new Date(s);
+  var days = Math.ceil((d - new Date()) / 86400000);
+  var dateStr = d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  if(days <= 0)  return '<span class="expiry-expired">⚠️ Hết hạn (' + dateStr + ')</span>';
+  if(days <= 14) return '<span class="expiry-warn">🟡 ' + days + ' ngày (' + dateStr + ')</span>';
+  return '<span class="expiry-ok">✅ ' + days + ' ngày (' + dateStr + ')</span>';
+}
 
-async function api(path, method='GET', body){
-  const r = await fetch(BE + path, {
-    method,
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body: body ? JSON.stringify(body) : undefined
-  });
-  const d = await r.json();
-  if(!r.ok) throw new Error(d.message || 'Lỗi ' + r.status);
+async function api(path, method, body){
+  method = method || 'GET';
+  var opts = { method: method, headers: {'Content-Type':'application/json','Authorization':'Bearer '+token} };
+  if(body) opts.body = JSON.stringify(body);
+  var r = await fetch(BE + path, opts);
+  var d = await r.json();
+  if(!r.ok) throw new Error(d.message || ('Lỗi ' + r.status));
   return d;
 }
 
-/* ── Login ── */
+function switchTab(name){
+  ['Payments','Users'].forEach(function(t){
+    document.getElementById('tab'+t).classList.toggle('active', t===name);
+    document.getElementById('tabContent'+t).style.display = t===name ? '' : 'none';
+  });
+  if(name === 'Users') loadUsers();
+}
+
 async function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const alertEl = document.getElementById('loginAlert');
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value;
+  var alertEl = document.getElementById('loginAlert');
   alertEl.classList.remove('show');
-
   if(!u || !p){ toast('⚠️ Nhập đầy đủ thông tin'); return; }
-  const btn = document.getElementById('loginBtn');
+  var btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = '⏳ Đang đăng nhập...';
-
   try {
-    const r = await fetch(BE + '/api/auth/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({username:u, password:p})
-    });
-    const j = await r.json();
+    var r = await fetch(BE + '/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
+    var j = await r.json();
     if(!r.ok) throw new Error(j.message || 'Sai tài khoản/mật khẩu');
-
-    const tok = j.data?.accessToken || j.data?.token;
+    var tok = (j.data && (j.data.accessToken || j.data.token));
     if(!tok) throw new Error('Không lấy được token');
-
-    // Decode JWT để kiểm tra role
-    const payload = JSON.parse(atob(tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-    const role = payload.role || '';
-    if(!role.includes('ADMIN')) throw new Error('Tài khoản này không có quyền Admin');
-
+    var payload = JSON.parse(atob(tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if(!(payload.role||'').includes('ADMIN')) throw new Error('Tài khoản này không có quyền Admin');
     token = tok;
     localStorage.setItem('adminToken', token);
     switchToApp();
-
   } catch(e) {
     document.getElementById('loginMsg').textContent = e.message;
     alertEl.classList.add('show');
@@ -442,217 +344,202 @@ async function doLogin(){
     btn.disabled = false; btn.textContent = '🚀 Đăng nhập';
   }
 }
-
-document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
 
 function doLogout(){
-  localStorage.removeItem('adminToken');
-  token = '';
+  localStorage.removeItem('adminToken'); token = '';
   document.getElementById('appScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   toast('👋 Đã đăng xuất');
 }
 
-/* ── Switch ── */
 function switchToApp(){
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
   loadData();
 }
 
-/* ── Load stats + pending list ── */
 async function loadData(){
-  const btn = document.getElementById('refreshBtn');
+  var btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-
-  // Load payment stats
   try {
-    const sd = await api('/api/payment/admin/stats');
-    const s = sd.data;
-    document.getElementById('sPending').textContent   = s.pending;
-    document.getElementById('sConfirmed').textContent = s.confirmed;
-    document.getElementById('sRevenue').textContent   = fmt(s.totalRevenue);
-    document.getElementById('sTotal').textContent     = s.totalOrders;
-  } catch(e) { console.warn('Payment stats error:', e.message); }
-
-  // Load user stats (admin dashboard mở rộng)
+    var sd = await api('/api/payment/admin/stats');
+    var s = sd.data;
+    document.getElementById('sPending').textContent   = s.pending   != null ? s.pending   : '—';
+    document.getElementById('sConfirmed').textContent = s.confirmed != null ? s.confirmed : '—';
+    document.getElementById('sRevenue').textContent   = fmt(s.totalRevenue || 0);
+    document.getElementById('sTotal').textContent     = s.totalOrders != null ? s.totalOrders : '—';
+  } catch(e){ console.warn('Payment stats:', e.message); }
   try {
-    const ud = await api('/api/user/admin/stats');
-    const u = ud.data;
-    document.getElementById('sTotalUsers').textContent  = u.totalUsers || '—';
-    document.getElementById('sActiveToday').textContent = u.activeToday || '0';
-    document.getElementById('sTotalWords').textContent  = (u.totalWords || 0).toLocaleString('vi-VN');
-    document.getElementById('sProUsers').textContent    = u.proUsers || 0;
-    document.getElementById('sPlusUsers').textContent   = u.plusUsers || 0;
-    document.getElementById('sFreeUsers').textContent   = u.freeUsers || 0;
+    var ud = await api('/api/user/admin/stats');
+    var u = ud.data;
+    document.getElementById('sTotalUsers').textContent = u.totalUsers != null ? u.totalUsers : '—';
+    document.getElementById('sProUsers').textContent   = u.proUsers  != null ? u.proUsers   : '—';
+    document.getElementById('sPlusUsers').textContent  = u.plusUsers != null ? u.plusUsers  : '—';
+  } catch(e){ console.warn('User stats:', e.message); }
 
-    // Top learners
-    const top = u.topLearners || [];
-    document.getElementById('topLearnersTable').innerHTML = top.map((l,i) =>
-      `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f3f4f6">
-        <span style="font-size:1rem">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'👤'}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:.82rem;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.fullName}</div>
-          <div style="font-size:.72rem;color:#6B7280">⭐ ${(l.xp||0).toLocaleString('vi-VN')} XP · 📖 ${l.wordsLearned||0} từ · 🔥 ${l.streak||0} ngày</div>
-        </div>
-        <span style="font-size:.7rem;padding:2px 7px;border-radius:99px;font-weight:800;background:${l.role==='PRO'?'#EDE9FE':l.role==='PLUS'?'#FEF9C3':'#F3F4F6'};color:${l.role==='PRO'?'#7C3AED':l.role==='PLUS'?'#B45309':'#6B7280'}">${l.role}</span>
-      </div>`
-    ).join('') || '<div style="color:#9CA3AF;font-size:.82rem">Chưa có dữ liệu</div>';
-
-    // League distribution
-    const leagues = u.leagueDist || {};
-    const lEntries = [['💎','DIAMOND','#7C3AED'],['🥇','GOLD','#D97706'],['🥈','SILVER','#6B7280'],['🥉','BRONZE','#92400E']];
-    document.getElementById('leagueDistTable').innerHTML = lEntries.map(([ico,name,color]) =>
-      `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0">
-        <span style="font-size:.85rem">${ico} ${name}</span>
-        <span style="font-weight:800;color:${color}">${leagues[name]||0} user</span>
-      </div>`
-    ).join('');
-
-    document.getElementById('adminExtStats').style.display = 'block';
-  } catch(e) { console.warn('User stats error:', e.message); }
-
-  // Load pending list
-  const list = document.getElementById('pendingList');
+  var list = document.getElementById('pendingList');
   list.innerHTML = '<div class="skeleton"></div>';
   try {
-    const pd = await api('/api/payment/admin/pending');
-    const items = pd.data || [];
+    var pd = await api('/api/payment/admin/pending');
+    var items = pd.data || [];
     document.getElementById('pendingCnt').textContent = items.length;
-
     if(items.length === 0){
-      list.innerHTML = `
-        <div class="empty-state">
-          <div class="ico">🎉</div>
-          <p>Không có đơn nào chờ duyệt thủ công!<br>
-          <span style="font-size:.8rem;color:var(--green-dark);font-weight:700">
-            ✅ SePay đang tự động xử lý khi có tiền vào
-          </span></p>
-        </div>`;
+      list.innerHTML = '<div class="empty-state"><div class="ico">🎉</div><p>Không có đơn nào chờ duyệt thủ công!<br><span style="font-size:.8rem;color:var(--green-dark);font-weight:700">✅ SePay đang tự động xử lý</span></p></div>';
     } else {
       list.innerHTML = '<div class="pay-list" id="cardWrap"></div>';
-      const wrap = document.getElementById('cardWrap');
-      items.forEach(item => wrap.appendChild(buildCard(item)));
+      var wrap = document.getElementById('cardWrap');
+      items.forEach(function(item){ wrap.appendChild(buildCard(item)); });
     }
-  } catch(e) {
-    const msg = (e.message.includes('fetch') || e.message.includes('connect'))
-      ? `Không kết nối được Backend (localhost:8080).<br>Kiểm tra Spring Boot đang chạy chưa?`
-      : e.message;
-    list.innerHTML = `<div class="empty-state"><div class="ico">⚠️</div><p>${msg}</p></div>`;
-  } finally {
-    btn.classList.remove('spinning');
-  }
+  } catch(e){
+    list.innerHTML = '<div class="empty-state"><div class="ico">⚠️</div><p>' + e.message + '</p></div>';
+  } finally { btn.classList.remove('spinning'); }
 }
 
 function buildCard(item){
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.className = 'pay-card'; div.id = 'card-' + item.id;
-  const init = (item.username||'?').charAt(0).toUpperCase();
-  const hasTxn = item.transactionCode && item.transactionCode.trim();
-  div.innerHTML = `
-    <div class="pay-card-top">
-      <div class="user-info">
-        <div class="avatar">${init}</div>
-        <div>
-          <div class="u-name">@${item.username}</div>
-          <div class="u-email">${item.email||'—'}</div>
-        </div>
-      </div>
-      <span class="plan-chip">👑 ${item.planName}</span>
-    </div>
-    <div class="info-grid">
-      <div class="info-item">
-        <div class="lbl">Mã đơn hàng</div>
-        <div class="val code">${item.orderCode}</div>
-      </div>
-      <div class="info-item">
-        <div class="lbl">Số tiền</div>
-        <div class="val amount">${fmt(item.amount)}</div>
-      </div>
-      <div class="info-item">
-        <div class="lbl">Mã giao dịch</div>
-        <div class="val ${hasTxn ? 'txn' : 'no-txn'}">${hasTxn ? item.transactionCode : '⚠️ Chưa gửi'}</div>
-      </div>
-      <div class="info-item">
-        <div class="lbl">Tạo lúc</div>
-        <div class="val">${fmtDate(item.createdAt)}</div>
-      </div>
-      ${item.note ? `<div class="info-item" style="grid-column:1/-1"><div class="lbl">Ghi chú</div><div class="val">${item.note}</div></div>` : ''}
-    </div>
-    <div class="card-actions">
-      <button class="btn-ok" onclick="confirmPayment(${item.id}, ${item.amount})">✅ Xác nhận PRO</button>
-      <button class="btn-no" onclick="openReject(${item.id})">❌ Từ chối</button>
-    </div>
-  `;
+  var init   = (item.username||'?').charAt(0).toUpperCase();
+  var hasTxn = item.transactionCode && item.transactionCode.trim();
+  var isPlus = (item.planName||'').toLowerCase().includes('plus');
+  var tier   = isPlus ? 'PLUS' : 'PRO';
+  div.innerHTML =
+    '<div class="pay-card-top">' +
+      '<div class="user-info"><div class="avatar">' + init + '</div>' +
+        '<div><div class="u-name">@' + item.username + '</div><div class="u-email">' + (item.email||'—') + '</div></div></div>' +
+      '<span class="plan-chip ' + (isPlus?'plus':'') + '">' + (isPlus?'🥈':'👑') + ' ' + item.planName + '</span>' +
+    '</div>' +
+    '<div class="info-grid">' +
+      '<div class="info-item"><div class="lbl">Mã đơn hàng</div><div class="val code">' + item.orderCode + '</div></div>' +
+      '<div class="info-item"><div class="lbl">Số tiền</div><div class="val amount">' + fmt(item.amount) + '</div></div>' +
+      '<div class="info-item"><div class="lbl">Mã giao dịch</div><div class="val ' + (hasTxn?'txn':'no-txn') + '">' + (hasTxn?item.transactionCode:'⚠️ Chưa gửi') + '</div></div>' +
+      '<div class="info-item"><div class="lbl">Tạo lúc</div><div class="val">' + fmtDate(item.createdAt) + '</div></div>' +
+      (item.note ? '<div class="info-item" style="grid-column:1/-1"><div class="lbl">Ghi chú</div><div class="val">' + item.note + '</div></div>' : '') +
+    '</div>' +
+    '<div class="card-actions">' +
+      '<button class="btn-ok" id="okBtn-' + item.id + '" onclick="confirmPayment(' + item.id + ',' + item.amount + ',\'' + tier + '\')">✅ Xác nhận ' + tier + '</button>' +
+      '<button class="btn-no" id="noBtn-' + item.id + '" onclick="openReject(' + item.id + ')">❌ Từ chối</button>' +
+    '</div>';
   return div;
 }
 
-/* ── Confirm ── */
-async function confirmPayment(id, amount){
-  const card = document.getElementById('card-' + id);
-  const btns = card.querySelectorAll('button');
-  btns.forEach(b => b.disabled = true);
-  card.querySelector('.btn-ok').textContent = '⏳ Đang xử lý...';
+async function confirmPayment(id, amount, tier){
+  var okBtn = document.getElementById('okBtn-'+id);
+  var noBtn = document.getElementById('noBtn-'+id);
+  if(okBtn){ okBtn.disabled = true; okBtn.textContent = '⏳ Đang xử lý...'; }
+  if(noBtn) noBtn.disabled = true;
   try {
-    await api(`/api/payment/admin/confirm/${id}`, 'POST');
-    card.style.transition = 'all .4s';
-    card.style.opacity = '0'; card.style.transform = 'scale(.95)';
-    setTimeout(() => { card.remove(); refreshCounts(-1, amount); }, 400);
-    toast('✅ Xác nhận thành công! User đã nâng cấp PRO 🎉', 'ok', 4000);
-  } catch(e) {
-    btns.forEach(b => b.disabled = false);
-    card.querySelector('.btn-ok').textContent = '✅ Xác nhận PRO';
-    toast('❌ ' + e.message, 'err');
+    await api('/api/payment/admin/confirm/' + id, 'POST');
+    var card = document.getElementById('card-'+id);
+    if(card){ card.style.transition='all .4s'; card.style.opacity='0'; card.style.transform='scale(.95)'; setTimeout(function(){ card.remove(); loadData(); }, 400); }
+    toast('✅ Xác nhận thành công! User đã nâng cấp ' + tier + ' 🎉', 'ok', 4000);
+  } catch(e){
+    if(okBtn){ okBtn.disabled=false; okBtn.textContent='✅ Xác nhận '+tier; }
+    if(noBtn) noBtn.disabled = false;
+    toast('❌ '+e.message, 'err');
   }
 }
 
-function refreshCounts(delta, amount){
-  // Update stats after confirm/reject
-  const pEl = document.getElementById('sPending');
-  const cEl = document.getElementById('sConfirmed');
-  const rEl = document.getElementById('sRevenue');
-  const cntEl = document.getElementById('pendingCnt');
-  const cur = parseInt(pEl.textContent) || 0;
-  const newVal = Math.max(0, cur + delta);
-  pEl.textContent = newVal; cntEl.textContent = newVal;
-  if(amount > 0 && cEl){
-    cEl.textContent = (parseInt(cEl.textContent)||0) + 1;
-    // Update revenue display
-    loadData(); // reload to get fresh stats
-  }
-}
+function openReject(id){ rejectId=id; document.getElementById('rejectReason').value=''; document.getElementById('rejectModal').classList.add('open'); }
+function closeReject(){ document.getElementById('rejectModal').classList.remove('open'); rejectId=null; }
 
-/* ── Reject ── */
-function openReject(id){ rejectId = id; document.getElementById('rejectReason').value = ''; document.getElementById('rejectModal').classList.add('open'); }
-function closeReject(){ document.getElementById('rejectModal').classList.remove('open'); rejectId = null; }
-
-async function confirmReject(){
+async function doReject(){
   if(!rejectId) return;
-  const id = rejectId;
-  const reason = document.getElementById('rejectReason').value.trim();
-  const btn = document.getElementById('rejectConfirmBtn');
+  var id = rejectId;
+  var reason = document.getElementById('rejectReason').value.trim();
+  var btn = document.getElementById('rejectConfirmBtn');
   btn.disabled = true; btn.textContent = '⏳...';
   try {
-    await api(`/api/payment/admin/reject/${id}`, 'POST', {reason});
+    await api('/api/payment/admin/reject/' + id, 'POST', {reason: reason});
     closeReject();
-    const card = document.getElementById('card-' + id);
-    if(card){ card.style.transition = 'all .4s'; card.style.opacity = '0'; setTimeout(() => { card.remove(); refreshCounts(-1, 0); }, 400); }
+    var card = document.getElementById('card-'+id);
+    if(card){ card.style.transition='all .4s'; card.style.opacity='0'; setTimeout(function(){ card.remove(); loadData(); }, 400); }
     toast('🗑️ Đã từ chối đơn hàng');
-  } catch(e) {
-    toast('❌ ' + e.message, 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Xác nhận từ chối';
-  }
+  } catch(e){ toast('❌ '+e.message, 'err'); }
+  finally { btn.disabled=false; btn.textContent='Xác nhận từ chối'; }
 }
 
-/* ── Auto-login if token valid ── */
+function openSetRole(username){
+  document.getElementById('srUsername').value = username || '';
+  document.getElementById('srRole').value = 'PRO';
+  document.getElementById('srMonths').value = '3';
+  document.getElementById('setRoleModal').classList.add('open');
+}
+function closeSetRole(){ document.getElementById('setRoleModal').classList.remove('open'); }
+
+async function doSetRole(){
+  var username = document.getElementById('srUsername').value.trim();
+  var role     = document.getElementById('srRole').value;
+  var months   = parseInt(document.getElementById('srMonths').value);
+  if(!username){ toast('❌ Nhập username!','err'); return; }
+  var btn = document.getElementById('setRoleBtn');
+  btn.disabled = true; btn.textContent = '⏳ Đang xử lý...';
+  try {
+    var res = await api('/api/user/admin/set-role', 'POST', {username:username, role:role, months:months});
+    var d = res.data;
+    var expiryStr = d.planExpiry
+      ? ('Hết hạn: ' + new Date(d.planExpiry).toLocaleDateString('vi-VN'))
+      : 'Vĩnh viễn';
+    toast('✅ @' + d.username + ' → ' + d.role + ' · ' + expiryStr, 'ok', 5000);
+    closeSetRole();
+    loadData();
+    if(document.getElementById('tabContentUsers').style.display !== 'none') loadUsers();
+  } catch(e){ toast('❌ '+e.message,'err'); }
+  finally { btn.disabled=false; btn.textContent='✅ Xác nhận'; }
+}
+
+async function loadUsers(){
+  var btn = document.getElementById('refreshUsersBtn');
+  if(btn) btn.classList.add('spinning');
+  var wrap = document.getElementById('userTableWrap');
+  wrap.innerHTML = '<div class="skeleton" style="height:200px"></div>';
+  try {
+    var res = await api('/api/user/admin/list?page=0&size=200');
+    allUsers = (res.data && res.data.items) || res.data || [];
+    renderUsers(allUsers);
+  } catch(e){
+    wrap.innerHTML = '<div class="empty-state"><div class="ico">⚠️</div><p>' + e.message + '</p></div>';
+  } finally { if(btn) btn.classList.remove('spinning'); }
+}
+
+function filterUsers(){
+  var q      = document.getElementById('userSearch').value.toLowerCase();
+  var filter = document.getElementById('userRoleFilter').value;
+  var filtered = allUsers.filter(function(u){
+    var matchQ = !q || (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q) || (u.fullName||'').toLowerCase().includes(q);
+    var matchR = !filter || u.role === filter;
+    return matchQ && matchR;
+  });
+  renderUsers(filtered);
+}
+
+function renderUsers(users){
+  var wrap = document.getElementById('userTableWrap');
+  if(!users.length){
+    wrap.innerHTML = '<div class="empty-state"><div class="ico">🔍</div><p>Không tìm thấy user nào</p></div>';
+    return;
+  }
+  var rows = users.map(function(u){
+    return '<tr>' +
+      '<td><strong>@' + u.username + '</strong>' + (u.fullName ? '<br><span style="font-size:.75rem;color:#9CA3AF">'+u.fullName+'</span>' : '') + '</td>' +
+      '<td style="font-size:.8rem">' + (u.email||'—') + '</td>' +
+      '<td><span class="role-badge ' + u.role + '">' + u.role + '</span></td>' +
+      '<td>' + fmtExpiry(u.planExpiry) + '</td>' +
+      '<td style="font-size:.82rem">' + (u.xp||0).toLocaleString('vi-VN') + '</td>' +
+      '<td style="font-size:.82rem">🔥 ' + (u.streak||0) + '</td>' +
+      '<td><button onclick="openSetRole(\'' + u.username + '\')" style="padding:5px 10px;background:var(--purple-light);color:var(--purple);border:none;border-radius:6px;font-weight:800;font-size:.75rem;cursor:pointer">🔑 Đổi role</button></td>' +
+    '</tr>';
+  }).join('');
+  wrap.innerHTML = '<div style="overflow-x:auto"><table class="user-table"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Hết hạn</th><th>XP</th><th>Streak</th><th>Thao tác</th></tr></thead><tbody>' + rows + '</tbody></table></div><div style="font-size:.76rem;color:#9CA3AF;margin-top:8px;text-align:right">Hiển thị ' + users.length + ' user</div>';
+}
+
 (function init(){
   if(!token) return;
   try {
-    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-    if(Date.now() < p.exp * 1000 && (p.role||'').includes('ADMIN')){ switchToApp(); return; }
+    var p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if(Date.now() < p.exp*1000 && (p.role||'').includes('ADMIN')){ switchToApp(); return; }
   } catch(e){}
-  localStorage.removeItem('adminToken'); token = '';
+  localStorage.removeItem('adminToken'); token='';
 })();
 </script>
 </body>
