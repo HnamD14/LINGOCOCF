@@ -2817,14 +2817,14 @@ async function syncStatsFromServer(){
         localStorage.setItem('lc_words', serverWords);
       }
       if(serverCorrect > 0){
-        const localCorrect = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+        const localCorrect = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
         if(serverCorrect > localCorrect){
           localStorage.setItem(uk(CORRECT_KEY), serverCorrect);
           localStorage.setItem('lc_correct', serverCorrect);
         }
       }
       if(serverTotal > 0){
-        const localTotal = Math.max(parseInt(localStorage.getItem('lc_total')||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+        const localTotal = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
         if(serverTotal > localTotal){
           localStorage.setItem(uk(TOTAL_KEY), serverTotal);
           localStorage.setItem('lc_total', serverTotal);
@@ -2975,9 +2975,9 @@ function getLevelUpMsg(lv){
 ════════════════════════════════════════════════ */
 
 function loadStats(){
-  const words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   parseInt(localStorage.getItem('lc_words')||'0'),   state.wordsLearned||0);
-  const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0'), state.correctAnswers||0);
-  const total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem('lc_total')||'0'),   state.totalAnswers||0);
+  const words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   state.wordsLearned||0);
+  const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), state.correctAnswers||0);
+  const total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   state.totalAnswers||0);
   updateStatsUI(words, correct, total);
   return { words, correct, total };
 }
@@ -2994,11 +2994,11 @@ function saveWordLearned_OLD(newWords){
 function saveQuizResult(isCorrect){
   // uk() key là nguồn chính (per-user); lc_ là shadow key
   const cBase = Math.max(
-    parseInt(localStorage.getItem('lc_correct')||'0'),
+    parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'),
     parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')
   );
   const tBase = Math.max(
-    parseInt(localStorage.getItem('lc_total')||'0'),
+    parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),
     parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')
   );
   const correct = cBase + (isCorrect ? 1 : 0);
@@ -3015,8 +3015,7 @@ function saveQuizResult(isCorrect){
 function saveWordLearned(newWords){
   // uk() key là nguồn chính (per-user), lc_ là shadow để đọc nhanh
   const cur = Math.max(
-    parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_words')||'0')
+    parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')
   );
   const updated = cur + newWords;
   localStorage.setItem(uk(WORDS_KEY), updated); // per-user key (nguồn chính)
@@ -3045,14 +3044,14 @@ function recordStats(wordsCount, correctCount, totalCount){
   // words
   if(wordsCount > 0) saveWordLearned(wordsCount);
   // correct / total
-  const cBase = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
-  const tBase = Math.max(parseInt(localStorage.getItem('lc_total')||'0'),   parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const cBase = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const tBase = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
   const newC = cBase + correctCount;
   const newT = tBase + totalCount;
   localStorage.setItem('lc_correct', newC);  localStorage.setItem(uk(CORRECT_KEY), newC);
   localStorage.setItem('lc_total',   newT);  localStorage.setItem(uk(TOTAL_KEY),   newT);
   // live-update profile dashboard
-  const _dw = document.getElementById('dashWords');    if(_dw) _dw.textContent = Math.max(parseInt(localStorage.getItem('lc_words')||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')).toLocaleString('vi-VN');
+  const _dw = document.getElementById('dashWords');    if(_dw) _dw.textContent = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')).toLocaleString('vi-VN');
   const _da = document.getElementById('dashAccuracy'); if(_da) _da.textContent = newT > 0 ? Math.round(newC/newT*100)+'%' : '—';
   // also push to server (non-blocking)
   try{ syncProgressToServer(); }catch(e){}
@@ -4603,10 +4602,10 @@ function syncHomeStats(){
   updateLevelUI(false);
   // ── Đồng thời cập nhật 4 stat cards ở tab Tôi ───────────────
   // uk() key = per-user (nguồn chính), lc_ = shadow fallback
-  const _words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),   parseInt(localStorage.getItem('lc_words')||'0'));
-  const _correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0'));
-  const _total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'),   parseInt(localStorage.getItem('lc_total')||'0'));
-  const _xp      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'), parseInt(localStorage.getItem('lc_xp')||'0'));
+  const _words   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
+  const _correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const _total   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const _xp      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'));
   const _g = id => document.getElementById(id);
   if(_g('dashTotalXP'))  _g('dashTotalXP').textContent  = _xp.toLocaleString('vi-VN');
   if(_g('dashWords'))    _g('dashWords').textContent    = _words.toLocaleString('vi-VN');
@@ -4822,9 +4821,9 @@ function showComplete(){
   document.getElementById('cs_xp').textContent       = '+' + xpEarned + ' XP';
 
   // Điền thống kê tích lũy
-  const totalWords   = Math.max(parseInt(localStorage.getItem('lc_words')||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
-  const totalCorrect = Math.max(parseInt(localStorage.getItem('lc_correct')||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
-  const totalTotal   = Math.max(parseInt(localStorage.getItem('lc_total')||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
+  const totalWords   = Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'));
+  const totalCorrect = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'));
+  const totalTotal   = Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'));
   const totalXP      = Math.max(state.xp, parseInt(localStorage.getItem(uk(XP_KEY))||'0'));
 
   const el = id => document.getElementById(id);
@@ -5249,6 +5248,8 @@ async function doLogin(){
       _autoLoginDone = true;
       // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
       localStorage.removeItem(CFG.USER_KEY);
+      // Xóa shadow keys lc_* không có prefix user để tránh lẫn data
+      ['lc_words','lc_correct','lc_total','lc_xp'].forEach(k => localStorage.removeItem(k));
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
@@ -5283,6 +5284,8 @@ async function doRegister(){
       _autoLoginDone = true;
       // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
       localStorage.removeItem(CFG.USER_KEY);
+      // Xóa shadow keys lc_* không có prefix user để tránh lẫn data
+      ['lc_words','lc_correct','lc_total','lc_xp'].forEach(k => localStorage.removeItem(k));
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
@@ -10076,9 +10079,9 @@ window.addEventListener('beforeunload', () => {
       body: JSON.stringify({
         xp:              state.xp,
         streak:          state.streak,
-        wordsLearned:    Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem('lc_words')||'0')),
-        correct:         Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0')),
-        total:           Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem('lc_total')||'0')),
+        wordsLearned:    Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')),
+        correct:         Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')),
+        total:           Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')),
         lastStudyDate:   localStorage.getItem(uk(LASTDAY_KEY)) || null,
         coins:           getCoins(),
         brokenStreakValue: brokenData ? brokenData.previousStreak : null,
@@ -10105,9 +10108,9 @@ async function syncProgressToServer(){
   const payload = {
     xp:           state.xp,
     streak:       state.streak,
-    wordsLearned: Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'), parseInt(localStorage.getItem('lc_words')||'0')),
-    correct:      Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), parseInt(localStorage.getItem('lc_correct')||'0')),
-    total:        Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0'), parseInt(localStorage.getItem('lc_total')||'0')),
+    wordsLearned: Math.max(parseInt(localStorage.getItem(uk(WORDS_KEY))||'0')),
+    correct:      Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0')),
+    total:        Math.max(parseInt(localStorage.getItem(uk(TOTAL_KEY))||'0')),
     lastStudyDate: localStorage.getItem(uk(LASTDAY_KEY)) || null,
     coins: getCoins(),
     // Gửi recovery data để BE có thể validate khi client gọi /streak/recover
@@ -10918,12 +10921,10 @@ function loadFullDashboard(){
   // ── Stat cards ──────────────────────────────────
   const xp = Math.max(
     parseInt(localStorage.getItem(uk(XP_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_xp')||'0'),
     state.xp||0
   );
   const words = Math.max(
     parseInt(localStorage.getItem(uk(WORDS_KEY))||'0'),
-    parseInt(localStorage.getItem('lc_words')||'0'),
     state.wordsLearned||0
   );
   const correct = Math.max(parseInt(localStorage.getItem(uk(CORRECT_KEY))||'0'), state.correctAnswers||0);
@@ -11306,10 +11307,10 @@ function getAchTier(id){ const d=_loadAch(); return d[id]!==undefined?d[id]:-1; 
 
 function checkAchievements(){
   if(!state.userId) return; // Fix: tránh re-show thành tựu khi chưa login xong
-  const words  =Math.max(parseInt(localStorage.getItem('lc_words')||'0'),parseInt(localStorage.getItem(uk('lingococ_words'))||'0'),state.wordsLearned||0);
-  const correct=Math.max(parseInt(localStorage.getItem('lc_correct')||'0'),parseInt(localStorage.getItem(uk('lingococ_correct'))||'0'),state.correctAnswers||0);
-  const total  =Math.max(parseInt(localStorage.getItem('lc_total')||'0'),parseInt(localStorage.getItem(uk('lingococ_total'))||'0'),state.totalAnswers||0);
-  const xp     =Math.max(state.xp||0,parseInt(localStorage.getItem('lc_xp')||'0'));
+  const words  = Math.max(parseInt(localStorage.getItem(uk('lingococ_words'))  ||'0'), state.wordsLearned  ||0);
+  const correct= Math.max(parseInt(localStorage.getItem(uk('lingococ_correct'))||'0'), state.correctAnswers||0);
+  const total  = Math.max(parseInt(localStorage.getItem(uk('lingococ_total'))  ||'0'), state.totalAnswers  ||0);
+  const xp     = Math.max(state.xp||0, parseInt(localStorage.getItem(uk('lingococ_xp'))||'0'));
   const streak =state.streak||0;
   const dailyCount=parseInt(localStorage.getItem(uk(DAILY_COUNT_KEY))||'0');
   const strokes   =parseInt(localStorage.getItem(uk(STROKE_COUNT_KEY))||'0');
