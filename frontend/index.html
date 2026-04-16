@@ -3082,7 +3082,7 @@ function isProExpired(){
   return new Date() > exp;
 }
 
-function showUpgradeOrRenew(userRole){
+function showUpgradeOrRenew(userRole){\
   const upgradeCard  = document.getElementById('upgradeCard');
   const upgradeToPro = document.getElementById('upgradeToPro');
   const renewCard    = document.getElementById('renewCard');
@@ -3099,51 +3099,63 @@ function showUpgradeOrRenew(userRole){
     return;
   }
 
+  const expiry   = getProExpiry();
+  const daysLeft = expiry ? Math.ceil((expiry - new Date()) / 86400000) : null;
+  const expStr   = expiry ? expiry.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}) : null;
+
+  // ── Hàm hiển thị dòng hết hạn dưới email ──
+  function _showExpiryLine(label){
+    const emailEl = document.getElementById('profileEmail');
+    if(!emailEl) return;
+    let line = document.getElementById('proExpiryLine');
+    if(!line){
+      line = document.createElement('div');
+      line.id = 'proExpiryLine';
+      line.style.cssText = 'font-size:.72rem;font-weight:800;margin-top:4px;display:flex;align-items:center;gap:5px';
+      emailEl.insertAdjacentElement('afterend', line);
+    }
+    if(daysLeft <= 0){
+      line.innerHTML = `<span style="color:#fca5a5">⚠️ ${label} đã hết hạn! Vui lòng gia hạn.</span>`;
+    } else if(daysLeft <= 7){
+      line.innerHTML = `<span style="color:#fca5a5">🔴 ${label} · còn <strong>${daysLeft} ngày</strong> · Hết hạn ${expStr}</span>`;
+    } else if(daysLeft <= 30){
+      line.innerHTML = `<span style="color:#fcd34d">🟡 ${label} · còn <strong>${daysLeft} ngày</strong> · Hết hạn ${expStr}</span>`;
+    } else {
+      line.innerHTML = `<span style="color:#6ee7b7">✅ ${label} · còn <strong>${daysLeft} ngày</strong> · Hết hạn ${expStr}</span>`;
+    }
+  }
+
+  // ── Hàm hiển thị renew card ──
+  function _showRenewCard(price3m, price1y, label, feature){
+    renewCard.style.display = '';
+    document.getElementById('renewPrice3M').textContent = price3m;
+    document.getElementById('renewPrice1Y').textContent = price1y;
+    if(daysLeft <= 0){
+      renewTitle.textContent = `⚠️ ${label} đã hết hạn!`;
+      renewDesc.innerHTML    = `Gia hạn để tiếp tục dùng ${feature}.`;
+      renewDesc.style.color  = '#fca5a5';
+    } else if(daysLeft <= 14){
+      renewTitle.textContent = `⏳ ${label} còn ${daysLeft} ngày`;
+      renewDesc.innerHTML    = 'Gia hạn sớm để không bị gián đoạn!';
+      renewDesc.style.color  = '#fcd34d';
+    }
+  }
+
   if(userRole === 'PLUS'){
-    // Hiện card nâng lên PRO + kiểm tra gia hạn PLUS
     upgradeToPro.style.display = '';
     state.currentTier = 'PLUS';
-    const expiry = getProExpiry();
     if(expiry){
-      const daysLeft = Math.ceil((expiry - new Date()) / 86400000);
-      if(daysLeft <= 14){
-        renewCard.style.display = '';
-        document.getElementById('renewPrice3M').textContent = '99k';
-        document.getElementById('renewPrice1Y').textContent = '199k';
-        renewTitle.textContent = daysLeft <= 0 ? '⚠️ PLUS đã hết hạn!' : `⏳ PLUS còn ${daysLeft} ngày`;
-        renewDesc.innerHTML    = daysLeft <= 0 ? 'Gia hạn để tiếp tục dùng HSK2.' : 'Gia hạn sớm để không bị gián đoạn!';
-        renewDesc.style.color  = daysLeft <= 0 ? '#fca5a5' : '#fcd34d';
-      }
+      _showExpiryLine('PLUS');
+      if(daysLeft <= 14) _showRenewCard('99k','199k','PLUS','HSK2');
     }
     return;
   }
 
   if(userRole === 'PRO' || userRole === 'ADMIN'){
     state.currentTier = 'PRO';
-    const expiry = getProExpiry();
-    if(!expiry){ return; } // duyệt thủ công không có expiry → không hiện gì
-    const daysLeft = Math.ceil((expiry - new Date()) / 86400000);
-    if(daysLeft <= 14){
-      renewCard.style.display = '';
-      document.getElementById('renewPrice3M').textContent = '199k';
-      document.getElementById('renewPrice1Y').textContent = '399k';
-      renewTitle.textContent = daysLeft <= 0 ? '⚠️ PRO đã hết hạn!' : `⏳ PRO còn ${daysLeft} ngày`;
-      renewDesc.innerHTML    = daysLeft <= 0 ? 'Gia hạn để tiếp tục dùng HSK2 + HSK3.' : 'Gia hạn sớm để không bị gián đoạn!';
-      renewDesc.style.color  = daysLeft <= 0 ? '#fca5a5' : '#fcd34d';
-    }
-    // Hiện ngày hết hạn dưới email
-    const emailEl = document.getElementById('profileEmail');
-    if(emailEl && daysLeft > 0){
-      const exp = expiry.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
-      const suffix = document.getElementById('proExpiryLine');
-      if(!suffix){
-        const line = document.createElement('div');
-        line.id = 'proExpiryLine';
-        line.style.cssText = 'font-size:.72rem;font-weight:800;color:#a5b4fc;margin-top:3px';
-        line.textContent = '👑 PRO · Hết hạn ' + exp;
-        emailEl.insertAdjacentElement('afterend', line);
-      } else { suffix.textContent = '👑 PRO · Hết hạn ' + exp; }
-    }
+    if(!expiry){ return; }
+    _showExpiryLine('PRO');
+    if(daysLeft <= 14) _showRenewCard('199k','399k','PRO','HSK2 + HSK3');
   }
 }
 
@@ -5428,8 +5440,10 @@ function _applyPlusBadge(){
   if(nameEl && !nameEl.querySelector('.pro-badge')){
     const badge = document.createElement('span');
     badge.className = 'pro-badge';
-    badge.textContent = ' 🥈 PLUS';
-    badge.style.cssText = 'font-size:.75rem;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff;padding:2px 8px;border-radius:999px;font-weight:900;margin-left:6px;vertical-align:middle';
+    const _exp = getProExpiry();
+    const _days = _exp ? Math.ceil((_exp - new Date()) / 86400000) : null;
+    badge.textContent = _days !== null ? ` 🥈 PLUS · ${_days}d` : ' 🥈 PLUS';
+    badge.style.cssText = 'font-size:.72rem;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff;padding:2px 8px;border-radius:999px;font-weight:900;margin-left:6px;vertical-align:middle';
     nameEl.appendChild(badge);
   }
 }
@@ -5475,8 +5489,10 @@ function unlockPro(user){
   if(nameEl && !nameEl.querySelector('.pro-badge')){
     const badge = document.createElement('span');
     badge.className = 'pro-badge';
-    badge.textContent = ' 👑 PRO';
-    badge.style.cssText = 'font-size:.75rem;background:linear-gradient(135deg,#FF6B35,#E8502A);color:#fff;padding:2px 8px;border-radius:999px;font-weight:900;margin-left:6px;vertical-align:middle';
+    const _exp = getProExpiry();
+    const _days = _exp ? Math.ceil((_exp - new Date()) / 86400000) : null;
+    badge.textContent = _days !== null ? ` 👑 PRO · ${_days}d` : ' 👑 PRO';
+    badge.style.cssText = 'font-size:.72rem;background:linear-gradient(135deg,#FF6B35,#E8502A);color:#fff;padding:2px 8px;border-radius:999px;font-weight:900;margin-left:6px;vertical-align:middle';
     nameEl.appendChild(badge);
   }
   setTimeout(_updateLibraryLockState, 100);
