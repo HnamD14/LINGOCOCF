@@ -8414,6 +8414,7 @@ async function _loadRealPlayers(page=0){
       xp: p.xp || 0,
       streak: p.streak || 0,
       isMe: p.username === myUser?.username,
+      nameColor: p.nameColor || null,
     }));
     // Nếu có nhiều trang thì load tiếp (tối đa 100 người)
     if(!Array.isArray(data.data) && data.data.hasNext && page === 0){
@@ -8426,6 +8427,7 @@ async function _loadRealPlayers(page=0){
           xp: p.xp || 0,
           streak: p.streak || 0,
           isMe: p.username === myUser?.username,
+          nameColor: p.nameColor || null,
         })));
       }
     }
@@ -8545,8 +8547,7 @@ function _renderBoard(type){
         ${p.emo}
       </div>
       <div class="podium-name" ${(()=>{
-        if(!p.isMe) return '';
-        const nc=localStorage.getItem(uk('lingococ_name_color'));
+        const nc = p.nameColor || (p.isMe ? localStorage.getItem(uk('lingococ_name_color')) : null);
         const gs={gold:'background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',purple:'background:linear-gradient(135deg,#7C3AED,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',red:'background:linear-gradient(135deg,#DC2626,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900'};
         return nc&&gs[nc]?'style="'+gs[nc]+'"':'';
       })()}>${p.isMe ? '🐸 '+p.name : p.name}</div>
@@ -8575,12 +8576,13 @@ function _renderBoard(type){
     const rank = i + 4;
     const row  = document.createElement('div');
     row.className = 'lb-row' + (p.isMe ? ' me' : '');
-    const nameColor = p.isMe ? localStorage.getItem(uk('lingococ_name_color')) : null;
     const nameGradients = {
       gold:   'background:linear-gradient(135deg,#F59E0B,#D97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
       purple: 'background:linear-gradient(135deg,#7C3AED,#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
       red:    'background:linear-gradient(135deg,#DC2626,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:900',
     };
+    // Dùng nameColor từ server (áp cho mọi user), fallback localStorage cho bản thân
+    const nameColor = p.nameColor || (p.isMe ? localStorage.getItem(uk('lingococ_name_color')) : null);
     const nameStyle = nameColor && nameGradients[nameColor] ? 'style="' + nameGradients[nameColor] + '"' : '';
     // Tính avatar trước để tránh nested backtick
     const meAvaHtml = (() => {

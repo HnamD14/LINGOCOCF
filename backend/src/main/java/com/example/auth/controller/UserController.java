@@ -207,6 +207,13 @@ public class UserController {
             row.put("streak",       u.getStreak()       != null ? u.getStreak()       : 0);
             row.put("wordsLearned", u.getWordsLearned() != null ? u.getWordsLearned() : 0);
             row.put("role",         u.getRole().name());
+            // Extract nameColor from shopEquipped (format: "avatarId|nc:color")
+            String nameColor = null;
+            String se = u.getShopEquipped();
+            if (se != null && se.contains("|nc:")) {
+                nameColor = se.substring(se.indexOf("|nc:") + 4);
+            }
+            row.put("nameColor", nameColor);
             board.add(row);
         }
 
