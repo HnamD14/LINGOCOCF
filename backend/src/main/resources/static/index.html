@@ -372,19 +372,25 @@
       <div class="fc-progress"><div class="fc-progress-fill" id="fcFill" style="width:0%"></div></div>
     </div>
   </div>
+  <!-- Flip mode toggle -->
+  <div style="display:flex;justify-content:center;gap:8px;padding:8px 16px 4px">
+    <button id="fcModeZh" onclick="setFcMode('zh')" style="flex:1;max-width:160px;padding:7px 0;border-radius:999px;border:1.5px solid var(--orange);background:var(--orange);color:#fff;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:900;cursor:pointer;transition:all .2s">🀄 Hán tự → Nghĩa</button>
+    <button id="fcModeVi" onclick="setFcMode('vi')" style="flex:1;max-width:160px;padding:7px 0;border-radius:999px;border:1.5px solid var(--orange);background:transparent;color:var(--orange);font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:900;cursor:pointer;transition:all .2s">🇻🇳 Nghĩa → Hán tự</button>
+  </div>
   <div class="fc-body">
     <div class="flashcard" id="flashcard" onclick="flipCard()">
       <div class="flashcard-inner">
         <div class="card-face front">
           <button class="speak-btn" id="speakFront" onclick="event.stopPropagation();speakCurrent()" title="Nghe phát âm">🔊</button>
           <div class="card-hanzi" id="cardHanzi">你好</div>
-          <div class="card-tap-hint">👆 Nhấn để xem nghĩa</div>
+          <div class="card-tap-hint" id="fcTapHint">👆 Nhấn để xem nghĩa</div>
         </div>
         <div class="card-face back">
           <button class="speak-btn" id="speakBack" onclick="event.stopPropagation();speakCurrent()" title="Nghe phát âm">🔊</button>
           <div class="card-pinyin" id="cardPinyin">Nǐ hǎo</div>
           <div class="card-meaning" id="cardMeaning">Xin chào</div>
           <div class="card-example" id="cardExample">你好！我叫小明。<br>Xin chào! Tôi tên Tiểu Minh.</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4);margin-top:8px">👆 Nhấn để lật lại</div>
         </div>
       </div>
     </div>
@@ -4753,12 +4759,20 @@ function loadCard(firstCard){
   setTimeout(()=>{ try{ speakCurrent(); }catch(e){} }, 300);
 }
 function flipCard(){
-  if(state.fcFlipped) return;
-  state.fcFlipped = true;
-  document.getElementById('flashcard').classList.add('flipped');
-  document.getElementById('fcActions').style.display = 'flex';
-  // 🔊 Đọc lại khi lật thẻ
-  setTimeout(() => speakCurrent(), 200);
+  const fc = document.getElementById('flashcard');
+  const fcActions = document.getElementById('fcActions');
+  if(!state.fcFlipped){
+    // Lật sang mặt sau (xem nghĩa)
+    state.fcFlipped = true;
+    fc.classList.add('flipped');
+    fcActions.style.display = 'flex';
+    setTimeout(() => speakCurrent(), 200);
+  } else {
+    // Lật ngược lại mặt trước (Hán tự)
+    state.fcFlipped = false;
+    fc.classList.remove('flipped');
+    fcActions.style.display = 'none';
+  }
 }
 
 // ── Prevent double-press ─────────────────────────────────────────
