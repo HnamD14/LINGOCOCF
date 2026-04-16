@@ -5397,10 +5397,19 @@ function onAuthSuccess(user, token, isNew = false){
   if(user.coins != null){ const lc=getCoins(); if(user.coins>lc) saveCoins(user.coins); }
   // ── Load shop data từ server ──
   if(user.shopOwned)     localStorage.setItem(uk(COIN_OWNED_KEY),     user.shopOwned);
-  // Chỉ overwrite equipped nếu server có giá trị thực (khác 'default')
-  // Tránh server trả về 'default' làm mất avatar đã mặc ở local
-  if(user.shopEquipped && user.shopEquipped !== 'default'){
-    localStorage.setItem(uk(COIN_EQUIPPED_KEY), user.shopEquipped);
+  // Decode shopEquipped: có thể là "avatarId|nc:nameColor"
+  if(user.shopEquipped){
+    const parts = user.shopEquipped.split('|nc:');
+    const avatarId  = parts[0];
+    const nameColor = parts[1] || '';
+    // Chỉ overwrite avatar nếu server có giá trị thực (khác 'default')
+    if(avatarId && avatarId !== 'default'){
+      localStorage.setItem(uk(COIN_EQUIPPED_KEY), avatarId);
+    }
+    // Restore màu tên nếu server có
+    if(nameColor){
+      localStorage.setItem(uk('lingococ_name_color'), nameColor);
+    }
   }
   if(user.shopInventory) localStorage.setItem(uk('lingococ_shop_inventory'), user.shopInventory);
   if(user.wordsLearned != null && user.wordsLearned > 0){ localStorage.setItem(uk(WORDS_KEY),   user.wordsLearned); localStorage.setItem('lc_words',   user.wordsLearned); }
@@ -6617,7 +6626,7 @@ const SHOP_ITEMS = {
 };
 
 function getOwned(){ try{ return JSON.parse(localStorage.getItem(uk(COIN_OWNED_KEY))||'[]'); }catch{ return []; } }
-function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; }
+function getEquipped(){ const v = localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; return v.split('|nc:')[0]; }
 function isOwned(id){ return getOwned().includes(id); }
 
 /* ── Weekly reset helpers ── */
@@ -6646,7 +6655,7 @@ function daysUntilMonday(){
 }
 
 function getOwned(){ try{ return JSON.parse(localStorage.getItem(uk(COIN_OWNED_KEY))||'[]'); }catch{ return []; } }
-function getEquipped(){ return localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; }
+function getEquipped(){ const v = localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default'; return v.split('|nc:')[0]; }
 function isOwned(id){ return getOwned().includes(id); }
 
 /* ── Inventory (consumables chưa dùng) ── */
@@ -6672,10 +6681,15 @@ function getInventoryCount(id){ const e = getInventory().find(i => i.id === id);
 /* ── Sync shop data lên server ── */
 async function syncShopToServer(){
   try {
+    // Encode nameColor vào shopEquipped: "avatarId|nameColor"
+    const equipped = localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default';
+    const nameColor = localStorage.getItem(uk('lingococ_name_color')) || '';
+    const shopEquippedEncoded = nameColor ? `${equipped}|nc:${nameColor}` : equipped;
+
     await api('/api/user/shop','POST',{
       coins:         getCoins(),
       shopOwned:     JSON.stringify(getOwned()),
-      shopEquipped:  localStorage.getItem(uk(COIN_EQUIPPED_KEY)) || 'default',
+      shopEquipped:  shopEquippedEncoded,
       shopInventory: JSON.stringify(getInventory()),
     }, true);
   } catch(e){}
