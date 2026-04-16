@@ -4461,7 +4461,7 @@ let state = {
   fcIdx: 0, fcKnow: 0, fcDontKnow: 0, fcFlipped: false,
   quizIdx: 0, quizCorrect: 0, quizAnswered: false,
   orderCode: null, pollTimer: null,
-  currentTier: 'PLUS',
+  currentTier: 'FREE',
   myUsername: 'Bạn',
 };
 
@@ -8600,7 +8600,7 @@ function switchPayTier(tier){
 }
 
 function openPaymentTier(tier){
-  state.currentTier = tier || 'PLUS';
+  state.currentTier = tier || 'FREE';
   selPlan = state.currentTier + '_3M';
   // Reset về bước 1
   ['payS1','payS2','payS3'].forEach((id,i) => {
@@ -8617,7 +8617,7 @@ function openPaymentTier(tier){
 }
 
 function openPayment(){
-  openPaymentTier(state.currentTier || 'PLUS');
+  openPaymentTier(state.currentTier || 'FREE');
 }
 
 function setPayStep(n){
