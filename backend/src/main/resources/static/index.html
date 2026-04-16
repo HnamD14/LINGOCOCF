@@ -5330,30 +5330,50 @@ function onAuthSuccess(user, token, isNew = false){
   const newUserId = (user.username || user.email || String(user.id) || 'default').toLowerCase().trim();
   const prevUserId = state.userId;
 
-  // Nếu đổi user (login user khác hoặc user mới) → xóa lc_ shared keys
+  // Hàm xóa toàn bộ data local của 1 userId
+  function _clearUserData(uid){
+    if(!uid) return;
+    const prefix = '_' + uid;
+    const toRemove = [];
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.endsWith(prefix)) toRemove.push(k);
+    }
+    toRemove.forEach(k => localStorage.removeItem(k));
+  }
+
+  // Nếu đổi user → xóa lc_ shared keys + KHÔNG xóa data của user mới (chỉ xóa user cũ nếu cần)
   if(prevUserId && prevUserId !== newUserId){
     ['lc_xp','lc_words','lc_correct','lc_total'].forEach(k => localStorage.removeItem(k));
-    // Xoá keys cũ không có per-user suffix (legacy cleanup)
     const oldKeys = [];
     for(let i=0; i<localStorage.length; i++){
       const k = localStorage.key(i);
       if(!k) continue;
-      // Lesson progress cũ không suffix
       if(k.startsWith(LM_PROGRESS_KEY+'_') && !k.includes('@') && !/[a-z_]+\d+$/.test(k)) oldKeys.push(k);
-      // Deck key bare (không suffix) — tránh lấy deck của user khác
       if(k === 'lingococ_mydecks' || k === 'sc_session_saved') oldKeys.push(k);
     }
     oldKeys.forEach(k => localStorage.removeItem(k));
   }
-  // User mới đăng ký → xóa hết lc_ shadow keys
+
+  // User mới đăng ký → xóa TOÀN BỘ data local của userId này (phòng trùng username)
   if(isNew){
     ['lc_xp','lc_words','lc_correct','lc_total'].forEach(k => localStorage.removeItem(k));
-    // Đảm bảo deck list trống hoàn toàn cho account mới
+    _clearUserData(newUserId);
     localStorage.removeItem('lingococ_mydecks');
     localStorage.removeItem('sc_session_saved');
   }
 
+  // ② Set userId TRƯỚC để uk() dùng đúng suffix từ đây trở đi
   state.userId = newUserId;
+
+  // Nếu server nói wordsLearned = 0 → xóa thành tựu local (tránh hiện nhầm data cũ)
+  if(!isNew && (user.wordsLearned == null || user.wordsLearned === 0)){
+    localStorage.removeItem(uk('lingococ_achievements'));
+    localStorage.removeItem(uk('lingococ_words'));
+    localStorage.removeItem(uk('lingococ_correct'));
+    localStorage.removeItem(uk('lingococ_total'));
+  }
+
   // Reset state sạch cho user này
   state.xp = 0;
   state.streak = 0;
