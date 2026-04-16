@@ -306,6 +306,48 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    // GET /api/user/admin/list — danh sách tất cả user cho admin panel
+    @GetMapping("/admin/list")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> adminList(
+            @AuthenticationPrincipal UserDetails ud,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "200") int size) {
+        User me = resolveUser(ud);
+        if (me.getRole() != User.Role.ADMIN)
+            return ResponseEntity.status(403).body(ApiResponse.error("Chỉ admin mới xem được"));
+
+        try {
+            List<User> all = userRepo.findAll();
+            List<Map<String, Object>> items = all.stream()
+                    .sorted((a, b) -> Long.compare(
+                            b.getXp() != null ? b.getXp() : 0L,
+                            a.getXp() != null ? a.getXp() : 0L))
+                    .map(u -> {
+                        Map<String, Object> m = new LinkedHashMap<>();
+                        m.put("username",   u.getUsername());
+                        m.put("fullName",   u.getFullName() != null ? u.getFullName() : u.getUsername());
+                        m.put("email",      u.getEmail());
+                        m.put("role",       u.getRole().name());
+                        // Safe planExpiry — nullable, column may not exist on older DBs
+                        String expiry = null;
+                        try { expiry = u.getPlanExpiry() != null ? u.getPlanExpiry().toString() + "Z" : null; } catch (Exception ignored) {}
+                        m.put("planExpiry",  expiry);
+                        m.put("xp",          u.getXp()           != null ? u.getXp()           : 0L);
+                        m.put("streak",      u.getStreak()        != null ? u.getStreak()       : 0);
+                        m.put("wordsLearned",u.getWordsLearned()  != null ? u.getWordsLearned() : 0);
+                        return m;
+                    }).toList();
+
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("items", items);
+            result.put("total", items.size());
+            return ResponseEntity.ok(ApiResponse.success("OK", result));
+        } catch (Exception e) {
+            log.error("adminList error: {}", e.getMessage());
+            return ResponseEntity.status(500).body(ApiResponse.error("Lỗi tải danh sách user: " + e.getMessage()));
+        }
+    }
+
     // GET /api/user/admin/stats — thống kê tổng quan cho admin dashboard
     @Operation(summary = "Admin dashboard stats")
     @GetMapping("/admin/stats")
@@ -381,6 +423,38 @@ public class UserController {
 
     private long safe(Long v)    { return v == null ? 0L : v; }
     private int  safe(Integer v) { return v == null ? 0  : v; }
+
+    // POST /api/user/admin/set-role  — Admin set role + planExpiry cho user
+    @PostMapping("/admin/set-role")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> adminSetRole(
+            @AuthenticationPrincipal UserDetails ud,
+            @RequestBody Map<String, Object> body) {
+        User me = resolveUser(ud);
+        if (me.getRole() != User.Role.ADMIN)
+            return ResponseEntity.status(403).body(ApiResponse.error("Chỉ admin mới dùng được"));
+
+        String username = (String) body.get("username");
+        String role     = (String) body.get("role");
+        Object monthsObj = body.get("months");
+        int months = monthsObj != null ? Integer.parseInt(monthsObj.toString()) : 0;
+
+        User target = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại: " + username));
+
+        target.setRole(User.Role.valueOf(role.toUpperCase()));
+        if (months > 0) {
+            target.setPlanExpiry(java.time.LocalDateTime.now().plusMonths(months));
+        } else if ("USER".equalsIgnoreCase(role)) {
+            target.setPlanExpiry(null);
+        }
+        userRepo.save(target);
+
+        Map<String, Object> res = new java.util.LinkedHashMap<>();
+        res.put("username",   target.getUsername());
+        res.put("role",       target.getRole().name());
+        res.put("planExpiry", target.getPlanExpiry() != null ? target.getPlanExpiry().toString() : null);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật thành công!", res));
+    }
 
     private UserInfo toInfo(User u) {
         return UserInfo.builder()
