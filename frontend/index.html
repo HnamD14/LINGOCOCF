@@ -3153,7 +3153,21 @@ function showUpgradeOrRenew(userRole){
 
   if(userRole === 'PRO' || userRole === 'ADMIN'){
     state.currentTier = 'PRO';
-    if(!expiry){ return; }
+    if(!expiry){
+      // Không có expiry → duyệt thủ công hoặc ADMIN → hiện "Vĩnh viễn"
+      const emailEl = document.getElementById('profileEmail');
+      if(emailEl){
+        let line = document.getElementById('proExpiryLine');
+        if(!line){
+          line = document.createElement('div');
+          line.id = 'proExpiryLine';
+          line.style.cssText = 'font-size:.72rem;font-weight:800;margin-top:4px';
+          emailEl.insertAdjacentElement('afterend', line);
+        }
+        line.innerHTML = `<span style="color:#6ee7b7">✅ PRO · Vĩnh viễn</span>`;
+      }
+      return;
+    }
     _showExpiryLine('PRO');
     if(daysLeft <= 14) _showRenewCard('199k','399k','PRO','HSK2 + HSK3');
   }
@@ -5233,6 +5247,8 @@ async function doLogin(){
     const {status,data} = await api('/api/auth/login','POST',{username:u,password:p});
     if(status===200 && data.success){
       _autoLoginDone = true;
+      // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
+      localStorage.removeItem(CFG.USER_KEY);
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
@@ -5265,6 +5281,8 @@ async function doRegister(){
     const {status,data} = await api('/api/auth/register','POST',{username:u,email:em,password:pw,fullName:name});
     if((status===200||status===201) && data.success){
       _autoLoginDone = true;
+      // Xóa cache user cũ để tránh lẫn role giữa các tài khoản
+      localStorage.removeItem(CFG.USER_KEY);
       localStorage.setItem(CFG.TOKEN_KEY, data.data.accessToken);
       if(data.data.refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
       localStorage.setItem(CFG.USER_KEY, JSON.stringify(data.data.user));
