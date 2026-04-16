@@ -60,7 +60,7 @@ public class PaymentService {
             throw new IllegalArgumentException("Gói không hợp lệ: " + plan);
 
         User user = userRepo.findByUsername(ud.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         long amount = PLAN_PRICE.get(plan);
         String code = genOrderCode(user.getUsername());

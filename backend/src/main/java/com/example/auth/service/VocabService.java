@@ -64,6 +64,10 @@ public class VocabService {
         List<Long> vocabIds = set.getItems().stream()
                 .map(i -> i.getVocabulary().getId())
                 .collect(Collectors.toList());
+
+        // Bug fix: IN () rỗng là SQL không hợp lệ trên PostgreSQL
+        if (vocabIds.isEmpty()) return List.of();
+
         Map<Long, UserProgress> progressMap = progressRepo
                 .findByUserAndVocabIds(user, vocabIds)
                 .stream()
@@ -120,6 +124,10 @@ public class VocabService {
         }
 
         List<Long> vocabIds = pool.stream().map(Vocabulary::getId).collect(Collectors.toList());
+
+        // Bug fix: IN () rỗng là SQL không hợp lệ trên PostgreSQL
+        if (vocabIds.isEmpty()) return List.of();
+
         Map<Long, UserProgress> progressMap = progressRepo
                 .findByUserAndVocabIds(user, vocabIds)
                 .stream()
