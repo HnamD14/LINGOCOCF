@@ -22,8 +22,8 @@ public class PaymentService {
     /* ══════════════════════════════════════════════
        ⚙ CẤU HÌNH NGÂN HÀNG — SỬA 3 DÒNG NÀY
     ══════════════════════════════════════════════ */
-    public static final String BANK_ID      = "MB";            // Mã ngân hàng (VietQR)
-    public static final String ACCOUNT_NO   = "0936215959";    // ← Số tài khoản của bạn
+    public static final String BANK_ID      = "MB";
+    public static final String ACCOUNT_NO   = "0936215959";       // ← Số tài khoản của bạn
     public static final String ACCOUNT_NAME = "NGUYEN DUY MANH";  // ← Tên chủ TK (HOA, không dấu)
 
     // PLUS: mở HSK2 | PRO: mở HSK2 + HSK3
@@ -43,6 +43,12 @@ public class PaymentService {
     /** Lấy role tương ứng gói nâng cấp */
     private User.Role roleForPlan(String plan) {
         return (plan.startsWith("PLUS")) ? User.Role.PLUS : User.Role.PRO;
+    }
+
+    /** Tính ngày hết hạn theo gói */
+    private java.time.LocalDateTime expiryForPlan(String plan) {
+        int months = plan.endsWith("_1Y") ? 12 : 3;
+        return java.time.LocalDateTime.now().plusMonths(months);
     }
 
     /* ─────────────────────────────────────────────
@@ -160,10 +166,11 @@ public class PaymentService {
 
         User user = p.getUser();
         user.setRole(roleForPlan(p.getPlan()));
+        user.setPlanExpiry(expiryForPlan(p.getPlan()));
         userRepo.save(user);
 
-        log.info("🎉 AUTO CONFIRMED: order={} | user={} → {} | txn={} | amount={}",
-            p.getOrderCode(), user.getUsername(), user.getRole(), txnCode, transferAmount);
+        log.info("🎉 AUTO CONFIRMED: order={} | user={} → {} | expiry={} | txn={} | amount={}",
+            p.getOrderCode(), user.getUsername(), user.getRole(), user.getPlanExpiry(), txnCode, transferAmount);
 
         return Map.of(
             "success",   true,
@@ -190,9 +197,10 @@ public class PaymentService {
 
         User user = p.getUser();
         user.setRole(roleForPlan(p.getPlan()));
+        user.setPlanExpiry(expiryForPlan(p.getPlan()));
         userRepo.save(user);
 
-        log.info("✅ MANUAL CONFIRMED: {} → {} upgraded to {}", id, user.getUsername(), user.getRole());
+        log.info("✅ MANUAL CONFIRMED: {} → {} upgraded to {} | expiry={}", id, user.getUsername(), user.getRole(), user.getPlanExpiry());
         return Map.of(
             "message",  "Xác nhận thành công! " + user.getUsername() + " đã là " + user.getRole().name() + ".",
             "username", user.getUsername()

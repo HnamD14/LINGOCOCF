@@ -110,5 +110,9 @@ public class User {
     @Column(name = "saved_cards_json", columnDefinition = "TEXT")
     private String savedCardsJson;      // JSON: [{hanzi,pinyin,meaning,...}]
 
+    // ── Plan expiry (PLUS / PRO) ──
+    @Column(name = "plan_expiry")
+    private java.time.LocalDateTime planExpiry;   // null = không hết hạn (ADMIN) hoặc chưa mua
+
     public enum Role { USER, PLUS, PRO, ADMIN }
 }

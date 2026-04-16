@@ -35,5 +35,6 @@ public class AuthResponse {
         private String  spinDate;
         private String  customDecksJson;
         private String  savedCardsJson;
+        private String  planExpiry;     // ISO string ngày hết hạn PLUS/PRO, null nếu không có
     }
 }

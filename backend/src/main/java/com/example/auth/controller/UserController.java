@@ -403,6 +403,7 @@ public class UserController {
                 .spinDate(u.getSpinDate()            != null ? u.getSpinDate()      : "")
                 .customDecksJson(u.getCustomDecksJson())
                 .savedCardsJson(u.getSavedCardsJson())
+                .planExpiry(u.getPlanExpiry() != null ? u.getPlanExpiry().toString() + "Z" : null)
                 .build();
     }
 }

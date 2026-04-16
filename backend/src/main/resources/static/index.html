@@ -5396,6 +5396,11 @@ function onAuthSuccess(user, token, isNew = false){
   applyNameGoldBadge();
   setTimeout(grantDailyCoins, 1800);
 
+  // ── Sync planExpiry từ server vào localStorage ──
+  if(user.planExpiry){
+    localStorage.setItem(uk(PRO_EXPIRY_KEY), new Date(user.planExpiry).toISOString());
+  }
+
   // ── Role unlock ──
   if(user.role === 'PRO' || user.role === 'ADMIN') unlockPro(user);
   else if(user.role === 'PLUS') { unlockPlus(); _applyPlusBadge(); }
