@@ -2164,16 +2164,26 @@
      ⑩ ROADMAP SCREEN
 ═══════════════════════════════════════════════ -->
 <div class="screen" id="roadmapScreen">
+  <!-- Starfield background -->
+  <div class="lm-starfield" id="lmStarfield"></div>
+  <!-- Mountain silhouette -->
+  <svg class="lm-mountains" viewBox="0 0 390 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 200 L50 90 L110 140 L170 50 L230 120 L290 65 L350 105 L390 85 L390 200Z" fill="#fff"/>
+  </svg>
+  <!-- Topbar -->
   <div class="lm-topbar">
-    <div style="font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;color:#fff">🗺️ Bản đồ học tập</div>
+    <div class="lm-title">🗺️ Bản đồ học tập</div>
     <div style="display:flex;gap:8px">
-      <div class="lm-pill" onclick="openStreakModal()">🔥 <span id="lm_streak">0</span></div>
-      <div class="lm-pill">⭐ <span id="lm_xp">0</span></div>
-      <div class="lm-pill" onclick="openStoneModal()" style="display:flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 40 40"><defs><radialGradient id="lmg" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#EDE9FE"/><stop offset="55%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#1E0A47"/></radialGradient></defs><polygon points="20,2 32,10 36,24 20,38 4,24 8,10" fill="url(#lmg)" stroke="#A78BFA" stroke-width="1.5"/><ellipse cx="15" cy="14" rx="4" ry="2.5" fill="#fff" opacity=".4" transform="rotate(-20,15,14)"/></svg> <span id="lm_hearts">5</span></div>
+      <div class="lm-stat-pill" onclick="openStreakModal()">🔥 <span id="lm_streak">0</span></div>
+      <div class="lm-stat-pill">⭐ <span id="lm_xp">0</span></div>
+      <div class="lm-stat-pill" onclick="openStoneModal()" style="display:flex;align-items:center;gap:5px">
+        <svg width="15" height="15" viewBox="0 0 40 40"><defs><radialGradient id="lmg2" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#EDE9FE"/><stop offset="55%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#1E0A47"/></radialGradient></defs><polygon points="20,2 32,10 36,24 20,38 4,24 8,10" fill="url(#lmg2)" stroke="#A78BFA" stroke-width="1.5"/></svg>
+        <span id="lm_hearts">5</span>
+      </div>
     </div>
   </div>
   <div class="lm-body" id="lmBody">
-    <div style="text-align:center;padding:40px 0;color:var(--gray-400);font-size:.88rem;font-weight:700">⏳ Đang tải bản đồ...</div>
+    <div style="text-align:center;padding:40px 0;color:rgba(255,255,255,.4);font-size:.88rem;font-weight:700">⏳ Đang tải bản đồ...</div>
   </div>
   <div class="bottom-nav">
     <button class="nav-item" onclick="goTab('homeScreen',this)"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3L21 10.5V20C21 20.6 20.6 21 20 21H15V16H9V21H4C3.4 21 3 20.6 3 20V10.5Z" fill="#FB923C" stroke="#EA580C" stroke-width="1"/><rect x="9" y="16" width="6" height="5" rx="1" fill="#92400E"/><rect x="15.5" y="6" width="3" height="5" rx="0.8" fill="#C2410C"/></svg></div>Trang chủ</button>
@@ -11947,15 +11957,26 @@ function renderLearningMap(){
   document.getElementById('lm_xp').textContent = (state.xp||0).toLocaleString('vi-VN');
   document.getElementById('lm_hearts').textContent = state.hearts ?? 5;
 
+  // Init starfield once
+  const sf = document.getElementById('lmStarfield');
+  if(sf && !sf._done){
+    sf._done = true;
+    for(let i=0;i<70;i++){
+      const s = document.createElement('div');
+      s.className = 'lm-star';
+      const sz = Math.random()*2.2+.4;
+      s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+2).toFixed(1)}s;--del:-${(Math.random()*4).toFixed(1)}s`;
+      sf.appendChild(s);
+    }
+  }
+
   const body = document.getElementById('lmBody');
   if(!body) return;
 
-  // Vị trí x cho từng bài trong unit (% từ trái, 0-100)
-  // Tạo đường cong uốn lượn tự nhiên, không đối xứng
   const PATHS = [
-    [50, 25, 70, 50, 30, 75, 50, 25],  // Unit 1: 8 bài
-    [50, 72, 30, 55, 75, 50],           // Unit 2: 6 bài
-    [50, 28, 65, 38, 50],               // Unit 3: 5 bài
+    [50, 25, 70, 50, 30, 75, 50, 25],
+    [50, 72, 30, 55, 75, 50],
+    [50, 28, 65, 38, 50],
   ];
 
   let html = '';
@@ -11964,106 +11985,114 @@ function renderLearningMap(){
     const unlocked = lmIsUnitUnlocked(unit);
     const firstActiveIdx = lmGetFirstActiveLessonIdx(unit.lessons);
     const allDone = firstActiveIdx >= unit.lessons.length;
+    const doneCount = unit.lessons.filter((_,i) => i < firstActiveIdx).length;
     const xPos = PATHS[unitIdx] || PATHS[0];
 
-    // Unit header card
-    html += `<div class="lm2-unit-header" style="--uc:${unit.color}">
-      <div class="lm2-unit-left">
-        <div class="lm2-unit-ico">${unit.icon}</div>
-        <div>
-          <div class="lm2-unit-name">${unit.name}</div>
-          <div class="lm2-unit-sub">${unit.lessons.length} bài · ${unit.badge}</div>
-        </div>
+    // ── Unit Banner (Silk Scroll Style) ──
+    html += `<div class="lm-unit-banner-new" style="--ub1:${unit.color};--ub2:${unit.colorDark}">
+      <div class="lm-unit-banner-bg"></div>
+      <div class="lm-unit-ico-new">${unit.icon}</div>
+      <div class="lm-unit-info-new">
+        <div class="lm-unit-name-new">${unit.name}</div>
+        <div class="lm-unit-sub-new">${unit.lessons.length} bài · ${unit.badge}</div>
+        <div class="lm-unit-prog-bar"><div class="lm-unit-prog-fill" style="width:${Math.round(doneCount/unit.lessons.length*100)}%"></div></div>
       </div>
-      <div class="lm2-unit-prog">${allDone?'✅':firstActiveIdx+'/'+unit.lessons.length}</div>
+      <div class="lm-unit-badge-new">${allDone?'✅':doneCount+'/'+unit.lessons.length}</div>
     </div>`;
 
     if(!unlocked){
-      html += `<div class="lm2-locked-zone">
-        <div class="lm2-locked-fog"></div>
-        <div class="lm2-locked-content">
-          <div style="font-size:2.5rem;margin-bottom:8px">🔒</div>
-          <div style="font-size:.9rem;font-weight:800;color:var(--gray-700)">Cần ${unit.requiredRole} để mở</div>
-          <button onclick="goScreen('profileScreen')" style="margin-top:12px;padding:9px 20px;background:${unit.color};color:#fff;border:none;border-radius:999px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:900;cursor:pointer">Nâng cấp →</button>
-        </div>
+      html += `<div class="lm-locked-zone-new">
+        <div class="lm-locked-ico">🔒</div>
+        <div class="lm-locked-txt">Cần ${unit.requiredRole||unit.badge} để mở</div>
+        <button onclick="goScreen('profileScreen')" class="lm-locked-btn-new">Nâng cấp →</button>
       </div>`;
       return;
     }
 
-    // SVG path connecting all nodes
-    const W = 320; // viewport width
-    const NODE_H = 100; // height per node step
-    const totalH = unit.lessons.length * NODE_H + 20;
-    const nodeR = 36;
+    const W = 320;
+    const NODE_H = 110;
+    const totalH = unit.lessons.length * NODE_H + 40;
 
-    // Build SVG path points
     const pts = unit.lessons.map((l,i) => ({
       x: Math.round((xPos[i]||50) / 100 * W),
-      y: Math.round(40 + i * NODE_H)
+      y: Math.round(50 + i * NODE_H)
     }));
 
-    // Smooth bezier path
-    let pathD = `M ${pts[0].x} ${pts[0].y}`;
+    // Full track path
+    let trackD = `M ${pts[0].x} ${pts[0].y}`;
     for(let i=1;i<pts.length;i++){
       const p0=pts[i-1], p1=pts[i];
-      const cy0=p0.y+(p1.y-p0.y)*0.4;
-      const cy1=p0.y+(p1.y-p0.y)*0.6;
-      pathD += ` C ${p0.x} ${cy0}, ${p1.x} ${cy1}, ${p1.x} ${p1.y}`;
+      const cy0=p0.y+(p1.y-p0.y)*.35, cy1=p0.y+(p1.y-p0.y)*.65;
+      trackD += ` C ${p0.x} ${cy0}, ${p1.x} ${cy1}, ${p1.x} ${p1.y}`;
     }
 
-    // Completed path (up to active node)
+    // Done path
     const doneUpTo = Math.min(firstActiveIdx, pts.length-1);
-    let donePath = `M ${pts[0].x} ${pts[0].y}`;
+    let doneD = `M ${pts[0].x} ${pts[0].y}`;
     for(let i=1;i<=doneUpTo;i++){
       const p0=pts[i-1], p1=pts[i];
-      const cy0=p0.y+(p1.y-p0.y)*0.4;
-      const cy1=p0.y+(p1.y-p0.y)*0.6;
-      donePath += ` C ${p0.x} ${cy0}, ${p1.x} ${cy1}, ${p1.x} ${p1.y}`;
+      const cy0=p0.y+(p1.y-p0.y)*.35, cy1=p0.y+(p1.y-p0.y)*.65;
+      doneD += ` C ${p0.x} ${cy0}, ${p1.x} ${cy1}, ${p1.x} ${p1.y}`;
     }
 
-    html += `<div class="lm2-map-wrap" style="height:${totalH}px">
-      <svg class="lm2-svg" viewBox="0 0 ${W} ${totalH}" preserveAspectRatio="none">
-        <!-- Gray track -->
-        <path d="${pathD}" fill="none" stroke="#E5E7EB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Colored progress -->
-        ${doneUpTo>0?`<path d="${donePath}" fill="none" stroke="${unit.color}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>`:'' }
+    html += `<div class="lm-map-wrap-new" style="height:${totalH}px">
+      <svg class="lm-map-svg-new" viewBox="0 0 ${W} ${totalH}" preserveAspectRatio="none">
+        <defs>
+          <filter id="glow${unitIdx}">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Base track -->
+        <path d="${trackD}" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="8" stroke-linecap="round"/>
+        <!-- Dashed overlay -->
+        <path d="${trackD}" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 8"/>
+        <!-- Done glow -->
+        ${doneUpTo>0?`<path d="${doneD}" fill="none" stroke="${unit.color}" stroke-width="10" stroke-linecap="round" opacity=".25" filter="url(#glow${unitIdx})"/>
+        <path d="${doneD}" fill="none" stroke="${unit.color}" stroke-width="5" stroke-linecap="round" opacity=".9"/>`:''
+        }
       </svg>`;
 
-    // Render nodes as absolute-positioned elements
+    // Nodes
     unit.lessons.forEach((lesson, i) => {
       const done = lmGetDone(lesson.id);
       const isActive = i === firstActiveIdx;
       const isLocked = i > firstActiveIdx;
+      const isCheckpoint = lesson.isCheckpoint;
       const px = pts[i].x, py = pts[i].y;
 
-      const bgColor = done ? unit.color : isActive ? 'var(--orange)' : '#E5E7EB';
-      const borderColor = done ? unit.colorDark : isActive ? '#c94e22' : '#D1D5DB';
-      const textColor = isLocked ? 'var(--gray-400)' : '#fff';
+      let nodeClass = 'lm-node-new';
+      if(done)        nodeClass += ' done';
+      else if(isActive) nodeClass += ' active';
+      else if(isLocked) nodeClass += ' locked';
+      if(isCheckpoint && !done) nodeClass += ' checkpoint';
+
       const ico = done ? '✓' : isLocked ? '🔒' : lesson.icon;
-      const glow = isActive ? `box-shadow:0 0 0 6px rgba(255,107,53,.25),0 4px 16px rgba(255,107,53,.4)` : done ? `box-shadow:0 2px 8px rgba(0,0,0,.12)` : '';
-      const pulse = isActive ? 'lm2-pulse' : '';
-      const onclick = isLocked ? `showToast('🔒 Hoàn thành bài trước!')` : `lmStartLesson('${unit.id}','${lesson.id}',${unitIdx},${i})`;
+      const labelAbove = i >= unit.lessons.length/2;
+      const labelY = labelAbove ? py-42 : py+50;
+      const labelColor = done ? unit.color : isActive ? '#FF9A3C' : 'rgba(255,255,255,.3)';
+      const onclick = isLocked
+        ? `showToast('🔒 Hoàn thành bài trước!')`
+        : `lmStartLesson('${unit.id}','${lesson.id}',${unitIdx},${i})`;
 
-      // Label position: above if bottom half, below if top half
-      const labelTop = i < unit.lessons.length/2;
-
-      html += `<div class="lm2-node ${pulse}" style="left:${px}px;top:${py}px;background:${bgColor};border-color:${borderColor};${glow}" onclick="${onclick}">
-        <div class="lm2-node-ico" style="color:${isLocked?'#9CA3AF':'#fff'}">${ico}</div>
-        ${isActive && !done ? '<div class="lm2-node-pulse-ring"></div>' : ''}
+      html += `
+      <div class="${nodeClass}" style="left:${px}px;top:${py}px" onclick="${onclick}">
+        <div class="lm-node-ring-new"></div>
+        <div class="lm-node-core-new">${ico}</div>
       </div>
-      <div class="lm2-label" style="left:${px}px;top:${labelTop ? py+46 : py-36}px;color:${isLocked?'var(--gray-400)':isActive?'var(--orange)':done?unit.color:'var(--gray-500)'}">
-        ${lesson.name}${lesson.isCheckpoint?' ⚡':''}
+      <div class="lm-node-label-new" style="left:${px}px;top:${labelY}px;color:${labelColor}">
+        ${lesson.name}${isCheckpoint?' ⚡':''}
       </div>`;
     });
 
     html += `</div>`;
 
-    // Bonus row sau unit hoàn thành
+    // Bonus row
     if(allDone){
-      html+=`<div class="lm2-bonus-row">
-        <div class="lm2-bonus" onclick="startMatchingGame()">🎯<span>Nối cặp</span></div>
-        <div class="lm2-bonus" onclick="startSpeedRound()">⚡<span>Tốc độ</span></div>
-        <div class="lm2-bonus" onclick="startListeningLab()">🎧<span>Nghe</span></div>
+      html += `<div class="lm-bonus-row-new">
+        <div class="lm-bonus-new" onclick="startMatchingGame()"><span>🎯</span><span>Nối cặp</span></div>
+        <div class="lm-bonus-new" onclick="startSpeedRound()"><span>⚡</span><span>Tốc độ</span></div>
+        <div class="lm-bonus-new" onclick="startListeningLab()"><span>🎧</span><span>Nghe</span></div>
       </div>`;
     }
   });
