@@ -68,6 +68,12 @@ public class AuthService {
                 .orElse(null);
         if (user == null) { log.info("🔐 Forgot password requested for unknown email"); return; }
 
+        // Kiểm tra Resend API key đã cấu hình chưa
+        if (!emailService.isConfigured()) {
+            log.error("❌ RESEND_API_KEY chưa cấu hình — không thể gửi email reset password!");
+            throw new IllegalStateException("Hệ thống email chưa được cấu hình. Vui lòng liên hệ admin.");
+        }
+
         // Tạo token ngẫu nhiên 32 ký tự + set expiry 1 giờ
         String token = UUID.randomUUID().toString().replace("-", "");
         user.setResetToken(token);

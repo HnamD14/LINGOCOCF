@@ -24,9 +24,19 @@ spring:
       hibernate:
         format_sql: false
 
-  # Không dùng SMTP nữa — email gửi qua Resend HTTP API
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
+  # Gmail SMTP
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 jwt:
   secret:     ${JWT_SECRET}
@@ -45,10 +55,7 @@ rate-limit:
 sepay:
   webhook-secret: ${SEPAY_WEBHOOK_SECRET:YOUR_SEPAY_WEBHOOK_SECRET_HERE}
 
-# ── Resend Email HTTP API (thay thế SMTP) ──────────────────────────
-resend:
-  api-key: ${RESEND_API_KEY:}
-  from:    ${MAIL_FROM:onboarding@resend.dev}
+# ── Email đã cấu hình qua spring.mail ở trên ──
 
 # ── Anthropic Claude AI ────────────────────────────────────────────
 anthropic:

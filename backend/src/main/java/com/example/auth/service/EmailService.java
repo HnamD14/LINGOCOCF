@@ -1,38 +1,39 @@
 package com.example.auth.service;
 
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.logging.Logger;
-
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class EmailService {
 
-    private static final Logger log = Logger.getLogger(EmailService.class.getName());
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final JavaMailSender mailSender;
 
-    @Value("${resend.api-key:}")
-    private String resendApiKey;
-
-    @Value("${resend.from:onboarding@resend.dev}")
+    @Value("${spring.mail.username:}")
     private String fromEmail;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    public boolean isConfigured() {
+        return fromEmail != null && !fromEmail.isBlank();
+    }
+
     @Async
     public void sendResetPasswordEmail(String toEmail, String username, String resetToken) {
-        String resetLink = frontendUrl + "/index.html?token=" + resetToken;
+        String resetLink = frontendUrl + "/?token=" + resetToken;
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
             <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
               <div style="max-width:520px;margin:auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
-                <div style="background:linear-gradient(135deg,#6C63FF,#48BB78);padding:30px;text-align:center">
+                <div style="background:linear-gradient(135deg,#FF6B35,#F59E0B);padding:30px;text-align:center">
                   <h1 style="color:#fff;margin:0;font-size:26px">🐸 LingoCóc</h1>
                   <p style="color:rgba(255,255,255,.85);margin:6px 0 0">Nền tảng học từ vựng tiếng Trung</p>
                 </div>
@@ -40,12 +41,12 @@ public class EmailService {
                   <h2 style="color:#333;margin-top:0">Xin chào, %s! 👋</h2>
                   <p style="color:#555;line-height:1.6">Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
                   <div style="text-align:center;margin:30px 0">
-                    <a href="%s" style="background:linear-gradient(135deg,#6C63FF,#48BB78);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;display:inline-block">
+                    <a href="%s" style="background:linear-gradient(135deg,#FF6B35,#F59E0B);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;display:inline-block">
                       🔑 Đặt lại mật khẩu
                     </a>
                   </div>
-                  <p style="color:#888;font-size:13px">Hoặc copy link này:<br>
-                    <span style="color:#6C63FF;word-break:break-all">%s</span>
+                  <p style="color:#888;font-size:13px">Hoặc copy link này vào trình duyệt:<br>
+                    <span style="color:#FF6B35;word-break:break-all">%s</span>
                   </p>
                   <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
                   <p style="color:#aaa;font-size:12px;margin:0">
@@ -59,18 +60,19 @@ public class EmailService {
               </div>
             </body></html>
             """.formatted(username, resetLink, resetLink);
+
         sendHtml(toEmail, "🔐 Đặt lại mật khẩu LingoCóc", html);
-        log.info("📧 Reset email sent to: " + toEmail);
+        log.info("📧 Reset email sent to: {}", toEmail);
     }
 
     @Async
     public void sendStreakReminderEmail(String toEmail, String username, int currentStreak) {
-        String studyLink = frontendUrl + "/index.html";
+        String studyLink = frontendUrl + "/";
         String urgencyMsg;
         String urgencyColor;
         if (currentStreak == 0) {
             urgencyMsg = "Bắt đầu chuỗi ngày học hôm nay!";
-            urgencyColor = "#6C63FF";
+            urgencyColor = "#FF6B35";
         } else if (currentStreak < 7) {
             urgencyMsg = "Cóc đang canh — " + currentStreak + " ngày streak sắp bay màu!";
             urgencyColor = "#F59E0B";
@@ -98,54 +100,30 @@ public class EmailService {
                       🐸 Học ngay — 5 phút thôi!
                     </a>
                   </div>
-                  <p style="color:#bbb;font-size:11px;text-align:center">
-                    Tắt nhắc nhở trong phần Cài đặt hồ sơ.
-                  </p>
                 </div>
               </div>
             </body></html>
             """.formatted(username, urgencyColor, currentStreak, urgencyMsg, studyLink);
+
         sendHtml(toEmail, "🔥 " + (currentStreak > 0 ? currentStreak + " ngày streak" : "Bắt đầu streak") + " — học 5 phút thôi!", html);
-        log.info("📧 Streak reminder sent to: " + toEmail + " (streak=" + currentStreak + ")");
     }
 
     public void sendHtml(String toEmail, String subject, String htmlBody) {
-        if (resendApiKey == null || resendApiKey.isBlank()) {
-            log.warning("⚠️ RESEND_API_KEY chưa được cấu hình — bỏ qua gửi email");
+        if (!isConfigured()) {
+            log.warn("⚠️ MAIL_USERNAME chưa cấu hình — bỏ qua gửi email tới {}", toEmail);
             return;
         }
         try {
-            String escaped = htmlBody
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "")
-                .replace("\t", "\\t");
-
-            String json = String.format(
-                "{\"from\":\"%s\",\"to\":[\"%s\"],\"subject\":\"%s\",\"html\":\"%s\"}",
-                fromEmail,
-                toEmail,
-                subject.replace("\"", "\\\""),
-                escaped
-            );
-
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.resend.com/emails"))
-                .header("Authorization", "Bearer " + resendApiKey)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                log.info("✅ Email sent via Resend to: " + toEmail);
-            } else {
-                log.severe("❌ Resend error " + response.statusCode() + ": " + response.body());
-            }
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+            log.info("✅ Email sent to: {}", toEmail);
         } catch (Exception e) {
-            log.severe("❌ Failed to send email to " + toEmail + ": " + e.getMessage());
+            log.error("❌ Failed to send email to {}: {}", toEmail, e.getMessage());
         }
     }
 }
