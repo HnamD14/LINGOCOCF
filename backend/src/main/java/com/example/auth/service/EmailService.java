@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -23,12 +22,15 @@ public class EmailService {
     private String frontendUrl;
 
     public boolean isConfigured() {
-        return fromEmail != null && !fromEmail.isBlank();
+        boolean ok = fromEmail != null && !fromEmail.isBlank();
+        if (!ok) log.warn("⚠️ spring.mail.username (MAIL_USERNAME) chưa được cấu hình!");
+        return ok;
     }
 
-    @Async
     public void sendResetPasswordEmail(String toEmail, String username, String resetToken) {
         String resetLink = frontendUrl + "/?token=" + resetToken;
+        log.info("📧 Đang gửi reset email tới {} | link: {}", toEmail, resetLink);
+
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
             <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
@@ -62,24 +64,17 @@ public class EmailService {
             """.formatted(username, resetLink, resetLink);
 
         sendHtml(toEmail, "🔐 Đặt lại mật khẩu LingoCóc", html);
-        log.info("📧 Reset email sent to: {}", toEmail);
     }
 
-    @Async
     public void sendStreakReminderEmail(String toEmail, String username, int currentStreak) {
         String studyLink = frontendUrl + "/";
-        String urgencyMsg;
-        String urgencyColor;
-        if (currentStreak == 0) {
-            urgencyMsg = "Bắt đầu chuỗi ngày học hôm nay!";
-            urgencyColor = "#FF6B35";
-        } else if (currentStreak < 7) {
-            urgencyMsg = "Cóc đang canh — " + currentStreak + " ngày streak sắp bay màu!";
-            urgencyColor = "#F59E0B";
-        } else {
-            urgencyMsg = "🔥 " + currentStreak + " ngày streak — đừng để đổ sông!";
-            urgencyColor = "#EF4444";
-        }
+        String urgencyMsg = currentStreak == 0
+            ? "Bắt đầu chuỗi ngày học hôm nay!"
+            : currentStreak < 7
+                ? "Cóc đang canh — " + currentStreak + " ngày streak sắp bay màu!"
+                : "🔥 " + currentStreak + " ngày streak — đừng để đổ sông!";
+        String urgencyColor = currentStreak == 0 ? "#FF6B35" : currentStreak < 7 ? "#F59E0B" : "#EF4444";
+
         String html = """
             <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"></head>
             <body style="font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px">
@@ -110,7 +105,7 @@ public class EmailService {
 
     public void sendHtml(String toEmail, String subject, String htmlBody) {
         if (!isConfigured()) {
-            log.warn("⚠️ MAIL_USERNAME chưa cấu hình — bỏ qua gửi email tới {}", toEmail);
+            log.error("❌ Không gửi email — MAIL_USERNAME chưa cấu hình trong Railway Variables!");
             return;
         }
         try {
@@ -121,9 +116,10 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
             mailSender.send(message);
-            log.info("✅ Email sent to: {}", toEmail);
+            log.info("✅ Email đã gửi thành công tới: {}", toEmail);
         } catch (Exception e) {
-            log.error("❌ Failed to send email to {}: {}", toEmail, e.getMessage());
+            log.error("❌ Lỗi gửi email tới {}: {} | Nguyên nhân: {}", toEmail, e.getMessage(),
+                e.getCause() != null ? e.getCause().getMessage() : "unknown");
         }
     }
 }
