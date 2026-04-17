@@ -161,6 +161,7 @@ public class AuthService {
                         .xp(user.getXp() != null ? user.getXp() : 0L)
                         .streak(user.getStreak() != null ? user.getStreak() : 0)
                         .wordsLearned(user.getWordsLearned() != null ? user.getWordsLearned() : 0)
+                        .lastStudyDate(user.getLastStudyDate() != null ? user.getLastStudyDate() : "")
                         .correctAnswers(user.getCorrectAnswers() != null ? user.getCorrectAnswers() : 0)
                         .totalAnswers(user.getTotalAnswers() != null ? user.getTotalAnswers() : 0)
                         .weeklyXp(user.getWeeklyXp() != null ? user.getWeeklyXp() : 0L)

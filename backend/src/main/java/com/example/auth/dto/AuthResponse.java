@@ -20,6 +20,7 @@ public class AuthResponse {
         private Long    xp;
         private Integer streak;
         private Integer wordsLearned;
+        private String  lastStudyDate;  // YYYY-MM-DD — để frontend biết đã học hôm nay chưa
         private Integer correctAnswers;
         private Integer totalAnswers;
         private Long    weeklyXp;

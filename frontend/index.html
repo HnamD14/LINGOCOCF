@@ -5400,6 +5400,17 @@ function onAuthSuccess(user, token, isNew = false){
   // ② Seed stats từ server data ngay lập tức (nếu có) — không cần chờ syncStatsFromServer
   if(user.xp          != null && user.xp          > 0){ state.xp     = user.xp;     localStorage.setItem(uk(XP_KEY),      user.xp);      localStorage.setItem('lc_xp', user.xp); }
   if(user.streak       != null && user.streak       > 0){ state.streak  = user.streak;  localStorage.setItem(uk(STREAK_KEY),  user.streak); }
+
+  // ③ QUAN TRỌNG: Khôi phục studiedToday từ server hoặc localStorage
+  // Tránh bug: logout rồi login lại trong cùng ngày vẫn tính thêm streak
+  const _today = new Date().toISOString().slice(0,10);
+  const _lastDayServer = user.lastStudyDate || '';
+  const _lastDayLocal  = localStorage.getItem(uk(LASTDAY_KEY)) || '';
+  const _studiedToday  = (_lastDayServer === _today) || (_lastDayLocal === _today);
+  if(_studiedToday){
+    state.studiedToday = true;
+    localStorage.setItem(uk(LASTDAY_KEY), _today); // đảm bảo local cũng ghi đúng
+  }
   // Hearts: trust server hoàn toàn khi login — KHÔNG để loadHearts() ghi đè
   if(!isUnlimitedHearts()){
     const serverHearts = (user.hearts != null) ? user.hearts : 5;
